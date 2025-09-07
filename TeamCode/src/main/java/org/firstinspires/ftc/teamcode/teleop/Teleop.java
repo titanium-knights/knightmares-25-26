@@ -2,20 +2,20 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import static java.lang.Thread.sleep;
 
-import com.acmerobotics.dashboard.config.Config;
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.utilities.Intake;
-import org.firstinspires.ftc.teamcode.utilities.Rotator;
+// import org.firstinspires.ftc.teamcode.utilities.Rotator;
 
 import org.firstinspires.ftc.teamcode.utilities.SimpleMecanumDrive;
 
-@Config
+@Configurable
 @TeleOp(name="DriveTrain Teleop")
 public class Teleop extends OpMode {
     Intake intake;
-    Rotator rotator;
+    // Rotator rotator;
     SimpleMecanumDrive drive;
 
     final double normalPower = 0.9;
@@ -47,8 +47,8 @@ public class Teleop extends OpMode {
         this.intakeButton = ButtonPressState.UNPRESSED;
         this.ultimateButton = ButtonPressState.UNPRESSED;
 
-        this.rotator = new Rotator(hardwareMap, telemetry);
-        this.intake = new Intake(hardwareMap, telemetry);
+        // this.rotator = new Rotator(hardwareMap, telemetry);
+        this.intake = new Intake(hardwareMap);
     }
 
     @Override
@@ -79,7 +79,11 @@ public class Teleop extends OpMode {
         }
 
         if (gamepad1.x) {
-            intake.takeIn();
+            intake.runMotor();
+        }
+
+        if (gamepad1.y) {
+            intake.runServo();
         }
 
 
