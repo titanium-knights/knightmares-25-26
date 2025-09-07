@@ -6,6 +6,9 @@
 
 buildscript {
     repositories {
+        maven {
+            url = "https://mymaven.bylazar.com/releases"
+        }
         mavenCentral()
         google()
     }

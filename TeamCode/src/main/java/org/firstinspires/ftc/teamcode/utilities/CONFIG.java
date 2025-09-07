@@ -10,17 +10,9 @@ public class CONFIG {
     public static String BACK_LEFT = "bl"; // 2
     public static String FRONT_LEFT = "fl"; // 3
 
-    //slide motor
-    public static String slide1 = "slides1";
-    public static String slide2 = "slides2";
-    public static String slideRot = "slidesRot";
-
-    public static String pullUpMotor1 = "pl1";
-    // public static String pullUpMotor2 = "pl2";
-
     //claw servo
     // public static String clawMotor = "cm";
-    public static String claw = "claw";
+    public static String intake = "in";
     //latch servo
-    public static String clawRotator = "clawRotator";
+    public static String rotator = "rot";
 }
