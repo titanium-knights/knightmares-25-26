@@ -9,14 +9,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.utilities.Intake;
 // import org.firstinspires.ftc.teamcode.utilities.Rotator;
 
-import org.firstinspires.ftc.teamcode.utilities.SimpleMecanumDrive;
+//import org.firstinspires.ftc.teamcode.utilities.SimpleMecanumDrive;
 
 @Configurable
 @TeleOp(name="DriveTrain Teleop")
 public class Teleop extends OpMode {
     Intake intake;
     // Rotator rotator;
-    SimpleMecanumDrive drive;
+//    SimpleMecanumDrive drive;
 
     final double normalPower = 0.9;
 
@@ -42,7 +42,7 @@ public class Teleop extends OpMode {
     ElapsedTime runtime = new ElapsedTime();
     @Override
     public void init() {
-        this.drive = new SimpleMecanumDrive(hardwareMap);
+//        this.drive = new SimpleMecanumDrive(hardwareMap);
         this.rotatorButton = ButtonPressState.UNPRESSED;
         this.intakeButton = ButtonPressState.UNPRESSED;
         this.ultimateButton = ButtonPressState.UNPRESSED;
@@ -98,7 +98,7 @@ public class Teleop extends OpMode {
 
         //Notation of a ? b : c means if a is true do b, else do c.
         double multiplier = normalPower;
-        drive.move(-x * multiplier, y * multiplier, -turn * multiplier);
+//        drive.move(-x * multiplier, y * multiplier, -turn * multiplier);
     }
 
 }
