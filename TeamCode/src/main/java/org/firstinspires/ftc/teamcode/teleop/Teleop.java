@@ -24,6 +24,7 @@ public class Teleop extends OpMode {
     public float stick_margin = 0.7f;
 
     public boolean intakeState = false;
+    public boolean shootState = false;
 
     enum ButtonPressState {
         PRESSED_GOOD, //the first time we see the button pressed
@@ -31,12 +32,14 @@ public class Teleop extends OpMode {
         UNPRESSED // its not pressed
     }
     ButtonPressState intakeButton;
+    ButtonPressState shootButton;
     ButtonPressState rotatorButton;
     ButtonPressState ultimateButton;
 
     boolean slowMode = false;
     double time;
     int autonAction = 0;
+    boolean intakeRunning = false;
 
 
     ElapsedTime runtime = new ElapsedTime();
@@ -45,6 +48,7 @@ public class Teleop extends OpMode {
 //        this.drive = new SimpleMecanumDrive(hardwareMap);
         this.rotatorButton = ButtonPressState.UNPRESSED;
         this.intakeButton = ButtonPressState.UNPRESSED;
+        this.shootButton = ButtonPressState.UNPRESSED;
         this.ultimateButton = ButtonPressState.UNPRESSED;
 
         // this.rotator = new Rotator(hardwareMap, telemetry);
@@ -54,37 +58,49 @@ public class Teleop extends OpMode {
     @Override
     public void loop() {
 
-
-
-//        DRIVETRAIN TELEMETRY
-//        telemetry.addLine(String.valueOf(drive.getfl()) + "get front left");
-//        telemetry.addLine(String.valueOf(drive.getbr()) + "get back right");
-//        telemetry.addLine(String.valueOf(drive.getfr()) + "get front right");
-//        telemetry.addLine(String.valueOf(drive.getbl()) + "get back left");
-//        telemetry.update();
-
         //DRIVE
         float x = gamepad2.left_stick_x;
         float y = gamepad2.left_stick_y;
         float turn = gamepad2.right_stick_x;
-        if (slowMode) {
-            telemetry.addLine("slowmode");
-            float slowx = (float)0.4*x;
-            float slowy = (float)0.4*y;
-            stick_margin = 0.3f;
-            move(slowx, slowy, turn);
+        stick_margin = 0.1f;
+        move(x, y, turn);
+// INTAKE STUFF
+
+        if (gamepad1.x && !intakeState && (intakeButton == ButtonPressState.UNPRESSED)) {
+            intakeButton = ButtonPressState.PRESSED_GOOD;
+            intakeState = true;
+            intake.takeIn();
+        } else if (gamepad1.x && intakeState && (intakeButton == ButtonPressState.UNPRESSED)) {
+            intakeState = false;
+            intakeButton = ButtonPressState.PRESSED_GOOD;
+            intake.stopIntake();
         } else {
-            stick_margin = 0.1f;
-            move(x, y, turn);
+            intakeButton = ButtonPressState.UNPRESSED;
+        }
+        // shoot
+        if (gamepad1.b && !shootState && (shootButton == ButtonPressState.UNPRESSED)) {
+            shootButton = ButtonPressState.PRESSED_GOOD;
+            shootState = true;
+            if (!intakeRunning) {
+                intake.closeClaw();
+                intakeRunning = true;
+            }
+            intake.takeIn();
+        } else if (gamepad1.b && shootState && (shootButton == ButtonPressState.UNPRESSED)) {
+            shootState = false;
+            shootButton = ButtonPressState.PRESSED_GOOD;
+            intakeRunning = false;
+            intake.stopIntake();
+        } else {
+            shootButton = ButtonPressState.UNPRESSED;
         }
 
-        if (gamepad1.x) {
-            intake.runMotor();
+        // rotator
+        if (gamepad2.right_bumper){
+
         }
 
-        if (gamepad1.y) {
-            intake.runServo();
-        }
+
 
 
     }

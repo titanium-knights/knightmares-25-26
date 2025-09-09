@@ -18,6 +18,10 @@ public class CONFIG {
     //public static String intake = "in";
     //public static String rotator = "rot";
 
-    public static String motor = "motor";
-    public static String servo = "servo";
+
+    public static String rotator = "rotator";
+    public static String intake = "intake";
+    public static String clawL = "clawl";
+    public static String clawR = "clawr";
+
 }
