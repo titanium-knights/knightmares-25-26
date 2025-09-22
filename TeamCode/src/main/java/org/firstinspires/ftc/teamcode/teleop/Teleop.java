@@ -15,6 +15,10 @@ import org.firstinspires.ftc.teamcode.utilities.Intake;
 @TeleOp(name="DriveTrain Teleop")
 public class Teleop extends OpMode {
     Intake intake;
+    DcMotor fr;
+    DcMotor fl;
+    DcMotor br;
+    DcMotor bl;
     // Rotator rotator;
 //    SimpleMecanumDrive drive;
 
@@ -53,6 +57,7 @@ public class Teleop extends OpMode {
 
         // this.rotator = new Rotator(hardwareMap, telemetry);
         this.intake = new Intake(hardwareMap);
+        this.fr = new FullPower(hardwareMap);
     }
 
     @Override
@@ -65,6 +70,10 @@ public class Teleop extends OpMode {
         stick_margin = 0.1f;
         move(x, y, turn);
 // INTAKE STUFF
+
+        if (gamepad1.a == true){
+
+        }
 
         if (gamepad1.x && !intakeState && (intakeButton == ButtonPressState.UNPRESSED)) {
             intakeButton = ButtonPressState.PRESSED_GOOD;

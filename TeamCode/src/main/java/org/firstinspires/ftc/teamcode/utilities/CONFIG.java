@@ -24,4 +24,9 @@ public class CONFIG {
     public static String clawL = "clawl";
     public static String clawR = "clawr";
 
+    public static String dcMotorfr = "dcMotorfr";
+    public static String dcMotorfl = "dcMotorfl";
+    public static String dcMotorbl = "dcMotorbl";
+    public static String dcMotorbr = "dcMotorbr";
+
 }
