@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import static java.lang.Thread.sleep;
 
-import com.acmerobotics.dashboard.config.Config;
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -11,15 +11,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.utilities.CONFIG;
-import org.firstinspires.ftc.teamcode.utilities.ClawRotator;
-import org.firstinspires.ftc.teamcode.utilities.Slides;
-import org.firstinspires.ftc.teamcode.utilities.Claw;
-import org.firstinspires.ftc.teamcode.utilities.PullUp;
-import org.firstinspires.ftc.teamcode.utilities.SimpleMecanumDrive;
 import org.firstinspires.ftc.teamcode.utilities.SlidesState;
 import org.firstinspires.ftc.teamcode.utilities.SwerveDrive;
 
-@Config
+@Configurable
 @TeleOp(name="Swerve Drive")
 public class SwerveDriveOpMode extends OpMode {
 
@@ -38,7 +33,10 @@ public class SwerveDriveOpMode extends OpMode {
         float x = gamepad2.left_stick_x;
         float y = gamepad2.left_stick_y;
         float turn = gamepad2.right_stick_x;
-        move(x, y, turn);
+        if (gamepad2.a) {
+           move(0,0.5f,0);
+        }
+        // move(x, y, turn);
 
     }
 
@@ -51,7 +49,7 @@ public class SwerveDriveOpMode extends OpMode {
 
         //Notation of a ? b : c means if a is true do b, else do c.
         double multiplier = normalPower;
-        drive.move(-x * multiplier, y * multiplier, -turn * multiplier);
+        // drive.move(-x * multiplier, y * multiplier, -turn * multiplier);
     }
 
 }

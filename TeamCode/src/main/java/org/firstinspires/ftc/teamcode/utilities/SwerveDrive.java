@@ -1,8 +1,13 @@
 package org.firstinspires.ftc.teamcode.utilities;
 
+import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import com.bylazar.telemetry.PanelsTelemetry;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class SwerveDrive {
 
@@ -13,6 +18,7 @@ public class SwerveDrive {
 
     // turning motors/servos
     private Servo frSteer, flSteer, blSteer, brSteer;
+    private TelemetryManager telemetryM;
 
     // TODO: we might have to take into account the distance of the wheels from the edge of the robot
     double L = 18.0; // robot length in inches
@@ -29,9 +35,15 @@ public class SwerveDrive {
         this.flSteer = hmap.servo.get(CONFIG.FL_STEER);
         this.blSteer = hmap.servo.get(CONFIG.BL_STEER);
         this.brSteer = hmap.servo.get(CONFIG.BR_STEER);
+
+        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
     }
 
     public void move(double x, double y, double turn) {
+        telemetryM.debug("x", x);
+        telemetryM.debug("y", y);
+        telemetryM.debug("turn", turn);
+        telemetryM.update();
 
         // TODO: Ls and Ws might be switched
         double A = x - turn * (L / R);
