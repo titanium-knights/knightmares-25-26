@@ -26,7 +26,7 @@ public class SwerveDrive {
     double W = 18.0; // robot width in inches
     double R = Math.sqrt(L*L + W*W); // diagonal size
 
-    public SwerveDrive(HardwareMap hmap) {
+    public SwerveDrive(HardwareMap hmap, Telemetry telemetry) {
         this.frDrive = hmap.dcMotor.get(CONFIG.FRONT_RIGHT);
         this.flDrive = hmap.dcMotor.get(CONFIG.FRONT_LEFT);
         this.blDrive = hmap.dcMotor.get(CONFIG.BACK_LEFT);
@@ -39,6 +39,9 @@ public class SwerveDrive {
 
         this.telemetry = telemetry;
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
+
+        telemetryM.debug("initted swerve");
+        telemetryM.update(telemetry);
     }
 
     public void move(double x, double y, double turn) {

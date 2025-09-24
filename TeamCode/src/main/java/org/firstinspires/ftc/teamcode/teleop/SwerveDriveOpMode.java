@@ -24,7 +24,7 @@ public class SwerveDriveOpMode extends OpMode {
     final double normalPower = 0.9;
 
     public void init() {
-        this.drive = new SwerveDrive(hardwareMap);
+        this.drive = new SwerveDrive(hardwareMap, telemetry);
     }
 
     public void loop() {
