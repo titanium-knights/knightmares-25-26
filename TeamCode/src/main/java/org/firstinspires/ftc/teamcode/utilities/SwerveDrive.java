@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.utilities;
 
-import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -70,7 +70,7 @@ public class SwerveDrive {
 
         // Normalize speeds (so none > 1)
         double max = Math.max(Math.max(frSpeed, flSpeed), Math.max(blSpeed, brSpeed));
-        if (max > 1.0) {
+        if (max > 0.8) {
             frSpeed /= max; flSpeed /= max; blSpeed /= max; brSpeed /= max;
         }
 

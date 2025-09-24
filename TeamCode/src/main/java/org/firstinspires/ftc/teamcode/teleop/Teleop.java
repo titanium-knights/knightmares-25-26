@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 import static java.lang.Thread.sleep;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -27,6 +28,8 @@ public class Teleop extends OpMode {
 
     public boolean intakeState = false;
     public boolean shootState = false;
+
+    private TelemetryManager telemetryM;
 
     enum ButtonPressState {
         PRESSED_GOOD, //the first time we see the button pressed
