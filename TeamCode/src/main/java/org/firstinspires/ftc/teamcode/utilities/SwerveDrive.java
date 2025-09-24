@@ -19,6 +19,7 @@ public class SwerveDrive {
     // turning motors/servos
     private Servo frSteer, flSteer, blSteer, brSteer;
     private TelemetryManager telemetryM;
+    private Telemetry telemetry;
 
     // TODO: we might have to take into account the distance of the wheels from the edge of the robot
     double L = 18.0; // robot length in inches
@@ -36,6 +37,7 @@ public class SwerveDrive {
         this.blSteer = hmap.servo.get(CONFIG.BL_STEER);
         this.brSteer = hmap.servo.get(CONFIG.BR_STEER);
 
+        this.telemetry = telemetry;
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
     }
 
@@ -43,7 +45,7 @@ public class SwerveDrive {
         telemetryM.debug("x", x);
         telemetryM.debug("y", y);
         telemetryM.debug("turn", turn);
-        telemetryM.update();
+        telemetryM.update(telemetry);
 
         // TODO: Ls and Ws might be switched
         double A = x - turn * (L / R);
