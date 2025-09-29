@@ -22,8 +22,8 @@ public class SwerveDrive {
     private Telemetry telemetry;
 
     // TODO: we might have to take into account the distance of the wheels from the edge of the robot
-    double L = 18.0; // robot length in inches
-    double W = 18.0; // robot width in inches
+    double L = 15.5; // robot length in inches
+    double W = 15.5; // robot width in inches
     double R = Math.sqrt(L*L + W*W); // diagonal size
     double speed = 0.2;
 
@@ -50,8 +50,7 @@ public class SwerveDrive {
         telemetryM.debug("y", y);
         telemetryM.debug("turn", turn);
 
-        // remember to change the letters for this too if you change it for speed
-        double angle = Math.atan2(y, -x) + 1.57; // radians
+        double angle = Math.toDegrees(Math.atan2(y, -x)) + 90.0;
 
         // motors
 
@@ -85,14 +84,14 @@ public class SwerveDrive {
 
         // servos
 
-        double gray = 5.235;
-        double pink = 3.142;
+        double gray = 300;
+        double pink = 180;
 
         if (Math.abs(turn) > 0.1) {
-            setSteerAngle(frSteer, 1.57, gray);
-            setSteerAngle(flSteer, -1.57, gray);
-            setSteerAngle(blSteer, 1.57, gray);
-            setSteerAngle(brSteer, -1.57, pink);
+            setSteerAngle(frSteer, 45, gray);
+            setSteerAngle(flSteer, -45, gray);
+            setSteerAngle(blSteer, 45, gray);
+            setSteerAngle(brSteer, -45, pink);
         }
         else if (x>=0.01 && y>=0.01) {
             setSteerAngle(frSteer, angle, gray);
@@ -104,14 +103,14 @@ public class SwerveDrive {
 
     private void setSteerAngle(Servo steerServo, double targetAngle, double rotLimit) {
         // so everything is within 1 radian
-        if (targetAngle >= 3.14) targetAngle -= 3.14;
-        if (targetAngle < 0) targetAngle += 3.14;
+        if (targetAngle >= 180) targetAngle -= 180;
+        if (targetAngle < 0) targetAngle += 180;
 
         telemetryM.debug("angle", targetAngle);
         telemetryM.update(telemetry);
 
-        // Convert radians → [0,1] servo position
-        double servoPos = targetAngle / rotLimit; // because 0 is vertical
+        // Convert degrees → [0,1] servo position
+        double servoPos = targetAngle / 180 * rotLimit; // because 0 is vertical
 
         steerServo.setPosition(servoPos);
     }
