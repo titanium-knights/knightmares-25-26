@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 
 import static java.lang.Thread.sleep;
 
-import com.acmerobotics.dashboard.config.Config;
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -11,15 +11,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.utilities.CONFIG;
-import org.firstinspires.ftc.teamcode.utilities.ClawRotator;
-import org.firstinspires.ftc.teamcode.utilities.Slides;
-import org.firstinspires.ftc.teamcode.utilities.Claw;
-import org.firstinspires.ftc.teamcode.utilities.PullUp;
-import org.firstinspires.ftc.teamcode.utilities.SimpleMecanumDrive;
 import org.firstinspires.ftc.teamcode.utilities.SlidesState;
 import org.firstinspires.ftc.teamcode.utilities.SwerveDrive;
 
-@Config
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+@Configurable
 @TeleOp(name="Swerve Drive")
 public class SwerveDriveOpMode extends OpMode {
 
@@ -27,9 +27,13 @@ public class SwerveDriveOpMode extends OpMode {
 
     float stick_margin = 0.1f;
     final double normalPower = 0.9;
+    private TelemetryManager telemetryM;
 
     public void init() {
-        this.drive = new SwerveDrive(hardwareMap);
+        this.drive = new SwerveDrive(hardwareMap, telemetry);
+
+        // this.telemetry = telemetry;
+        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
     }
 
     public void loop() {
@@ -38,6 +42,11 @@ public class SwerveDriveOpMode extends OpMode {
         float x = gamepad2.left_stick_x;
         float y = gamepad2.left_stick_y;
         float turn = gamepad2.right_stick_x;
+//        if (gamepad2.a) {
+//            telemetryM.debug("gaempad2.a pressed");
+//            telemetryM.update(telemetry);
+//            drive.move(0,0.5f,0);
+//        }
         move(x, y, turn);
 
     }

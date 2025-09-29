@@ -3,10 +3,12 @@ package org.firstinspires.ftc.teamcode.teleop;
 import static java.lang.Thread.sleep;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.teamcode.utilities.Intake;
+// import org.firstinspires.ftc.teamcode.utilities.Intake;
+import org.firstinspires.ftc.teamcode.utilities.SwerveDrive;
 // import org.firstinspires.ftc.teamcode.utilities.Rotator;
 
 //import org.firstinspires.ftc.teamcode.utilities.SimpleMecanumDrive;
@@ -14,11 +16,8 @@ import org.firstinspires.ftc.teamcode.utilities.Intake;
 @Configurable
 @TeleOp(name="DriveTrain Teleop")
 public class Teleop extends OpMode {
-    Intake intake;
-    DcMotor fr;
-    DcMotor fl;
-    DcMotor br;
-    DcMotor bl;
+    // Intake intake;
+    SwerveDrive drive;
     // Rotator rotator;
 //    SimpleMecanumDrive drive;
 
@@ -29,6 +28,8 @@ public class Teleop extends OpMode {
 
     public boolean intakeState = false;
     public boolean shootState = false;
+
+    private TelemetryManager telemetryM;
 
     enum ButtonPressState {
         PRESSED_GOOD, //the first time we see the button pressed
@@ -56,8 +57,8 @@ public class Teleop extends OpMode {
         this.ultimateButton = ButtonPressState.UNPRESSED;
 
         // this.rotator = new Rotator(hardwareMap, telemetry);
-        this.intake = new Intake(hardwareMap);
-        this.fr = new FullPower(hardwareMap);
+        // this.intake = new Intake(hardwareMap);
+        // this.drive = new SwerveDrive(hardwareMap);
     }
 
     @Override
@@ -71,38 +72,39 @@ public class Teleop extends OpMode {
         move(x, y, turn);
 // INTAKE STUFF
 
-        if (gamepad1.a == true){
+//        if (gamepad1.a == true){
+//
+//        }
+//
+//        if (gamepad1.x && !intakeState && (intakeButton == ButtonPressState.UNPRESSED)) {
+//            intakeButton = ButtonPressState.PRESSED_GOOD;
+//            intakeState = true;
+//            intake.takeIn();
+//        } else if (gamepad1.x && intakeState && (intakeButton == ButtonPressState.UNPRESSED)) {
+//            intakeState = false;
+//            intakeButton = ButtonPressState.PRESSED_GOOD;
+//            intake.stopIntake();
+//        } else {
+//            intakeButton = ButtonPressState.UNPRESSED;
+//        }
 
-        }
-
-        if (gamepad1.x && !intakeState && (intakeButton == ButtonPressState.UNPRESSED)) {
-            intakeButton = ButtonPressState.PRESSED_GOOD;
-            intakeState = true;
-            intake.takeIn();
-        } else if (gamepad1.x && intakeState && (intakeButton == ButtonPressState.UNPRESSED)) {
-            intakeState = false;
-            intakeButton = ButtonPressState.PRESSED_GOOD;
-            intake.stopIntake();
-        } else {
-            intakeButton = ButtonPressState.UNPRESSED;
-        }
         // shoot
-        if (gamepad1.b && !shootState && (shootButton == ButtonPressState.UNPRESSED)) {
-            shootButton = ButtonPressState.PRESSED_GOOD;
-            shootState = true;
-            if (!intakeRunning) {
-                intake.closeClaw();
-                intakeRunning = true;
-            }
-            intake.takeIn();
-        } else if (gamepad1.b && shootState && (shootButton == ButtonPressState.UNPRESSED)) {
-            shootState = false;
-            shootButton = ButtonPressState.PRESSED_GOOD;
-            intakeRunning = false;
-            intake.stopIntake();
-        } else {
-            shootButton = ButtonPressState.UNPRESSED;
-        }
+//        if (gamepad1.b && !shootState && (shootButton == ButtonPressState.UNPRESSED)) {
+//            shootButton = ButtonPressState.PRESSED_GOOD;
+//            shootState = true;
+//            if (!intakeRunning) {
+//                intake.closeClaw();
+//                intakeRunning = true;
+//            }
+//            intake.takeIn();
+//        } else if (gamepad1.b && shootState && (shootButton == ButtonPressState.UNPRESSED)) {
+//            shootState = false;
+//            shootButton = ButtonPressState.PRESSED_GOOD;
+//            intakeRunning = false;
+//            intake.stopIntake();
+//        } else {
+//            shootButton = ButtonPressState.UNPRESSED;
+//        }
 
         // rotator
         if (gamepad2.right_bumper){
