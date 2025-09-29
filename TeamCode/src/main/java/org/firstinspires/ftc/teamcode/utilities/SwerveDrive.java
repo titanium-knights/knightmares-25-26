@@ -25,6 +25,7 @@ public class SwerveDrive {
     double L = 18.0; // robot length in inches
     double W = 18.0; // robot width in inches
     double R = Math.sqrt(L*L + W*W); // diagonal size
+    double speed = 0.5;
 
     public SwerveDrive(HardwareMap hmap, Telemetry telemetry) {
         this.frDrive = hmap.dcMotor.get(CONFIG.FRONT_RIGHT);
@@ -50,48 +51,38 @@ public class SwerveDrive {
         telemetryM.debug("turn", turn);
         telemetryM.update(telemetry);
 
-        // TODO: Ls and Ws might be switched
-        double A = x - turn * (L / R);
-        double B = x + turn * (L / R);
-        double C = y - turn * (W / R);
-        double D = y + turn * (W / R);
-
-        // TODO: the letters might be wrong lowk
-        double frSpeed = Math.hypot(A, D); // B, C
-        double flSpeed = Math.hypot(A, C); // B, D
-        double blSpeed = Math.hypot(B, C); // A, D
-        double brSpeed = Math.hypot(B, D); // A, C
-
         // remember to change the letters for this too if you change it for speed
-        double frAngle = Math.atan2(A, D);
-        double flAngle = Math.atan2(A, C);
-        double blAngle = Math.atan2(B, C);
-        double brAngle = Math.atan2(B, D);
+        double angle = Math.atan2(y, x); // radians
 
-        // Normalize speeds (so none > 1)
-        double max = Math.max(Math.max(frSpeed, flSpeed), Math.max(blSpeed, brSpeed));
-        if (max > 0.8) {
-            frSpeed /= max; flSpeed /= max; blSpeed /= max; brSpeed /= max;
+        if (x>=0) {
+            frDrive.setPower(speed);
+            flDrive.setPower(speed);
+            blDrive.setPower(speed);
+            brDrive.setPower(speed);
+        }
+        else {
+            frDrive.setPower(-speed);
+            flDrive.setPower(-speed);
+            blDrive.setPower(-speed);
+            brDrive.setPower(-speed);
         }
 
-        frDrive.setPower(frSpeed);
-        flDrive.setPower(flSpeed);
-        blDrive.setPower(blSpeed);
-        brDrive.setPower(brSpeed);
+        double gray = 5.235;
+        double pink = 3.142;
 
-        setSteerAngle(frSteer, frAngle);
-        setSteerAngle(flSteer, flAngle);
-        setSteerAngle(blSteer, blAngle);
-        setSteerAngle(brSteer, brAngle);
+        setSteerAngle(frSteer, angle, gray);
+        setSteerAngle(flSteer, angle, gray);
+        setSteerAngle(blSteer, angle, gray);
+        setSteerAngle(brSteer, angle, pink);
     }
 
-    private void setSteerAngle(Servo steerServo, double targetAngle) {
-        // Normalize target angle to [0, 2π)
-        targetAngle = targetAngle % (2 * Math.PI);
-        if (targetAngle < 0) targetAngle += 2 * Math.PI;
+    private void setSteerAngle(Servo steerServo, double targetAngle, double rotLimit) {
+        // so everything is within 1 radian
+        if (targetAngle > 3.1415) targetAngle -= 3.1415;
+        if (targetAngle < 0) targetAngle += 3.1415;
 
         // Convert radians → [0,1] servo position
-        double servoPos = targetAngle / (2 * Math.PI);
+        double servoPos = targetAngle / rotLimit;
 
         steerServo.setPosition(servoPos);
     }
