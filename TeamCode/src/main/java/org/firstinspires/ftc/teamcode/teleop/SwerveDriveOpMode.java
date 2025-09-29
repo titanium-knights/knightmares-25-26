@@ -42,12 +42,12 @@ public class SwerveDriveOpMode extends OpMode {
         float x = gamepad2.left_stick_x;
         float y = gamepad2.left_stick_y;
         float turn = gamepad2.right_stick_x;
-        if (gamepad2.a) {
-            telemetryM.debug("gaempad2.a pressed");
-            telemetryM.update(telemetry);
-            drive.move(0,0.5f,0);
-        }
-        // move(x, y, turn);
+//        if (gamepad2.a) {
+//            telemetryM.debug("gaempad2.a pressed");
+//            telemetryM.update(telemetry);
+//            drive.move(0,0.5f,0);
+//        }
+        move(x, y, turn);
 
     }
 
@@ -60,7 +60,7 @@ public class SwerveDriveOpMode extends OpMode {
 
         //Notation of a ? b : c means if a is true do b, else do c.
         double multiplier = normalPower;
-        // drive.move(-x * multiplier, y * multiplier, -turn * multiplier);
+        drive.move(-x * multiplier, y * multiplier, -turn * multiplier);
     }
 
 }

@@ -25,7 +25,7 @@ public class SwerveDrive {
     double L = 18.0; // robot length in inches
     double W = 18.0; // robot width in inches
     double R = Math.sqrt(L*L + W*W); // diagonal size
-    double speed = 0.5;
+    double speed = 0.2;
 
     public SwerveDrive(HardwareMap hmap, Telemetry telemetry) {
         this.frDrive = hmap.dcMotor.get(CONFIG.FRONT_RIGHT);
@@ -49,40 +49,44 @@ public class SwerveDrive {
         telemetryM.debug("x", x);
         telemetryM.debug("y", y);
         telemetryM.debug("turn", turn);
-        telemetryM.update(telemetry);
 
         // remember to change the letters for this too if you change it for speed
-        double angle = Math.atan2(y, x); // radians
+        double angle = Math.atan2(y, -x) + 1.57; // radians
 
-        if (x>=0) {
-            frDrive.setPower(speed);
-            flDrive.setPower(speed);
-            blDrive.setPower(speed);
-            brDrive.setPower(speed);
-        }
-        else {
-            frDrive.setPower(-speed);
-            flDrive.setPower(-speed);
-            blDrive.setPower(-speed);
-            brDrive.setPower(-speed);
-        }
+//        if (x>=0) {
+//            frDrive.setPower(speed);
+//            flDrive.setPower(speed);
+//            blDrive.setPower(speed);
+//            brDrive.setPower(speed);
+//        }
+//        else {
+//            frDrive.setPower(-speed);
+//            flDrive.setPower(-speed);
+//            blDrive.setPower(-speed);
+//            brDrive.setPower(-speed);
+//        }
 
         double gray = 5.235;
         double pink = 3.142;
 
-        setSteerAngle(frSteer, angle, gray);
-        setSteerAngle(flSteer, angle, gray);
-        setSteerAngle(blSteer, angle, gray);
-        setSteerAngle(brSteer, angle, pink);
+        if (x>=0.01 && y>=0.01) {
+            setSteerAngle(frSteer, angle, gray);
+            setSteerAngle(flSteer, angle, gray);
+            setSteerAngle(blSteer, angle, gray);
+            setSteerAngle(brSteer, angle, pink);
+        }
     }
 
     private void setSteerAngle(Servo steerServo, double targetAngle, double rotLimit) {
         // so everything is within 1 radian
-        if (targetAngle > 3.1415) targetAngle -= 3.1415;
-        if (targetAngle < 0) targetAngle += 3.1415;
+        if (targetAngle >= 3.14) targetAngle -= 3.14;
+        if (targetAngle < 0) targetAngle += 3.14;
+
+        telemetryM.debug("angle", targetAngle);
+        telemetryM.update(telemetry);
 
         // Convert radians → [0,1] servo position
-        double servoPos = targetAngle / rotLimit;
+        double servoPos = targetAngle / rotLimit; // because 0 is vertical
 
         steerServo.setPosition(servoPos);
     }
