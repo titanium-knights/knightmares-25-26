@@ -23,6 +23,8 @@ public class Teleop extends OpMode {
     // in case of joystick drift, ignore very small values
     public float stick_margin = 0.7f;
 
+    static float TRIGGER_THRESHOLD = 0.2f;
+
     public boolean intakeState = false;
     public boolean shootState = false;
 
@@ -31,6 +33,8 @@ public class Teleop extends OpMode {
         DEPRESSED, //you haven't let go
         UNPRESSED // its not pressed
     }
+
+
     ButtonPressState intakeButton;
     ButtonPressState shootButton;
     ButtonPressState rotatorButton;
@@ -66,17 +70,33 @@ public class Teleop extends OpMode {
         move(x, y, turn);
 // INTAKE STUFF
 
-        if (gamepad1.x && !intakeState && (intakeButton == ButtonPressState.UNPRESSED)) {
+
+        //Intake motor
+        if (gamepad1.left_trigger > TRIGGER_THRESHOLD) {
             intakeButton = ButtonPressState.PRESSED_GOOD;
             intakeState = true;
-            intake.takeIn();
-        } else if (gamepad1.x && intakeState && (intakeButton == ButtonPressState.UNPRESSED)) {
+            intake.motorIntake();
+        } else if (gamepad1.left_trigger < TRIGGER_THRESHOLD) {
             intakeState = false;
             intakeButton = ButtonPressState.PRESSED_GOOD;
-            intake.stopIntake();
+            intake.stopMotor();
         } else {
             intakeButton = ButtonPressState.UNPRESSED;
         }
+
+        //Outake motor
+        if (gamepad1.right_trigger > TRIGGER_THRESHOLD) {
+            intakeButton = ButtonPressState.PRESSED_GOOD;
+            intakeState = true;
+            intake.motorIntake();
+        } else if (gamepad1.right_trigger > TRIGGER_THRESHOLD) {
+            intakeState = false;
+            intakeButton = ButtonPressState.PRESSED_GOOD;
+            intake.stopMotor(); 
+        } else {
+            intakeButton = ButtonPressState.UNPRESSED;
+        }
+
         // shoot
         if (gamepad1.b && !shootState && (shootButton == ButtonPressState.UNPRESSED)) {
             shootButton = ButtonPressState.PRESSED_GOOD;
