@@ -125,5 +125,17 @@ public class Teleop extends OpMode {
         double multiplier = normalPower;
 //        drive.move(-x * multiplier, y * multiplier, -turn * multiplier);
     }
+    public void moveRotator(){
+        if(this.rotatorButton == ButtonPressState.PRESSED_GOOD) {
+            if (gamepad2.right_bumper) {
+                this.intakeButton = ButtonPressState.PRESSED_GOOD;
+            }
+            if (gamepad2.left_bumper) {
+                this.shootButton = ButtonPressState.PRESSED_GOOD;
+            }
+        }else{
+            System.out.println("The rotator button is not pressed.")
+        }
 
+    }
 }
