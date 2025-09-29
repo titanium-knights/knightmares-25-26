@@ -53,23 +53,48 @@ public class SwerveDrive {
         // remember to change the letters for this too if you change it for speed
         double angle = Math.atan2(y, -x) + 1.57; // radians
 
-//        if (x>=0) {
-//            frDrive.setPower(speed);
-//            flDrive.setPower(speed);
-//            blDrive.setPower(speed);
-//            brDrive.setPower(speed);
+        // motors
+
+//        if (Math.abs(turn) <= 0.1) {
+//            if (x>=0) {
+//                frDrive.setPower(speed);
+//                flDrive.setPower(speed);
+//                blDrive.setPower(speed);
+//                brDrive.setPower(speed);
+//            }
+//            else {
+//                frDrive.setPower(-speed);
+//                flDrive.setPower(-speed);
+//                blDrive.setPower(-speed);
+//                brDrive.setPower(-speed);
+//            }
+//        } else {
+//            if (turn < -0.01) {
+//                frDrive.setPower(speed);
+//                flDrive.setPower(speed);
+//                blDrive.setPower(speed);
+//                brDrive.setPower(speed);
+//            }
+//            else if (turn > 0.01){
+//                frDrive.setPower(-speed);
+//                flDrive.setPower(-speed);
+//                blDrive.setPower(-speed);
+//                brDrive.setPower(-speed);
+//            }
 //        }
-//        else {
-//            frDrive.setPower(-speed);
-//            flDrive.setPower(-speed);
-//            blDrive.setPower(-speed);
-//            brDrive.setPower(-speed);
-//        }
+
+        // servos
 
         double gray = 5.235;
         double pink = 3.142;
 
-        if (x>=0.01 && y>=0.01) {
+        if (Math.abs(turn) > 0.1) {
+            setSteerAngle(frSteer, 1.57, gray);
+            setSteerAngle(flSteer, -1.57, gray);
+            setSteerAngle(blSteer, 1.57, gray);
+            setSteerAngle(brSteer, -1.57, pink);
+        }
+        else if (x>=0.01 && y>=0.01) {
             setSteerAngle(frSteer, angle, gray);
             setSteerAngle(flSteer, angle, gray);
             setSteerAngle(blSteer, angle, gray);
