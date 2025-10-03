@@ -32,6 +32,7 @@ public class Teleop extends OpMode {
     public boolean shootState = false;
 
     private TelemetryManager telemetryM;
+    double currentHeading;
 
     enum ButtonPressState {
         PRESSED_GOOD, //the first time we see the button pressed
