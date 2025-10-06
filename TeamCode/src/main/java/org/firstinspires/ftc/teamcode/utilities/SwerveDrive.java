@@ -14,30 +14,30 @@ public class SwerveDrive {
     private static final int TICKS_PER_REV = 4096;
 
     // Drive motors
-    private SwerveModule frontLeft, frontRight, backLeft, backRight;
-    // private BNO055IMU imu;
+    private DcMotor frDrive, flDrive, blDrive, brDrive;
+
+    // turning motors/servos
+    private Servo frSteer, flSteer, blSteer, brSteer;
     private TelemetryManager telemetryM;
     private Telemetry telemetry;
 
     // TODO: we might have to take into account the distance of the wheels from the edge of the robot
+
     double L = 15.5; // robot length in inches
     double W = 15.5; // robot width in inches
-    double R = Math.sqrt(L*L + W*W); // diagonal size
+    double R = Math.sqrt(L * L + W * W); // diagonal size
     double speed = 0.2;
 
     public SwerveDrive(HardwareMap hmap, Telemetry telemetry) {
+        this.frDrive = hmap.dcMotor.get(CONFIG.FRONT_RIGHT);
+        this.flDrive = hmap.dcMotor.get(CONFIG.FRONT_LEFT);
+        this.blDrive = hmap.dcMotor.get(CONFIG.BACK_LEFT);
+        this.brDrive = hmap.dcMotor.get(CONFIG.BACK_RIGHT);
 
-        // Init IMU
-//        imu = hardwareMap.get(BNO055IMU.class, "imu");
-//        BNO055IMU.Parameters params = new BNO055IMU.Parameters();
-//        params.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-//        imu.initialize(params);
-
-        // Initialize modules (replace names with config names!)
-        this.frontLeft  = new SwerveModule(hmap.dcMotor.get(CONFIG.FRONT_LEFT), hmap.servo.get("FL_STEER"), 0);
-        this.backLeft  = new SwerveModule(hmap.dcMotor.get(CONFIG.BACK_LEFT), hmap.servo.get("BL_STEER"), 0);
-        this.backRight  = new SwerveModule(hmap.dcMotor.get(CONFIG.BACK_RIGHT), hmap.servo.get("BR_STEER"), 0);
-        this.frontRight  = new SwerveModule(hmap.dcMotor.get(CONFIG.FRONT_RIGHT), hmap.servo.get("FR_STEER"), 0);
+        this.frSteer = hmap.servo.get(CONFIG.FR_STEER);
+        this.flSteer = hmap.servo.get(CONFIG.FL_STEER);
+        this.blSteer = hmap.servo.get(CONFIG.BL_STEER);
+        this.brSteer = hmap.servo.get(CONFIG.BR_STEER);
 
         this.telemetry = telemetry;
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -47,14 +47,12 @@ public class SwerveDrive {
     }
 
     public void move(double x, double y, double turn) {
+//        telemetryM.debug("x", x);
+//        telemetryM.debug("y", y);
+//        telemetryM.debug("turn", turn);
 
-        // double headingRad = Math.toRadians(getHeading());
-
-        telemetryM.debug("x", x);
-        telemetryM.debug("y", y);
-        telemetryM.debug("turn", turn);
-
-        double angle = Math.toDegrees(Math.atan2(y, -x)) + 90.0;
+        // remember to change the letters for this too if you change it for speed
+        double angle = Math.toDegrees(Math.atan2(y, -x));
 
         // motors
 
@@ -87,21 +85,23 @@ public class SwerveDrive {
 //        }
 
         // servos
-
         double gray = 300;
         double pink = 180;
 
         if (Math.abs(turn) > 0.1) {
-            frontRight.setAngle(45, gray);
-            frontLeft.setAngle(45, gray);
-            backLeft.setAngle(45, gray);
-            backRight.setAngle(45, pink);
-        }
-        else if (x>=0.01 && y>=0.01) {
-            frontRight.setAngle(angle, gray);
-            frontLeft.setAngle(angle, gray);
-            backLeft.setAngle(angle, gray);
-            backRight.setAngle(angle, gray);
+            setSteerAngle(frSteer, 1.57, gray);
+            setSteerAngle(flSteer, -1.57, gray);
+            setSteerAngle(blSteer, 1.57, gray);
+            setSteerAngle(brSteer, -1.57, pink);
+            setSteerAngle(frSteer, 45, gray);
+            setSteerAngle(flSteer, -45, gray);
+            setSteerAngle(blSteer, 45, gray);
+            setSteerAngle(brSteer, -45, pink);
+        } else {
+            setSteerAngle(frSteer, angle, gray);
+            setSteerAngle(flSteer, angle, gray);
+            setSteerAngle(blSteer, angle, gray);
+            setSteerAngle(brSteer, angle, pink);
         }
     }
 
@@ -117,34 +117,5 @@ public class SwerveDrive {
         double servoPos = targetAngle / 180 * rotLimit; // because 0 is vertical
 
         steerServo.setPosition(servoPos);
-    }
-
-    public void getHeading() {
-//        Orientation angles = imu.getAngularOrientation();
-//        return AngleUnit.DEGREES.normalize(angles.firstAngle - headingOffset);
-    }
-
-    public void resetHeading() {
-//        headingOffset = imu.getAngularOrientation().firstAngle;
-    }
-
-    public void getEncoderFL() {
-        // TODO: add IMU
-        return;
-    }
-
-    public void getEncoderBL() {
-        // TODO: add IMU
-        return;
-    }
-
-    public void getEncoderBR() {
-        // TODO: add IMU
-        return;
-    }
-
-    public void getEncoderFR() {
-        // TODO: add IMU
-        return;
     }
 }
