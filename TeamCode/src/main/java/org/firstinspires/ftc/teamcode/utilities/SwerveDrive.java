@@ -52,7 +52,7 @@ public class SwerveDrive {
 //        telemetryM.debug("turn", turn);
 
         // remember to change the letters for this too if you change it for speed
-        double angle = Math.toDegrees(Math.atan2(y, -x));
+        double angle = Math.toDegrees(Math.atan2(y, x));
 
         // motors
 
@@ -101,21 +101,24 @@ public class SwerveDrive {
             setSteerAngle(frSteer, angle, gray);
             setSteerAngle(flSteer, angle, gray);
             setSteerAngle(blSteer, angle, gray);
-            setSteerAngle(brSteer, angle, pink);
+            setSteerAngle(brSteer, angle, gray);
         }
     }
 
     private void setSteerAngle(Servo steerServo, double targetAngle, double rotLimit) {
         // so everything is within 1 radian
-        if (targetAngle >= 180) targetAngle -= 180;
-        if (targetAngle < 0) targetAngle += 180;
+        if (targetAngle > 180) targetAngle -= 180;
+        if (targetAngle <= 0) targetAngle += 180;
 
         telemetryM.debug("angle", targetAngle);
-        telemetryM.update(telemetry);
 
         // Convert degrees → [0,1] servo position
-        double servoPos = targetAngle / 180 * rotLimit; // because 0 is vertical
+        double servoPos = targetAngle / rotLimit; // because 0 is vertical
 
         steerServo.setPosition(servoPos);
+
+        telemetryM.debug("servo pos", servoPos);
+        telemetryM.debug("set angle", steerServo.getPosition());
+        telemetryM.update(telemetry);
     }
 }
