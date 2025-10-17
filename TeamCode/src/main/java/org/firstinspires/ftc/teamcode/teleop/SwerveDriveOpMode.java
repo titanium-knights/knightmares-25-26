@@ -60,7 +60,7 @@ public class SwerveDriveOpMode extends OpMode {
 
         //Notation of a ? b : c means if a is true do b, else do c.
         double multiplier = normalPower;
-        drive.move(-x * multiplier, y * multiplier, 0);
+        drive.move(-x * multiplier, y * multiplier, -turn * multiplier);
     }
 
 }
