@@ -56,64 +56,59 @@ public class SwerveDrive {
 
         // motors
 
-//        if (Math.abs(turn) <= 0.1) {
-//            if (x>=0) {
-//                frDrive.setPower(speed);
-//                flDrive.setPower(speed);
-//                blDrive.setPower(speed);
-//                brDrive.setPower(speed);
-//            }
-//            else {
-//                frDrive.setPower(-speed);
-//                flDrive.setPower(-speed);
-//                blDrive.setPower(-speed);
-//                brDrive.setPower(-speed);
-//            }
-//        } else {
-//            if (turn < -0.01) {
-//                frDrive.setPower(speed);
-//                flDrive.setPower(speed);
-//                blDrive.setPower(speed);
-//                brDrive.setPower(speed);
-//            }
-//            else if (turn > 0.01){
-//                frDrive.setPower(-speed);
-//                flDrive.setPower(-speed);
-//                blDrive.setPower(-speed);
-//                brDrive.setPower(-speed);
-//            }
-//        }
+        if (Math.abs(turn) <= 0.1) {
+            if (x>=0) {
+                frDrive.setPower(speed);
+                flDrive.setPower(speed);
+                blDrive.setPower(speed);
+                brDrive.setPower(speed);
+            }
+            else {
+                frDrive.setPower(-speed);
+                flDrive.setPower(-speed);
+                blDrive.setPower(-speed);
+                brDrive.setPower(-speed);
+            }
+        } else {
+            if (turn < -0.01) {
+                frDrive.setPower(speed);
+                flDrive.setPower(speed);
+                blDrive.setPower(speed);
+                brDrive.setPower(speed);
+            }
+            else if (turn > 0.01){
+                frDrive.setPower(-speed);
+                flDrive.setPower(-speed);
+                blDrive.setPower(-speed);
+                brDrive.setPower(-speed);
+            }
+        }
 
         // servos
-        double gray = 300;
-        double pink = 180;
 
         if (Math.abs(turn) > 0.1) {
-            setSteerAngle(frSteer, 1.57, gray);
-            setSteerAngle(flSteer, -1.57, gray);
-            setSteerAngle(blSteer, 1.57, gray);
-            setSteerAngle(brSteer, -1.57, pink);
-            setSteerAngle(frSteer, 45, gray);
-            setSteerAngle(flSteer, -45, gray);
-            setSteerAngle(blSteer, 45, gray);
-            setSteerAngle(brSteer, -45, pink);
+            setSteerAngle(frSteer, 1.57);
+            setSteerAngle(flSteer, -1.57);
+            setSteerAngle(blSteer, 1.57);
+            setSteerAngle(brSteer, -1.57);
+            setSteerAngle(frSteer, 45);
+            setSteerAngle(flSteer, -45);
+            setSteerAngle(blSteer, 45);
+            setSteerAngle(brSteer, -45);
         } else {
-            setSteerAngle(frSteer, angle, gray);
-            setSteerAngle(flSteer, angle, gray);
-            setSteerAngle(blSteer, angle, gray);
-            setSteerAngle(brSteer, angle, gray);
+            setSteerAngle(frSteer, angle);
+            setSteerAngle(flSteer, angle);
+            setSteerAngle(blSteer, angle);
+            setSteerAngle(brSteer, angle);
         }
     }
 
-    private void setSteerAngle(Servo steerServo, double targetAngle, double rotLimit) {
-        // so everything is within 1 radian
-        if (targetAngle > 180) targetAngle -= 180;
-        if (targetAngle <= 0) targetAngle += 180;
+    private void setSteerAngle(Servo steerServo, double targetAngle) {
 
         telemetryM.debug("angle", targetAngle);
 
         // Convert degrees → [0,1] servo position
-        double servoPos = targetAngle / rotLimit; // because 0 is vertical
+        double servoPos = targetAngle / 360; // might be 355 if its inaccurate
 
         steerServo.setPosition(servoPos);
 
