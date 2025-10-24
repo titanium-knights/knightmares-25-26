@@ -136,7 +136,7 @@ public class Teleop extends OpMode {
                 this.shootButton = ButtonPressState.PRESSED_GOOD;
             }
         }else{
-            System.out.println("The rotator button is not pressed.")
+            System.out.println("The rotator button is not pressed.");
         }
 
     }
