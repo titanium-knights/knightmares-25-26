@@ -9,7 +9,8 @@ public class CONFIG {
     public static String BACK_RIGHT = "br"; // 1
     public static String BACK_LEFT = "bl"; // 2
     public static String FRONT_LEFT = "fl"; // 3
-
+    //webcam
+    public static String webcam = "Webcam";
     public static String FR_STEER = "frs"; // 0
     public static String BR_STEER = "brs"; // 1
     public static String BL_STEER = "bls"; // 2
