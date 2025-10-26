@@ -26,7 +26,7 @@ public class SwerveDrive {
     double L = 15.5; // robot length in inches
     double W = 15.5; // robot width in inches
     double R = Math.sqrt(L * L + W * W); // diagonal size
-    double speed = 0.2;
+    double speed = 0.6;
 
     public SwerveDrive(HardwareMap hmap, Telemetry telemetry) {
         this.frDrive = hmap.dcMotor.get(CONFIG.FRONT_RIGHT);
@@ -47,47 +47,56 @@ public class SwerveDrive {
     }
 
     public void move(double x, double y, double turn) {
-//        telemetryM.debug("x", x);
-//        telemetryM.debug("y", y);
-//        telemetryM.debug("turn", turn);
 
         // remember to change the letters for this too if you change it for speed
-        double fl_init = 120.06; // 1667 microseconds
-        double bl_init = 0.00;
-        double br_init = 56.34; // 1313 microseconds
-        double fr_init = 110.7; // 1615 microseconds (-69.3?)
+        double fl_init = 90;
+        double bl_init = 90;
+        double br_init = 90;
+        double fr_init = 90;
 
-        double angle = Math.toDegrees(Math.atan2(y, x));
+        double angle = Math.toDegrees(Math.atan2(y, -x));
 
+        if (Math.abs(x)>0.2 || Math.abs(y)>0.2) {
+            frDrive.setPower(speed);
+            flDrive.setPower(speed);
+            blDrive.setPower(speed);
+            brDrive.setPower(speed);
+        } else {
+
+            frDrive.setPower(0);
+            flDrive.setPower(0);
+            blDrive.setPower(0);
+            brDrive.setPower(0);
+        }
         // motors
 
-        if (Math.abs(turn) <= 0.1) {
-            if (x>=0) {
-                frDrive.setPower(speed);
-                flDrive.setPower(speed);
-                blDrive.setPower(speed);
-                brDrive.setPower(speed);
-            }
-            else {
-                frDrive.setPower(-speed);
-                flDrive.setPower(-speed);
-                blDrive.setPower(-speed);
-                brDrive.setPower(-speed);
-            }
-        } else {
-            if (turn < -0.01) {
-                frDrive.setPower(speed);
-                flDrive.setPower(speed);
-                blDrive.setPower(speed);
-                brDrive.setPower(speed);
-            }
-            else if (turn > 0.01){
-                frDrive.setPower(-speed);
-                flDrive.setPower(-speed);
-                blDrive.setPower(-speed);
-                brDrive.setPower(-speed);
-            }
-        }
+//        if (Math.abs(turn) <= 0.1) {
+//            if (x>=0) {
+//                frDrive.setPower(speed);
+//                flDrive.setPower(speed);
+//                blDrive.setPower(speed);
+//                brDrive.setPower(speed);
+//            }
+//            else {
+//                frDrive.setPower(-speed);
+//                flDrive.setPower(-speed);
+//                blDrive.setPower(-speed);
+//                brDrive.setPower(-speed);
+//            }
+//        } else {
+//            if (turn < -0.01) {
+//                frDrive.setPower(speed);
+//                flDrive.setPower(speed);
+//                blDrive.setPower(speed);
+//                brDrive.setPower(speed);
+//            }
+//            else if (turn > 0.01){
+//                frDrive.setPower(-speed);
+//                flDrive.setPower(-speed);
+//                blDrive.setPower(-speed);
+//                brDrive.setPower(-speed);
+//            }
+//        }
 
         // servos
 
@@ -108,8 +117,10 @@ public class SwerveDrive {
 
         telemetryM.debug("angle", targetAngle);
 
+        targetAngle %= 360;
+
         // Convert degrees → [0,1] servo position
-        double servoPos = targetAngle / 360; // might be 355 if its inaccurate
+        double servoPos = targetAngle / 350; // might be 355 if its inaccurate
 
         steerServo.setPosition(servoPos);
 

@@ -16,18 +16,8 @@ public class CONFIG {
     public static String BL_STEER = "bls"; // 2
     public static String FL_STEER = "fls"; // 3
 
-    //public static String intake = "in";
-    //public static String rotator = "rot";
-
-
-    public static String rotator = "rotator";
-//    public static String intake = "intake";
-//    public static String clawL = "clawl";
-//    public static String clawR = "clawr";
-//
-//    public static String dcMotorfr = "dcMotorfr";
-//    public static String dcMotorfl = "dcMotorfl";
-//    public static String dcMotorbl = "dcMotorbl";
-//    public static String dcMotorbr = "dcMotorbr";
+    public static String intake = "in"; //
+    public static String rotator = "rot"; //
+    public static String ball = "ball";
 
 }
