@@ -52,6 +52,11 @@ public class SwerveDrive {
 //        telemetryM.debug("turn", turn);
 
         // remember to change the letters for this too if you change it for speed
+        double fl_init = 120.06; // 1667 microseconds
+        double bl_init = 0.00;
+        double br_init = 56.34; // 1313 microseconds
+        double fr_init = 110.7; // 1615 microseconds (-69.3?)
+
         double angle = Math.toDegrees(Math.atan2(y, x));
 
         // motors
@@ -87,19 +92,15 @@ public class SwerveDrive {
         // servos
 
         if (Math.abs(turn) > 0.1) {
-            setSteerAngle(frSteer, 1.57);
-            setSteerAngle(flSteer, -1.57);
-            setSteerAngle(blSteer, 1.57);
-            setSteerAngle(brSteer, -1.57);
-            setSteerAngle(frSteer, 45);
-            setSteerAngle(flSteer, -45);
-            setSteerAngle(blSteer, 45);
-            setSteerAngle(brSteer, -45);
+            setSteerAngle(frSteer, fr_init + 45);
+            setSteerAngle(flSteer, fl_init - 45);
+            setSteerAngle(blSteer, bl_init + 45);
+            setSteerAngle(brSteer, br_init - 45);
         } else {
-            setSteerAngle(frSteer, angle);
-            setSteerAngle(flSteer, angle);
-            setSteerAngle(blSteer, angle);
-            setSteerAngle(brSteer, angle);
+            setSteerAngle(frSteer, fr_init + angle);
+            setSteerAngle(flSteer, fl_init + angle);
+            setSteerAngle(blSteer, bl_init + angle);
+            setSteerAngle(brSteer, br_init + angle);
         }
     }
 
