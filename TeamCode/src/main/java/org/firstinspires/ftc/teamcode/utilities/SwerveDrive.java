@@ -94,16 +94,16 @@ public class SwerveDrive {
 
         // servos
 
-        if (Math.abs(turn) > 0.1) {
-            setSteerAngle(frSteer, fr_init + 45);
-            setSteerAngle(flSteer, fl_init - 45);
-            setSteerAngle(blSteer, bl_init + 45);
-            setSteerAngle(brSteer, br_init - 45);
-        } else if (Math.hypot(x,y) > 0.2){
+        if (Math.hypot(x,y) > 0.2){
             setSteerAngle(frSteer, fr_init + angle);
             setSteerAngle(flSteer, fl_init + angle);
             setSteerAngle(blSteer, bl_init + angle);
             setSteerAngle(brSteer, br_init + angle);
+        } else {
+            setSteerAngle(frSteer, 0);
+            setSteerAngle(flSteer, 0);
+            setSteerAngle(blSteer, 0);
+            setSteerAngle(brSteer, 0);
         }
     }
 
