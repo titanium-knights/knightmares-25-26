@@ -27,7 +27,7 @@ public class SwerveDrive {
     double L = 15.5; // robot length in inches
     double W = 15.5; // robot width in inches
     double R = Math.sqrt(L * L + W * W); // diagonal size
-    double speed = 0.2;
+    double MAX_SPEED = 0.8;
 
     public SwerveDrive(HardwareMap hmap, Telemetry telemetry) {
         this.frDrive = hmap.dcMotor.get(CONFIG.FRONT_RIGHT);
@@ -48,12 +48,20 @@ public class SwerveDrive {
     }
 
     public void move(double x, double y, double turn) {
-//        telemetryM.debug("x", x);
-//        telemetryM.debug("y", y);
-//        telemetryM.debug("turn", turn);
 
         // remember to change the letters for this too if you change it for speed
-        double angle = Math.toDegrees(Math.atan2(y, x));
+        double fl_init = 90;
+        double bl_init = 90;
+        double br_init = 90;
+        double fr_init = 90;
+
+        double angle = Math.toDegrees(Math.atan2(y, -x));
+
+        double speed = Math.hypot(x,y)*MAX_SPEED;
+        frDrive.setPower(speed);
+        flDrive.setPower(speed);
+        blDrive.setPower(speed);
+        brDrive.setPower(speed);
 
         // motors
 
@@ -86,35 +94,28 @@ public class SwerveDrive {
 //        }
 
         // servos
-        double gray = 300;
-        double pink = 180;
 
-        if (Math.abs(turn) > 0.1) {
-            setSteerAngle(frSteer, 1.57, gray);
-            setSteerAngle(flSteer, -1.57, gray);
-            setSteerAngle(blSteer, 1.57, gray);
-            setSteerAngle(brSteer, -1.57, pink);
-            setSteerAngle(frSteer, 45, gray);
-            setSteerAngle(flSteer, -45, gray);
-            setSteerAngle(blSteer, 45, gray);
-            setSteerAngle(brSteer, -45, pink);
+        if (Math.hypot(x,y) > 0.2){
+            setSteerAngle(frSteer, fr_init + angle);
+            setSteerAngle(flSteer, fl_init + angle);
+            setSteerAngle(blSteer, bl_init + angle);
+            setSteerAngle(brSteer, br_init + angle);
         } else {
-            setSteerAngle(frSteer, angle, gray);
-            setSteerAngle(flSteer, angle, gray);
-            setSteerAngle(blSteer, angle, gray);
-            setSteerAngle(brSteer, angle, gray);
+            setSteerAngle(frSteer, 0);
+            setSteerAngle(flSteer, 0);
+            setSteerAngle(blSteer, 0);
+            setSteerAngle(brSteer, 0);
         }
     }
 
-    private void setSteerAngle(Servo steerServo, double targetAngle, double rotLimit) {
-        // so everything is within 1 radian
-        if (targetAngle > 180) targetAngle -= 180;
-        if (targetAngle <= 0) targetAngle += 180;
+    private void setSteerAngle(Servo steerServo, double targetAngle) {
 
         telemetryM.debug("angle", targetAngle);
 
+        targetAngle %= 360;
+
         // Convert degrees → [0,1] servo position
-        double servoPos = targetAngle / rotLimit; // because 0 is vertical
+        double servoPos = targetAngle / 350; // might be 355 if its inaccurate
 
         steerServo.setPosition(servoPos);
 
