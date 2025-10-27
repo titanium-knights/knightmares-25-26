@@ -54,13 +54,13 @@ public class SwerveDrive {
         double br_init = 90;
         double fr_init = 90;
 
-        double angle = Math.toDegrees(Math.atan2(y, -x));
+        double angle = Math.toDegrees(Math.atan2(y, -x)) + 180;
 
         double speed = Math.hypot(x,y)*MAX_SPEED;
-        frDrive.setPower(speed);
-        flDrive.setPower(speed);
-        blDrive.setPower(speed);
-        brDrive.setPower(speed);
+//        frDrive.setPower(speed);
+//        flDrive.setPower(speed);
+//        blDrive.setPower(speed);
+//        brDrive.setPower(speed);
 
         // motors
 
@@ -99,11 +99,17 @@ public class SwerveDrive {
             setSteerAngle(flSteer, fl_init + angle);
             setSteerAngle(blSteer, bl_init + angle);
             setSteerAngle(brSteer, br_init + angle);
-        } else {
-            setSteerAngle(frSteer, 0);
-            setSteerAngle(flSteer, 0);
-            setSteerAngle(blSteer, 0);
-            setSteerAngle(brSteer, 0);
+        }
+        else if (turn > 0.2){
+            setSteerAngle(frSteer, 135 );
+            setSteerAngle(flSteer, 45);
+            setSteerAngle(blSteer, 135 );
+            setSteerAngle(brSteer, 45 );
+        } else if (turn < -0.2){
+            setSteerAngle(frSteer, 45);
+            setSteerAngle(flSteer, 135);
+            setSteerAngle(blSteer, 45 );
+            setSteerAngle(brSteer, 135 );
         }
     }
 
@@ -114,9 +120,32 @@ public class SwerveDrive {
         targetAngle %= 360;
 
         // Convert degrees → [0,1] servo position
-        double servoPos = targetAngle / 350; // might be 355 if its inaccurate
+        double servoPos = targetAngle / 360; // might be 355 if its inaccurate
+        double currPos = steerServo.getPosition();
 
-        steerServo.setPosition(servoPos);
+        if ((currPos - servoPos) > 0) {
+            if ((currPos - servoPos) < 0.5) {
+                steerServo.setPosition(servoPos);
+            } else {
+                double midValue = currPos - 0.01;
+                while (midValue > servoPos) {
+                    steerServo.setPosition(midValue);
+                    midValue -= 0.01;
+                }
+                steerServo.setPosition(servoPos);
+            }
+        } else {
+            if ((servoPos - currPos) < 0.5) {
+                steerServo.setPosition(servoPos);
+            } else {
+                double midValue = currPos + 0.01;
+                while (midValue > servoPos) {
+                    steerServo.setPosition(midValue);
+                    midValue += 0.01;
+                }
+                steerServo.setPosition(servoPos);
+            }
+        }
 
         telemetryM.debug("servo pos", servoPos);
         telemetryM.debug("set angle", steerServo.getPosition());
