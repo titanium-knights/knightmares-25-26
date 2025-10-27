@@ -16,9 +16,10 @@ public class SwerveDrive {
     // Drive motors
     private DcMotor frDrive, flDrive, blDrive, brDrive;
 
+
     // turning motors/servos
     private Servo frSteer, flSteer, blSteer, brSteer;
-    private TelemetryManager telemetryM;
+    private TelemetryManager telemetryM;    
     private Telemetry telemetry;
 
     // TODO: we might have to take into account the distance of the wheels from the edge of the robot
