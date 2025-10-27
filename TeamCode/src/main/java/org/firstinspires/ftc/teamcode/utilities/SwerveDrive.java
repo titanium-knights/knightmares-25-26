@@ -56,7 +56,7 @@ public class SwerveDrive {
 
         double angle = Math.toDegrees(Math.atan2(y, -x));
 
-        double speed = Math.hypot(x,y)*0.8;
+        double speed = Math.hypot(x,y)*MAX_SPEED;
         frDrive.setPower(speed);
         flDrive.setPower(speed);
         blDrive.setPower(speed);
