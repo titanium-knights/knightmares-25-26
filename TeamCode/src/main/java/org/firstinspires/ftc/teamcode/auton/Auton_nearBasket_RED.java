@@ -34,7 +34,6 @@ public class Auton_nearBasket_RED extends AutonMethods {
 
         // ✅ Now run movements
         moveForward(10.0);
-        moveBackward(10.0);
     }
 }
 

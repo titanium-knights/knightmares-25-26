@@ -38,7 +38,12 @@ public class Complex_nearBasket_RED extends AutonMethods {
         moveForward(10.0);
         rotateDown(10.0);
         pullBall(10.0);
+        takeIn(10.0);
         moveBackward(10.0);
+        moveRight(5.0);
+        rotateUp(5.0);
+        shoot(10.0);
+        pushBall(10.0);
     }
 }
 

@@ -101,6 +101,20 @@ public abstract class AutonMethods extends LinearOpMode {
         stopDrive();
     }
 
+    public void shoot(double x){
+        double duration = 8000 * x;
+        intake.shoot();
+        sleep((int)duration);
+        stopDrive();
+    }
+
+    public void takeIn(double x){
+        double duration = 8000 * x;
+        intake.takeIn();
+        sleep((int)duration);
+        stopDrive();
+    }
+
 
     double conversionVariable = 24;
     public double convert(double num){
