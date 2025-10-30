@@ -71,6 +71,8 @@ public abstract class AutonMethods extends LinearOpMode {
         stopDrive();
      }
 
+     //Arm Rotator
+
      public void rotateUp(double x){
         double duration = 8000 * x;
         rotator.rotateUp();
@@ -85,7 +87,19 @@ public abstract class AutonMethods extends LinearOpMode {
         stopDrive();
      }
 
-     // slides rotate
+    public void pullBall(double x){
+        double duration = 8000 * x;
+        intake.pullBall();
+        sleep((int)duration);
+        stopDrive();
+    }
+
+    public void pushBall(double x){
+        double duration = 8000 * x;
+        intake.pushBall();
+        sleep((int)duration);
+        stopDrive();
+    }
 
 
     double conversionVariable = 24;
