@@ -40,15 +40,6 @@ public abstract class AutonMethods extends LinearOpMode {
         sleep(100);
     }
 
-    // latch
-//    public void latch() {
-//        latch.latchOn();
-//    }
-//
-//    public void unlatch() {
-//        latch.latchOn();
-//    }
-
 
     // Going forward, backward, turning, going left, going right
 
