@@ -87,7 +87,7 @@ public class Teleop extends OpMode {
         } else {
             ballButton = ButtonPressState.UNPRESSED;
         }
-        
+
         if (gamepad1.x && !intakeState && (intakeButton == ButtonPressState.UNPRESSED)) {
             intakeButton = ButtonPressState.PRESSED_GOOD;
             intakeState = true;
