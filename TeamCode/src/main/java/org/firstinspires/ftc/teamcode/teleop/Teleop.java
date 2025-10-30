@@ -58,10 +58,11 @@ public class Teleop extends OpMode {
         this.ultimateButton = ButtonPressState.UNPRESSED;
         this.ballButton = ButtonPressState.UNPRESSED;
 
-
         this.rotator = new Rotator(hardwareMap, telemetry);
         this.intake = new Intake(hardwareMap);
         this.drive = new SwerveDrive(hardwareMap, telemetry);
+
+        intake.pullBall();
     }
 
     @Override
@@ -74,23 +75,24 @@ public class Teleop extends OpMode {
         stick_margin = 0.1f;
         move(x, y, turn);
 
-        if((gamepad2.right_trigger > 0.2) && (!ballState)&& (intakeButton == ButtonPressState.UNPRESSED)){
+        if((gamepad1.right_trigger > 0.2) && (!ballState)&& (intakeButton == ButtonPressState.UNPRESSED)){
             ballButton = ButtonPressState.PRESSED_GOOD;
             ballState = true;
             intake.pushBall();
 
-        } else if ((gamepad2.right_trigger < 0.2) && (ballState)&& (intakeButton == ButtonPressState.UNPRESSED)){
+        } else if ((gamepad1.right_trigger > 0.2) && (ballState)&& (intakeButton == ButtonPressState.UNPRESSED)){
             ballButton = ButtonPressState.PRESSED_GOOD;
             ballState = false;
-            intake.pushBall();
+            intake.pullBall();
         } else {
             ballButton = ButtonPressState.UNPRESSED;
         }
-        if (gamepad2.x && !intakeState && (intakeButton == ButtonPressState.UNPRESSED)) {
+        
+        if (gamepad1.x && !intakeState && (intakeButton == ButtonPressState.UNPRESSED)) {
             intakeButton = ButtonPressState.PRESSED_GOOD;
             intakeState = true;
             intake.takeIn();
-        } else if (gamepad2.x && intakeState && (intakeButton == ButtonPressState.UNPRESSED)) {
+        } else if (gamepad1.x && intakeState && (intakeButton == ButtonPressState.UNPRESSED)) {
             intakeState = false;
             intakeButton = ButtonPressState.PRESSED_GOOD;
             intake.shoot();
@@ -98,18 +100,12 @@ public class Teleop extends OpMode {
             intakeButton = ButtonPressState.UNPRESSED;
         }
 
-        if (gamepad2.right_bumper && (rotatorButton == ButtonPressState.PRESSED_GOOD) && (rotatorState == false)) {
+        if (gamepad1.right_bumper) {
             rotator.rotateUp();
-            rotatorState = true;
-            rotatorButton = ButtonPressState.PRESSED_GOOD;
-        } else if (gamepad2.left_bumper && (rotatorButton == ButtonPressState.PRESSED_GOOD) && (rotatorState == true)) {
+        } else if (gamepad1.left_bumper) {
             rotator.rotateDown();
-            rotatorState = false;
-
-            rotatorButton = ButtonPressState.PRESSED_GOOD;
         } else{
             rotator.stopRotator();
-            rotatorButton = ButtonPressState.UNPRESSED;
         }
 
     }

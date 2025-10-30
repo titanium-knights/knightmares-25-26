@@ -8,6 +8,7 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.teleop.Teleop;
 
 public class SwerveDrive {
 
@@ -27,7 +28,7 @@ public class SwerveDrive {
     double L = 15.5; // robot length in inches
     double W = 15.5; // robot width in inches
     double R = Math.sqrt(L * L + W * W); // diagonal size
-    double MAX_SPEED = 0.8;
+    double MAX_SPEED = 0.7;
 
     public SwerveDrive(HardwareMap hmap, Telemetry telemetry) {
         this.frDrive = hmap.dcMotor.get(CONFIG.FRONT_RIGHT);
@@ -58,10 +59,13 @@ public class SwerveDrive {
         double angle = Math.toDegrees(Math.atan2(y, -x)) + 180;
 
         double speed = Math.hypot(x,y)*MAX_SPEED;
-//        frDrive.setPower(speed);
-//        flDrive.setPower(speed);
-//        blDrive.setPower(speed);
-//        brDrive.setPower(speed);
+
+        frDrive.setPower(speed);
+        flDrive.setPower(-speed);
+        blDrive.setPower(-speed);
+        brDrive.setPower(speed);
+
+        telemetryM.debug("speed", speed);
 
         // motors
 
@@ -101,16 +105,11 @@ public class SwerveDrive {
             setSteerAngle(blSteer, bl_init + angle);
             setSteerAngle(brSteer, br_init + angle);
         }
-        else if (turn > 0.2){
+        else if (Math.abs(turn) > 0.2){
             setSteerAngle(frSteer, 135 );
             setSteerAngle(flSteer, 45);
             setSteerAngle(blSteer, 135 );
             setSteerAngle(brSteer, 45 );
-        } else if (turn < -0.2){
-            setSteerAngle(frSteer, 45);
-            setSteerAngle(flSteer, 135);
-            setSteerAngle(blSteer, 45 );
-            setSteerAngle(brSteer, 135 );
         }
     }
 

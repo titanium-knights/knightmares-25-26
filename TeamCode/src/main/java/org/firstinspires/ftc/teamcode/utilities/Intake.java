@@ -17,8 +17,8 @@ public class Intake {
     float leftOpen = 0.3f;
     float rightOpen = 0.7f;
 
-    double pullPos = 1600 / 2000;
-    double pushPos = 2000 / 2000;
+    double pullPos = 1900 / 2000; // 2000/2000
+    double pushPos = 1600 / 2000;
 
 
     public Intake(HardwareMap hmap) {
