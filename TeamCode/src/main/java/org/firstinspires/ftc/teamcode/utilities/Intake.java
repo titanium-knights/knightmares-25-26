@@ -12,13 +12,9 @@ public class Intake {
     //everything in encoder ticks or number of rotations
     DcMotor intakeMotor;
     Servo ballServo;
-    float leftClose = 0.7f;
-    float rightClose = 0.3f;
-    float leftOpen = 0.3f;
-    float rightOpen = 0.7f;
 
-    double pullPos = 1900 / 2000; // 2000/2000
-    double pushPos = 1600 / 2000;
+    double pullPos = 0.5; // 2000/2000
+    double pushPos = 0.8;
 
 
     public Intake(HardwareMap hmap) {
@@ -53,6 +49,7 @@ public class Intake {
 
     public void pushBall(){
         ballServo.setPosition(pushPos);
+
     }
     public void pullBall(){
         ballServo.setPosition(pullPos);

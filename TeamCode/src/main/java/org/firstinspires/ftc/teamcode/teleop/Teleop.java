@@ -75,29 +75,29 @@ public class Teleop extends OpMode {
         stick_margin = 0.1f;
         move(x, y, turn);
 
-        if((gamepad1.right_trigger > 0.2) && (!ballState)&& (intakeButton == ButtonPressState.UNPRESSED)){
+        if((gamepad1.right_trigger > 0.05) && (!ballState)&& (ballButton == ButtonPressState.UNPRESSED)){
             ballButton = ButtonPressState.PRESSED_GOOD;
             ballState = true;
             intake.pushBall();
+//            telemetryM.debug("push");
+//            telemetryM.update(telemetry);
 
-        } else if ((gamepad1.right_trigger > 0.2) && (ballState)&& (intakeButton == ButtonPressState.UNPRESSED)){
+        } else if ((gamepad1.right_trigger > 0.05) && (ballState)&& (ballButton == ButtonPressState.UNPRESSED)){
             ballButton = ButtonPressState.PRESSED_GOOD;
             ballState = false;
             intake.pullBall();
+//            telemetryM.debug("pull");
+//            telemetryM.update(telemetry);
         } else {
             ballButton = ButtonPressState.UNPRESSED;
         }
 
-        if (gamepad1.x && !intakeState && (intakeButton == ButtonPressState.UNPRESSED)) {
-            intakeButton = ButtonPressState.PRESSED_GOOD;
-            intakeState = true;
+        if (gamepad1.y) {
             intake.takeIn();
-        } else if (gamepad1.x && intakeState && (intakeButton == ButtonPressState.UNPRESSED)) {
-            intakeState = false;
-            intakeButton = ButtonPressState.PRESSED_GOOD;
+        } else if (gamepad1.x) {
             intake.shoot();
         } else {
-            intakeButton = ButtonPressState.UNPRESSED;
+            intake.stopIntake();
         }
 
         if (gamepad1.right_bumper) {
