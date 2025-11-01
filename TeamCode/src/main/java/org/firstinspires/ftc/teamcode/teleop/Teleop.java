@@ -75,20 +75,20 @@ public class Teleop extends OpMode {
         stick_margin = 0.1f;
         move(x, y, turn);
 
-        if((gamepad1.right_trigger > 0.05) && (!ballState)&& (ballButton == ButtonPressState.UNPRESSED)){
+        if((gamepad1.right_trigger > 0.2) && (!ballState)&& (ballButton == ButtonPressState.UNPRESSED)){
             ballButton = ButtonPressState.PRESSED_GOOD;
             ballState = true;
             intake.pushBall();
 //            telemetryM.debug("push");
 //            telemetryM.update(telemetry);
 
-        } else if ((gamepad1.right_trigger > 0.05) && (ballState)&& (ballButton == ButtonPressState.UNPRESSED)){
+        } else if ((gamepad1.right_trigger > 0.2) && (ballState)&& (ballButton == ButtonPressState.UNPRESSED)){
             ballButton = ButtonPressState.PRESSED_GOOD;
             ballState = false;
             intake.pullBall();
 //            telemetryM.debug("pull");
 //            telemetryM.update(telemetry);
-        } else {
+        } else if ((ballButton == ButtonPressState.PRESSED_GOOD)){
             ballButton = ButtonPressState.UNPRESSED;
         }
 
