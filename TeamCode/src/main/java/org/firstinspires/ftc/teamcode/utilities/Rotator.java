@@ -26,7 +26,7 @@ public class Rotator {
 
     // 0 is 1600 microseconds
     //
-    double power = 0.6;
+    double power = 0.9;
 
     public static Telemetry telemetry;
 

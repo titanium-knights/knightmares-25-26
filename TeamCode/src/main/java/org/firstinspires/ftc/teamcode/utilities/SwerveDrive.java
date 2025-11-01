@@ -29,6 +29,7 @@ public class SwerveDrive {
     double W = 15.5; // robot width in inches
     double R = Math.sqrt(L * L + W * W); // diagonal size
     double MAX_SPEED = 0.7;
+    double TURN_SPEED = 0.5;
 
     public SwerveDrive(HardwareMap hmap, Telemetry telemetry) {
         this.frDrive = hmap.dcMotor.get(CONFIG.FRONT_RIGHT);
@@ -59,43 +60,9 @@ public class SwerveDrive {
         double angle = Math.toDegrees(Math.atan2(y, -x)) + 180;
 
         double speed = Math.hypot(x,y)*MAX_SPEED;
-
-        frDrive.setPower(speed);
-        flDrive.setPower(-speed);
-        blDrive.setPower(-speed);
-        brDrive.setPower(speed);
+        double turnspeed = turn*TURN_SPEED-0.1;
 
         telemetryM.debug("speed", speed);
-
-        // motors
-
-//        if (Math.abs(turn) <= 0.1) {
-//            if (x>=0) {
-//                frDrive.setPower(speed);
-//                flDrive.setPower(speed);
-//                blDrive.setPower(speed);
-//                brDrive.setPower(speed);
-//            }
-//            else {
-//                frDrive.setPower(-speed);
-//                flDrive.setPower(-speed);
-//                blDrive.setPower(-speed);
-//                brDrive.setPower(-speed);
-//            }
-//        } else {
-//            if (turn < -0.01) {
-//                frDrive.setPower(speed);
-//                flDrive.setPower(speed);
-//                blDrive.setPower(speed);
-//                brDrive.setPower(speed);
-//            }
-//            else if (turn > 0.01){
-//                frDrive.setPower(-speed);
-//                flDrive.setPower(-speed);
-//                blDrive.setPower(-speed);
-//                brDrive.setPower(-speed);
-//            }
-//        }
 
         // servos
 
@@ -104,12 +71,24 @@ public class SwerveDrive {
             setSteerAngle(flSteer, fl_init + angle);
             setSteerAngle(blSteer, bl_init + angle);
             setSteerAngle(brSteer, br_init + angle);
+
+            frDrive.setPower(speed);
+            flDrive.setPower(-speed);
+            blDrive.setPower(-speed);
+            brDrive.setPower(speed);
         }
         else if (Math.abs(turn) > 0.2){
-            setSteerAngle(frSteer, 135 );
-            setSteerAngle(flSteer, 45);
-            setSteerAngle(blSteer, 135 );
-            setSteerAngle(brSteer, 45 );
+            setSteerAngle(frSteer, 135);
+            setSteerAngle(flSteer, 225);
+            setSteerAngle(blSteer, 315);
+            setSteerAngle(brSteer, 45);
+
+            frDrive.setPower(turnspeed);
+            flDrive.setPower(-turnspeed);
+            blDrive.setPower(-turnspeed);
+            brDrive.setPower(turnspeed);
+        } else {
+            frDrive.setPower(0);
         }
     }
 
