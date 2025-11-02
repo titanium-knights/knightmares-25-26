@@ -88,7 +88,7 @@ public class Teleop extends OpMode {
             intake.pullBall();
 //            telemetryM.debug("pull");
 //            telemetryM.update(telemetry);
-        } else if ((ballButton == ButtonPressState.PRESSED_GOOD)){
+        } else{
             ballButton = ButtonPressState.UNPRESSED;
         }
 
