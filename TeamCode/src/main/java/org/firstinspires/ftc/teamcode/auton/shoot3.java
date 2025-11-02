@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.utilities.Intake;
 import org.firstinspires.ftc.teamcode.utilities.Rotator;
 import org.firstinspires.ftc.teamcode.utilities.SwerveDrive;
 
-@Autonomous(name = "Auton Near Basket RED")
+@Autonomous(name = "auton_shoot3")
 public class shoot3 extends AutonMethods {
 
     @Override

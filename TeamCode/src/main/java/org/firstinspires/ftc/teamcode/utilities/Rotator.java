@@ -32,11 +32,11 @@ public class Rotator {
 
 
     public void rotateUp() {
-        rotatorMotor.setPower(power);
+        rotatorMotor.setPower(-power);
     }
 
     public void rotateDown() {
-        rotatorMotor.setPower(-power);
+        rotatorMotor.setPower(power);
     }
 
     public void stopRotator() {

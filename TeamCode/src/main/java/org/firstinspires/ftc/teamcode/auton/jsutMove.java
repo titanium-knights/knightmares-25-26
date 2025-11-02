@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.utilities.Intake;
 import org.firstinspires.ftc.teamcode.utilities.Rotator;
 import org.firstinspires.ftc.teamcode.utilities.SwerveDrive;
 
-@Autonomous(name = "Auton Near Basket RED")
+@Autonomous(name = "auton_justMove")
 public class jsutMove extends AutonMethods {
 
     @Override

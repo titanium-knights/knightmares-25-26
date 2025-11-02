@@ -29,7 +29,7 @@ public class SwerveDrive {
     double W = 15.5; // robot width in inches
     double R = Math.sqrt(L * L + W * W); // diagonal size
     double MAX_SPEED = 0.7;
-    double TURN_SPEED = 0.5;
+    double TURN_SPEED = 0.6;
 
     public SwerveDrive(HardwareMap hmap, Telemetry telemetry) {
         this.frDrive = hmap.dcMotor.get(CONFIG.FRONT_RIGHT);
@@ -60,7 +60,7 @@ public class SwerveDrive {
         double angle = Math.toDegrees(Math.atan2(y, -x)) + 180;
 
         double speed = Math.hypot(x,y)*MAX_SPEED;
-        double turnspeed = turn*TURN_SPEED-0.1;
+        double turnspeed = turn*TURN_SPEED;
 
         telemetryM.debug("speed", speed);
 
@@ -77,18 +77,21 @@ public class SwerveDrive {
             blDrive.setPower(-speed);
             brDrive.setPower(speed);
         }
-        else if (Math.abs(turn) > 0.2){
+        else if (Math.abs(turn) > 0.1){
             setSteerAngle(frSteer, 135);
             setSteerAngle(flSteer, 225);
             setSteerAngle(blSteer, 315);
             setSteerAngle(brSteer, 45);
 
             frDrive.setPower(turnspeed);
-            flDrive.setPower(-turnspeed);
+            flDrive.setPower(turnspeed);
             blDrive.setPower(-turnspeed);
-            brDrive.setPower(turnspeed);
+            brDrive.setPower(-turnspeed);
         } else {
             frDrive.setPower(0);
+            flDrive.setPower(0);
+            blDrive.setPower(0);
+            brDrive.setPower(0);
         }
     }
 
