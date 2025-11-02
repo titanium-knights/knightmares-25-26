@@ -15,24 +15,7 @@ public abstract class AutonMethods extends LinearOpMode {
     public Rotator rotator;
     public Intake intake;
     public SwerveDrive swerveDrive;
-
-    @Override
-    public void runOpMode() throws InterruptedException {
-
-        telemetry.addData("Status", "Initializing hardware...");
-        telemetry.update();
-
-        // Initialize components and check for null references
-        swerveDrive = new SwerveDrive(hardwareMap, telemetry);
-        intake = new Intake(hardwareMap);
-        rotator = new Rotator(hardwareMap, telemetry);
-        // latch = new Latch(hardwareMap, telemetry);
-
-        telemetry.addData("Status", "Initialization Complete");
-        telemetry.update();
-        waitForStart();
-    }
-    public final double POWER = 0.5;
+    public final double POWER = 0.7;
 
     public void stopDrive() {
         swerveDrive.move(0, 0, 0);
@@ -44,7 +27,7 @@ public abstract class AutonMethods extends LinearOpMode {
     // Going forward, backward, turning, going left, going right
 
     public void moveForward(double x){
-        double duration = 1080 * x;
+        double duration = 2000 * x;
         swerveDrive.move(0, -POWER, 0);
         sleep((int)duration);
         stopDrive();

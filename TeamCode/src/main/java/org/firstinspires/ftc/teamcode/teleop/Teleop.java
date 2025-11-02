@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 import static java.lang.Thread.sleep;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -59,8 +60,10 @@ public class Teleop extends OpMode {
         this.ballButton = ButtonPressState.UNPRESSED;
 
         this.rotator = new Rotator(hardwareMap, telemetry);
-        this.intake = new Intake(hardwareMap);
+        this.intake = new Intake(hardwareMap, telemetry);
         this.drive = new SwerveDrive(hardwareMap, telemetry);
+
+        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
         intake.pullBall();
     }
@@ -75,21 +78,26 @@ public class Teleop extends OpMode {
         stick_margin = 0.1f;
         move(x, y, turn);
 
-        if((gamepad1.right_trigger > 0.2) && (!ballState)&& (ballButton == ButtonPressState.UNPRESSED)){
-            ballButton = ButtonPressState.PRESSED_GOOD;
-            ballState = true;
+        if((gamepad1.dpad_up)){
+//            ballButton = ButtonPressState.PRESSED_GOOD;
+//            ballState = true;
             intake.pushBall();
-//            telemetryM.debug("push");
-//            telemetryM.update(telemetry);
+            telemetryM.addLine("dpad up");
+            telemetryM.update();
 
-        } else if ((gamepad1.right_trigger > 0.2) && (ballState)&& (ballButton == ButtonPressState.UNPRESSED)){
-            ballButton = ButtonPressState.PRESSED_GOOD;
-            ballState = false;
+        } else if((gamepad1.dpad_down)){
+//            ballButton = ButtonPressState.PRESSED_GOOD;
+//            ballState = true;
             intake.pullBall();
-//            telemetryM.debug("pull");
-//            telemetryM.update(telemetry);
-        } else{
-            ballButton = ButtonPressState.UNPRESSED;
+            telemetryM.addLine("dpad down");
+            telemetryM.update();
+
+        } else {
+//            ballButton = ButtonPressState.PRESSED_GOOD;
+//            ballState = false;
+            telemetryM.addLine("default down");
+            telemetryM.update();
+            intake.pullBall();
         }
 
         if (gamepad1.y) {

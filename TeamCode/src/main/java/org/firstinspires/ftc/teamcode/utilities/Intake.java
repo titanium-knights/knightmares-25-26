@@ -2,10 +2,13 @@ package org.firstinspires.ftc.teamcode.utilities;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Intake {
     //DANIEL comment: For this, we don't really care about degrees so, we deal with
@@ -13,13 +16,18 @@ public class Intake {
     DcMotor intakeMotor;
     Servo ballServo;
 
-    double pullPos = 0.4; // 2000/2000
-    double pushPos = 0.8;
+    double pullPos = 0.45; // 2000/2000
+    double pushPos = 0.83;
+    private TelemetryManager telemetryM;
+    private Telemetry telemetry;
 
 
-    public Intake(HardwareMap hmap) {
+    public Intake(HardwareMap hmap, Telemetry telemetry) {
         this.intakeMotor = hmap.dcMotor.get(CONFIG.intake);
         this.ballServo = hmap.servo.get(CONFIG.ball);
+
+        this.telemetry = telemetry;
+        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
         setInit();
     }
 
@@ -49,10 +57,16 @@ public class Intake {
 
     public void pushBall(){
         ballServo.setPosition(pushPos);
+        telemetryM.addLine("pushed ball");
+        telemetryM.update();
+
 
     }
     public void pullBall(){
         ballServo.setPosition(pullPos);
+        telemetryM.addLine("pulled ball");
+        telemetryM.update();
+
     }
 
 
