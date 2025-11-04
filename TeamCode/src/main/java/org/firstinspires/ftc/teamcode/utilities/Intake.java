@@ -95,9 +95,4 @@ public class Intake {
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeMotor.setPower(-1);
     }
-
-    public void stopMotor() {
-        intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        intakeMotor.setPower(0);
-    }
 }

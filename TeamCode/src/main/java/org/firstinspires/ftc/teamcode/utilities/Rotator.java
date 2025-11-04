@@ -43,6 +43,11 @@ public class Rotator {
         rotatorMotor.setPower(0);
     }
 
+    public void killRotator() {
+        rotatorMotor.setPower(0);
+        rotatorMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+    }
+
     // public double getPosition() {
 //        return (rotatorServo.getPosition());
 //    }

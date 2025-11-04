@@ -52,10 +52,10 @@ public class SwerveDrive {
     public void move(double x, double y, double turn) {
 
         // remember to change the letters for this too if you change it for speed
-        double fl_init = 90;
-        double bl_init = 90;
-        double br_init = 90;
-        double fr_init = 90;
+        double fl_init = 80;
+        double bl_init = 80;
+        double br_init = 80;
+        double fr_init = 80;
 
         double angle = Math.toDegrees(Math.atan2(y, -x)) + 180;
 
@@ -78,10 +78,10 @@ public class SwerveDrive {
             brDrive.setPower(speed);
         }
         else if (Math.abs(turn) > 0.1){
-            setSteerAngle(frSteer, 135);
-            setSteerAngle(flSteer, 225);
-            setSteerAngle(blSteer, 315);
-            setSteerAngle(brSteer, 45);
+            setSteerAngle(frSteer, 135/1.1);
+            setSteerAngle(flSteer, 225/1.1);
+            setSteerAngle(blSteer, 315/1.1);
+            setSteerAngle(brSteer, 45/1.1);
 
             frDrive.setPower(-turnspeed);
             flDrive.setPower(turnspeed);
@@ -92,12 +92,24 @@ public class SwerveDrive {
             setSteerAngle(flSteer, 180);
             setSteerAngle(blSteer, 180);
             setSteerAngle(brSteer, 180);
+
             frDrive.setPower(0);
             flDrive.setPower(0);
             blDrive.setPower(0);
             brDrive.setPower(0);
         }
         
+    }
+
+    public void killMotors() {
+        flDrive.setPower(0);
+        flDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        blDrive.setPower(0);
+        blDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        brDrive.setPower(0);
+        brDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        frDrive.setPower(0);
+        frDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
     private void setSteerAngle(Servo steerServo, double targetAngle) {
@@ -107,7 +119,7 @@ public class SwerveDrive {
         targetAngle %= 360;
 
         // Convert degrees → [0,1] servo position
-        double servoPos = targetAngle / 360; // might be 355 if its inaccurate
+        double servoPos = targetAngle / 360 * 1.1; // might be 355 if its inaccurate
         double currPos = steerServo.getPosition();
 
         if ((currPos - servoPos) > 0) {
