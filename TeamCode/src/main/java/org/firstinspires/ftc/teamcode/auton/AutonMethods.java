@@ -47,13 +47,12 @@ public abstract class AutonMethods extends LinearOpMode {
          stopDrive();
      }
 
-     public void moveLeft(double x){
-        double duration = 1500 * x;
-        swerveDrive.move(-POWER, 0, 0);
-        sleep((int)duration);
-        stopDrive();
+     public void moveLeft(double x) {
+         double duration = 1500 * x;
+         swerveDrive.move(-POWER, 0, 0);
+         sleep((int) duration);
+         stopDrive();
      }
-
      //Arm Rotator
 
      public void rotateUp(double x){
