@@ -52,7 +52,7 @@ public class Outtake {
 
 
     // pullUpMotor1 and 2 are reversed. If you want it to go up, power will be negative. If you want it to go down, power will be positive.
-
+    // update
     public void pushBall() {
         ballServo.setPosition(pushPos);
         telemetryM.addLine("pushed ball");
@@ -63,4 +63,5 @@ public class Outtake {
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeMotor.setPower(-1);
     }
+
 }
