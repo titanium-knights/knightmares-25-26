@@ -15,8 +15,8 @@ public class Intake {
     //everything in encoder ticks or number of rotations
     DcMotor intakeMotor;
     DcMotor intakeMotorForShoot;
-    Servo ballServo;
 
+    Servo ballServo;
     double pullPos = 0.45; // 2000/2000
     double pushPos = 0.83;
     private TelemetryManager telemetryM;
