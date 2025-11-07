@@ -14,6 +14,7 @@ public class Intake {
     //DANIEL comment: For this, we don't really care about degrees so, we deal with
     //everything in encoder ticks or number of rotations
     DcMotor intakeMotor;
+    DcMotor intakeMotorForShoot;
     Servo ballServo;
 
     double pullPos = 0.45; // 2000/2000
@@ -24,6 +25,7 @@ public class Intake {
 
     public Intake(HardwareMap hmap, Telemetry telemetry) {
         this.intakeMotor = hmap.dcMotor.get(CONFIG.intake);
+        this.intakeMotorForShoot = hmap.dcMotor.get(CONFIG.intake_shoot);
         this.ballServo = hmap.servo.get(CONFIG.ball);
 
         this.telemetry = telemetry;
@@ -77,6 +79,9 @@ public class Intake {
     public void shoot(){ // 1
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeMotor.setPower(-1);
+
+        intakeMotorForShoot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intakeMotorForShoot.setPower(1);
 
     }
 
