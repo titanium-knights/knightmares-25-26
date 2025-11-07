@@ -9,17 +9,19 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.utilities.Intake;
+import org.firstinspires.ftc.teamcode.utilities.Outtake;
 import org.firstinspires.ftc.teamcode.utilities.SwerveDrive;
-import org.firstinspires.ftc.teamcode.utilities.Rotator;
-
-//import org.firstinspires.ftc.teamcode.utilities.SimpleMecanumDrive;
+import org.firstinspires.ftc.teamcode.utilities.Storer;
+//import org.firstinspires.ftc.teamcode.utilities.Rotator;
 
 @Configurable
 @TeleOp(name="DriveTrain Teleop")
 public class Teleop extends OpMode {
     Intake intake;
+    Outtake outtake;
     SwerveDrive drive;
-    Rotator rotator;
+    Storer storer;
+//    Rotator rotator;
 
     final double normalPower = 0.9;
 
@@ -59,9 +61,10 @@ public class Teleop extends OpMode {
         this.ultimateButton = ButtonPressState.UNPRESSED;
         this.ballButton = ButtonPressState.UNPRESSED;
 
-        this.rotator = new Rotator(hardwareMap, telemetry);
+//        this.rotator = new Rotator(hardwareMap, telemetry);
         this.intake = new Intake(hardwareMap, telemetry);
         this.drive = new SwerveDrive(hardwareMap, telemetry);
+        this.storer = new Storer(hardwareMap, telemetry);
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
@@ -77,6 +80,25 @@ public class Teleop extends OpMode {
         float turn = gamepad2.right_stick_x;
         stick_margin = 0.1f;
         move(x, y, turn);
+        //Subsystems
+        /*
+         Okay so these r the buttons
+
+         lt                   rt
+         lb:Intake            rb:Outtake
+
+
+         DPAD
+               ^: ballPush
+         <:         >:
+               v: ballPull(passive)
+
+
+         XYAB
+               Y:two
+         X:one      B:three
+               A
+         */
 
         if((gamepad1.dpad_up)){
 //            ballButton = ButtonPressState.PRESSED_GOOD;
@@ -100,21 +122,32 @@ public class Teleop extends OpMode {
             intake.pullBall();
         }
 
-        if (gamepad1.y) {
+        if (gamepad1.left_bumper) {
             intake.takeIn();
-        } else if (gamepad1.x) {
-            intake.shoot();
+        } else if (gamepad1.right_bumper) {
+            outtake.shoot();
         } else {
             intake.stopIntake();
         }
 
-        if (gamepad1.right_bumper) {
-            rotator.rotateUp();
-        } else if (gamepad1.left_bumper) {
-            rotator.rotateDown();
-        } else{
-            rotator.stopRotator();
+        if (gamepad1.x){
+            storer.toOne();
+        } else if (gamepad1.y){
+            storer.toTwo();
+        } else if (gamepad1.b){
+            storer.toThree();
         }
+
+//        if (gamepad1.right_bumper) {
+//            rotator.rotateUp();
+//        } else if (gamepad1.left_bumper) {
+//            rotator.rotateDown();
+//        } else{
+//            rotator.stopRotator();
+//        }
+
+
+
 
     }
 

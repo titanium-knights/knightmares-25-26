@@ -13,20 +13,17 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Outtake {
     //DANIEL comment: For this, we don't really care about degrees so, we deal with
     //everything in encoder ticks or number of rotations
-    DcMotor intakeMotor;
-    DcMotor intakeMotorForShoot;
+    DcMotor outtakeMotor1;
+    DcMotor outtakeMotor2;
 
-    Servo ballServo;
-    double pullPos = 0.45; // 2000/2000
-    double pushPos = 0.83;
+
     private TelemetryManager telemetryM;
     private Telemetry telemetry;
 
 
     public Outtake(HardwareMap hmap, Telemetry telemetry) {
-        this.intakeMotor = hmap.dcMotor.get(CONFIG.intake);
-        this.intakeMotorForShoot = hmap.dcMotor.get(CONFIG.intake_shoot);
-        this.ballServo = hmap.servo.get(CONFIG.ball);
+        this.outtakeMotor1 = hmap.dcMotor.get(CONFIG.outtake);
+        this.outtakeMotor2 = hmap.dcMotor.get(CONFIG.outtake);
 
         this.telemetry = telemetry;
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -35,33 +32,36 @@ public class Outtake {
 
     public void setInit() {
         // makes it so the motor is not loose when power is 0
-        intakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        intakeMotor.setZeroPowerBehavior(BRAKE);
+        outtakeMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        outtakeMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        outtakeMotor1.setZeroPowerBehavior(BRAKE);
+        outtakeMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        outtakeMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        outtakeMotor2.setZeroPowerBehavior(BRAKE);
     }
 
     public void stop(){ // sets power to 0 - everything stops
-        intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        outtakeMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        outtakeMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //        pullUpMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         setPower(0);
     }
     public void setPower(double power) {
-        intakeMotor.setPower(power);
+        outtakeMotor1.setPower(power);
+        outtakeMotor2.setPower(power);
 //        pullUpMotor2.setPower(power);
     }
 
 
     // pullUpMotor1 and 2 are reversed. If you want it to go up, power will be negative. If you want it to go down, power will be positive.
     // update
-    public void pushBall() {
-        ballServo.setPosition(pushPos);
-        telemetryM.addLine("pushed ball");
-        telemetryM.update();
-    }
 
-    public void motorOutake() {
-        intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        intakeMotor.setPower(-1);
+
+    public void shoot() {
+        outtakeMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        outtakeMotor1.setPower(-1);
+        outtakeMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        outtakeMotor2.setPower(-1);
     }
 
 }
