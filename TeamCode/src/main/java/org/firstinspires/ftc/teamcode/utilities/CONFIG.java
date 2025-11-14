@@ -17,7 +17,9 @@ public class CONFIG {
     public static String FL_STEER = "fls"; // 3
 
     public static String intake = "in"; //
-    public static String rotator = "rot"; //
+    public static String outtake = "out"; //
     public static String ball = "ball";
+    public static String storer = "storer";
+
 
 }
