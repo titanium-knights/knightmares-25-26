@@ -22,8 +22,8 @@ public class Outtake {
 
 
     public Outtake(HardwareMap hmap, Telemetry telemetry) {
-        this.outtakeMotor1 = hmap.dcMotor.get(CONFIG.outtake);
-        this.outtakeMotor2 = hmap.dcMotor.get(CONFIG.outtake);
+        this.outtakeMotor1 = hmap.dcMotor.get(CONFIG.outtake1);
+        this.outtakeMotor2 = hmap.dcMotor.get(CONFIG.outtake2);
 
         this.telemetry = telemetry;
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -40,7 +40,7 @@ public class Outtake {
         outtakeMotor2.setZeroPowerBehavior(BRAKE);
     }
 
-    public void stop(){ // sets power to 0 - everything stops
+    public void stopOuttake(){ // sets power to 0 - everything stops
         outtakeMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         outtakeMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //        pullUpMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -59,9 +59,9 @@ public class Outtake {
 
     public void shoot() {
         outtakeMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        outtakeMotor1.setPower(-1);
+        outtakeMotor1.setPower(-0.8);
         outtakeMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        outtakeMotor2.setPower(-1);
+        outtakeMotor2.setPower(-0.8);
     }
 
 }

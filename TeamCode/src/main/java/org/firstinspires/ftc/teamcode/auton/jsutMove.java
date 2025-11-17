@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.utilities.Intake;
-import org.firstinspires.ftc.teamcode.utilities.Rotator;
+import org.firstinspires.ftc.teamcode.utilities.Outtake;
 import org.firstinspires.ftc.teamcode.utilities.SwerveDrive;
 
 import com.bylazar.telemetry.TelemetryManager;
@@ -17,7 +17,7 @@ public class jsutMove extends AutonMethods {
     @Override
     public void runOpMode() throws InterruptedException {
         // ✅ Put initialization here
-        rotator = new Rotator(hardwareMap, telemetry);
+//        outtake = new Outtake(hardwareMap, telemetry);
         intake = new Intake(hardwareMap, telemetry);
         swerveDrive = new SwerveDrive(hardwareMap, telemetry);
 
