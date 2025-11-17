@@ -4,7 +4,7 @@ import com.bylazar.configurables.annotations.Configurable;
 
 @Configurable
 public class CONFIG {
-    //drivetrain wheels
+    //drivetrain wheels - Control Hub
     public static String FRONT_RIGHT = "fr"; // 0
     public static String BACK_RIGHT = "br"; // 1
     public static String BACK_LEFT = "bl"; // 2
@@ -15,11 +15,12 @@ public class CONFIG {
     public static String BR_STEER = "brs"; // 1
     public static String BL_STEER = "bls"; // 2
     public static String FL_STEER = "fls"; // 3
-
-    public static String intake = "in"; //
-    public static String outtake = "out"; //
-    public static String ball = "ball";
-    public static String storer = "storer";
+// Expansion Hub
+    public static String intake = "in"; // 2
+    public static String outtake1 = "out1"; // 0
+    public static String outtake2 = "out2"; // 1
+    public static String ball = "ball"; // 0
+    public static String storer = "storer"; // 1
 
 
 }

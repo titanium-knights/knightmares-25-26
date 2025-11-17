@@ -65,6 +65,7 @@ public class Teleop extends OpMode {
         this.intake = new Intake(hardwareMap, telemetry);
         this.drive = new SwerveDrive(hardwareMap, telemetry);
         this.storer = new Storer(hardwareMap, telemetry);
+        this.outtake = new Outtake(hardwareMap, telemetry);
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
@@ -128,6 +129,7 @@ public class Teleop extends OpMode {
             outtake.shoot();
         } else {
             intake.stopIntake();
+            outtake.stopOuttake();
         }
 
         if (gamepad1.x){
