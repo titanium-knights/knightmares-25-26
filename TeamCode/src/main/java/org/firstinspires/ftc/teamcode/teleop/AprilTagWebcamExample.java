@@ -5,7 +5,10 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.tel
 import android.graphics.Canvas;
 import android.util.Size;
 
+import com.bylazar.configurables.annotations.Configurable;
+import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -24,9 +27,11 @@ import java.util.List;
 
 import kotlin.properties.ObservableProperty;
 
-
+@Configurable
+@TeleOp(name="AprilTagWebcamExample")
 public class AprilTagWebcamExample extends OpMode {
     AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
+    private TelemetryManager telemetryM;
 
     @Override
     public void init() {
@@ -37,7 +42,7 @@ public class AprilTagWebcamExample extends OpMode {
     public void loop() {
         aprilTagWebcam.update();
         AprilTagDetection id20 = aprilTagWebcam.getTagBySpecificId(20);
-        telemetry.addData("id20 String", id20.toString());
+        // telemetry.addData("id20 String", id20.toString());
 
     }
 }

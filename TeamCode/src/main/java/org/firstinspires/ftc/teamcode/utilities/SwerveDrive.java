@@ -28,7 +28,7 @@ public class SwerveDrive {
     double L = 15.5; // robot length in inches
     double W = 15.5; // robot width in inches
     double R = Math.sqrt(L * L + W * W); // diagonal size
-    double MAX_SPEED = 0.9;
+    double MAX_SPEED = 0.8;
     double TURN_SPEED = 0.8;
 
     public SwerveDrive(HardwareMap hmap, Telemetry telemetry) {
@@ -62,43 +62,40 @@ public class SwerveDrive {
         double speed = Math.hypot(x,y)*MAX_SPEED;
         double turnspeed = turn*TURN_SPEED;
 
-        telemetryM.debug("speed", speed);
-
         // servos
 
         if (Math.hypot(x,y) > 0.2){
-            setSteerAngle(frSteer, fr_init + angle);
-            setSteerAngle(flSteer, fl_init + angle);
-            setSteerAngle(blSteer, bl_init + angle);
-            setSteerAngle(brSteer, br_init + angle);
+            findServoPos(frSteer, fr_init + angle);
+            findServoPos(flSteer, fl_init + angle);
+            findServoPos(blSteer, bl_init + angle);
+            findServoPos(brSteer, br_init + angle);
 
             frDrive.setPower(-speed);
             flDrive.setPower(-speed);
             blDrive.setPower(speed);
             brDrive.setPower(speed);
         }
-        else if (Math.abs(turn) > 0.1){
-            setSteerAngle(frSteer, 135/1.1);
-            setSteerAngle(flSteer, 225/1.1);
-            setSteerAngle(blSteer, 315/1.1);
-            setSteerAngle(brSteer, 45/1.1);
+        else if (Math.abs(turn) > 0.2){
+            findServoPos(frSteer, 135/1.1);
+            findServoPos(flSteer, 225/1.1);
+            findServoPos(blSteer, 315/1.1);
+            findServoPos(brSteer, 45/1.1);
 
             frDrive.setPower(-turnspeed);
             flDrive.setPower(turnspeed);
             blDrive.setPower(turnspeed);
             brDrive.setPower(-turnspeed);
         } else {
-            setSteerAngle(frSteer, 180);
-            setSteerAngle(flSteer, 180);
-            setSteerAngle(blSteer, 180);
-            setSteerAngle(brSteer, 180);
+            findServoPos(frSteer, 180);
+            findServoPos(flSteer, 180);
+            findServoPos(blSteer, 180);
+            findServoPos(brSteer, 180);
 
             frDrive.setPower(0);
             flDrive.setPower(0);
             blDrive.setPower(0);
             brDrive.setPower(0);
         }
-        
     }
 
     public void killMotors() {
@@ -112,14 +109,36 @@ public class SwerveDrive {
         frDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
-    private void setSteerAngle(Servo steerServo, double targetAngle) {
+    private void findServoPos(Servo steerServo, double targetAngle) {
 
-        telemetryM.debug("angle", targetAngle);
-
+        double tol = 25;
         targetAngle %= 360;
 
         // Convert degrees → [0,1] servo position
         double servoPos = targetAngle / 360 * 1.1; // might be 355 if its inaccurate
+
+        if (targetAngle > 90-tol && targetAngle < 90+tol) {
+            servoPos = 0.25;
+        }
+        else if (targetAngle > 180-tol && targetAngle < 180+tol) {
+            servoPos = 0.50;
+        }
+        else if (targetAngle > 270-tol && targetAngle < 270+tol) {
+            servoPos = 0.80;
+        }
+        else if ((targetAngle > 360-tol && targetAngle <= 360) || (targetAngle >= 0 && targetAngle < tol)) {
+            servoPos = 1.05;
+        }
+        setServoPos(steerServo, servoPos);
+
+        telemetryM.debug("target angle", targetAngle);
+        telemetryM.debug("set pos", servoPos);
+        telemetryM.debug("real angle", steerServo.getPosition());
+        telemetryM.update(telemetry);
+    }
+
+    private void setServoPos(Servo steerServo, double servoPos) {
+
         double currPos = steerServo.getPosition();
 
         if ((currPos - servoPos) > 0) {
@@ -145,9 +164,5 @@ public class SwerveDrive {
                 steerServo.setPosition(servoPos);
             }
         }
-
-        telemetryM.debug("servo pos", servoPos);
-        telemetryM.debug("set angle", steerServo.getPosition());
-        telemetryM.update(telemetry);
     }
 }

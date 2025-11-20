@@ -54,9 +54,9 @@ public class SwerveDriveOpMode extends OpMode {
     public void move(float x, float y, float turn) {
         // if the stick movement is negligible, set STICK_MARGIN to 0
 
-        if (Math.abs(x) <= stick_margin) x = .0f;
-        if (Math.abs(y) <= stick_margin) y = .0f;
-        if (Math.abs(turn) <= stick_margin) turn = .0f;
+        if (Math.abs(x) <= stick_margin) x = .15f;
+        if (Math.abs(y) <= stick_margin) y = .15f;
+        if (Math.abs(turn) <= stick_margin) turn = .15f;
 
         //Notation of a ? b : c means if a is true do b, else do c.
         double multiplier = normalPower;

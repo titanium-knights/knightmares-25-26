@@ -24,10 +24,10 @@ public class AprilTagWebcam {
     private AprilTagProcessor aprilTagProcessor;
     private VisionPortal visionPortal;
     private List<AprilTagDetection> detectedTags = new ArrayList<>();
-    private Telemetry telemtry;
+    private Telemetry telemetry;
 
-    public void init(HardwareMap hwMap, Telemetry telemtry) {
-        this.telemtry = telemetry;
+    public void init(HardwareMap hwMap, Telemetry telemetry) {
+        this.telemetry = telemetry;
 
         aprilTagProcessor = new AprilTagProcessor.Builder()
                 .setDrawTagID(true)
