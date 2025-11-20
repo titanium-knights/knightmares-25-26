@@ -29,7 +29,6 @@ public class Teleop extends OpMode {
     public float stick_margin = 0.7f;
 
     public boolean intakeState = false;
-    public boolean rotatorState = false;
     public boolean shootState = false;
 
     private TelemetryManager telemetryM;
@@ -42,7 +41,6 @@ public class Teleop extends OpMode {
     ButtonPressState intakeButton;
     ButtonPressState shootButton;
     ButtonPressState rotatorButton;
-    ButtonPressState ultimateButton;
     ButtonPressState ballButton;
 
     boolean slowMode = false;
@@ -58,7 +56,6 @@ public class Teleop extends OpMode {
         this.rotatorButton = ButtonPressState.UNPRESSED;
         this.intakeButton = ButtonPressState.UNPRESSED;
         this.shootButton = ButtonPressState.UNPRESSED;
-        this.ultimateButton = ButtonPressState.UNPRESSED;
         this.ballButton = ButtonPressState.UNPRESSED;
 
 //        this.rotator = new Rotator(hardwareMap, telemetry);
@@ -68,8 +65,6 @@ public class Teleop extends OpMode {
         this.outtake = new Outtake(hardwareMap, telemetry);
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
-
-        intake.pullBall();
     }
 
     @Override
@@ -85,72 +80,61 @@ public class Teleop extends OpMode {
         /*
          Okay so these r the buttons
 
-         lt                   rt
-         lb:Intake            rb:Outtake
+         lt:intake            rt:outtake
+         lb:pusher            rb:puller
 
 
          DPAD
-               ^: ballPush
-         <:         >:
-               v: ballPull(passive)
+                  ^: in two
+         <:in one         >: in three
+                  v
 
 
          XYAB
-               Y:two
-         X:one      B:three
-               A
+                  Y:out two
+         X:out one        B:out three
+                  A
          */
 
-        if((gamepad1.dpad_up)){
-//            ballButton = ButtonPressState.PRESSED_GOOD;
-//            ballState = true;
+        // INTAKE/OUTTAKE
+
+        if((gamepad1.left_bumper)){
             intake.pushBall();
-            telemetryM.addLine("dpad up");
-            telemetryM.update();
-
-        } else if((gamepad1.dpad_down)){
-//            ballButton = ButtonPressState.PRESSED_GOOD;
-//            ballState = true;
+        } else if((gamepad1.right_bumper)){
             intake.pullBall();
-            telemetryM.addLine("dpad down");
-            telemetryM.update();
-
         } else {
-//            ballButton = ButtonPressState.PRESSED_GOOD;
-//            ballState = false;
             telemetryM.addLine("default down");
             telemetryM.update();
             intake.pullBall();
         }
 
-        if (gamepad1.left_bumper) {
-            intake.takeIn();
-        } else if (gamepad1.right_bumper) {
-            outtake.shoot();
+        if (gamepad1.left_trigger > 0.1) {
+            intake.runIntake();
+        } else if (gamepad1.right_trigger > 0.1) {
+            outtake.runOuttake();
         } else {
             intake.stopIntake();
             outtake.stopOuttake();
         }
 
-        if (gamepad1.x){
-            storer.toOne();
-        } else if (gamepad1.y){
-            storer.toTwo();
-        } else if (gamepad1.b){
-            storer.toThree();
+
+        // STORER
+
+        if (gamepad1.dpad_left){
+            storer.toInOne();
+        } else if (gamepad1.dpad_up){
+            storer.toInTwo();
+        } else if (gamepad1.dpad_right){
+            storer.toInThree();
         }
 
-//        if (gamepad1.right_bumper) {
-//            rotator.rotateUp();
-//        } else if (gamepad1.left_bumper) {
-//            rotator.rotateDown();
-//        } else{
-//            rotator.stopRotator();
-//        }
-
-
-
-
+        if (gamepad1.x){
+            storer.toOutOne();
+        } else if (gamepad1.y){
+            storer.toOutTwo();
+        } else if (gamepad1.b){
+            storer.toOutThree();
+        }
     }
 
     public void move(float x, float y, float turn) {

@@ -57,7 +57,7 @@ public class Outtake {
     // update
 
 
-    public void shoot() {
+    public void runOuttake() {
         outtakeMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         outtakeMotor1.setPower(-0.8);
         outtakeMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
