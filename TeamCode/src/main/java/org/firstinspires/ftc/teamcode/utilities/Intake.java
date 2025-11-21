@@ -46,9 +46,8 @@ public class Intake {
         ballServo.setPosition(pushPos);
         telemetryM.addLine("pushed ball");
         telemetryM.update();
-
-
     }
+
     public void pullBall(){
         ballServo.setPosition(pullPos);
         telemetryM.addLine("pulled ball");
