@@ -22,6 +22,7 @@ public class Intake {
     double pushPos = 0.83;
     private TelemetryManager telemetryM;
     private Telemetry telemetry;
+    double power = 0.8;
 
 
     public Intake(HardwareMap hmap, Telemetry telemetry) {
@@ -37,8 +38,8 @@ public class Intake {
     public void stop(){ // sets power to 0 - everything stops
         intakeServo.setPower(0);
     }
-    public void run(double power) {
-        intakeServo.setPower(1);
+    public void run() {
+        intakeServo.setPower(power);
     }
 
     public void pushBall(){
