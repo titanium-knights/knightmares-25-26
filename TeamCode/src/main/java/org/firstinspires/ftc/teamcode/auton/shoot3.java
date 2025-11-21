@@ -34,8 +34,8 @@ public class shoot3 extends AutonMethods {
         // ✅ Now run movements
         moveBackward(0.01);
         moveForward(1.0);
-        rotateUp(5.0);
-        shoot(10.0);
+//        rotateUp(5.0);
+//        shoot(10.0);
         pushBall(10.0);
     }
 }

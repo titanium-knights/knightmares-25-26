@@ -109,11 +109,11 @@ public class Teleop extends OpMode {
         }
 
         if (gamepad1.left_trigger > 0.1) {
-            intake.runIntake();
+            intake.run();
         } else if (gamepad1.right_trigger > 0.1) {
             outtake.runOuttake();
         } else {
-            intake.stopIntake();
+            intake.stop();
             outtake.stopOuttake();
         }
 

@@ -1,18 +1,16 @@
 package org.firstinspires.ftc.teamcode.auton;
 
-import static org.firstinspires.ftc.teamcode.utilities.CONFIG.intake;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.Servo;
 
 
 import org.firstinspires.ftc.teamcode.utilities.Outtake;
 import org.firstinspires.ftc.teamcode.utilities.Intake;
+import org.firstinspires.ftc.teamcode.utilities.Storer;
 import org.firstinspires.ftc.teamcode.utilities.SwerveDrive;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public abstract class AutonMethods extends LinearOpMode {
-    public Outtake rotator;
+    public Storer storer;
+    public Outtake outtake;
     public Intake intake;
     public SwerveDrive swerveDrive;
     public final double POWER = 0.7;
@@ -55,18 +53,6 @@ public abstract class AutonMethods extends LinearOpMode {
      }
      //Arm Rotator
 
-     public void rotateUp(double x){
-        double duration = 8000 * x;
-        sleep((int)duration);
-        stopDrive();
-     }
-
-     public void rotateDown(double x){
-        double duration = 8000 * x;
-        sleep((int)duration);
-        stopDrive();
-     }
-
     public void pullBall(double x){
         double duration = 8000 * x;
         intake.pullBall();
@@ -81,19 +67,6 @@ public abstract class AutonMethods extends LinearOpMode {
         stopDrive();
     }
 
-    public void shoot(double x){
-        double duration = 8000 * x;
-        intake.shoot();
-        sleep((int)duration);
-        stopDrive();
-    }
-
-    public void takeIn(double x){
-        double duration = 8000 * x;
-        intake.takeIn();
-        sleep((int)duration);
-        stopDrive();
-    }
 
 
     double conversionVariable = 24;
