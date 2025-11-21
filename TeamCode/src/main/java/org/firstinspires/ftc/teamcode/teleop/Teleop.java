@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.utilities.Intake;
 import org.firstinspires.ftc.teamcode.utilities.Outtake;
+import org.firstinspires.ftc.teamcode.utilities.Rotator;
 import org.firstinspires.ftc.teamcode.utilities.SwerveDrive;
 import org.firstinspires.ftc.teamcode.utilities.Storer;
 //import org.firstinspires.ftc.teamcode.utilities.Rotator;
@@ -21,7 +22,7 @@ public class Teleop extends OpMode {
     Outtake outtake;
     SwerveDrive drive;
     Storer storer;
-//    Rotator rotator;
+    Rotator rotator;
 
     final double normalPower = 0.9;
 
@@ -63,6 +64,7 @@ public class Teleop extends OpMode {
         this.drive = new SwerveDrive(hardwareMap, telemetry);
         this.storer = new Storer(hardwareMap, telemetry);
         this.outtake = new Outtake(hardwareMap, telemetry);
+        this.rotator = new Rotator(hardwareMap, telemetry);
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
     }
@@ -94,6 +96,9 @@ public class Teleop extends OpMode {
                   Y:out two
          X:out one        B:out three
                   A
+
+         joystick left: rotate turret left
+         joystick right: rotate turret right
          */
 
         // INTAKE/OUTTAKE
@@ -116,6 +121,18 @@ public class Teleop extends OpMode {
             intake.stop();
             outtake.stopOuttake();
         }
+
+        // TURRET ROTATION
+
+        if (gamepad1.left_stick_x > 0.3) {
+            rotator.rotateRight();
+        } else if (gamepad1.left_stick_x < -0.3) {
+            rotator.rotateLeft();
+        }
+
+
+
+
 
 
         // STORER
