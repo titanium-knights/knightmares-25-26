@@ -30,8 +30,13 @@ public class jsutMove extends AutonMethods {
         runtime.reset();
 
         // ✅ Now run movements
-        moveBackward(0.01);
-        moveForward(1.0);
+        moveBackward(1.0);
+
+//        if in other launch zone
+//        ElapsedTime runtime = new ElapsedTime();
+//        waitForStart();
+//        runtime.reset();
+        //moveForward(1.0);
     }
 }
 
