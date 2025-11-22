@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.utilities.Intake;
 import org.firstinspires.ftc.teamcode.utilities.Outtake;
 import org.firstinspires.ftc.teamcode.utilities.SwerveDrive;
 
-@Autonomous(name = "auton_shoot3")
+@Autonomous(name = "shoot3_lb")
 public class shootLB extends AutonMethods {
 
     private TelemetryManager telemetryM;

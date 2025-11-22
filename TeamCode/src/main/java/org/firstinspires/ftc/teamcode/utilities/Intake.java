@@ -18,8 +18,8 @@ public class Intake {
     CRServo intakeServo;
     Servo ballServo;
 
-    double pullPos = 0.45; // 2000/2000
-    double pushPos = 0.83;
+    double pullPos = 0.50; // 2000/2000
+    double pushPos = 0.30;
     private TelemetryManager telemetryM;
     private Telemetry telemetry;
     double power = 0.8;
@@ -39,7 +39,7 @@ public class Intake {
         intakeServo.setPower(0);
     }
     public void run() {
-        intakeServo.setPower(power);
+        intakeServo.setPower(-power);
     }
 
     public void pushBall(){

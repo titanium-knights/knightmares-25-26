@@ -72,7 +72,7 @@ public abstract class AutonMethods extends LinearOpMode {
     }
 
     public void outtake() {
-        outtake.runOuttake();
+        outtake.shoot();
         sleep((int) 1000);
     }
 

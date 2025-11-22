@@ -38,7 +38,7 @@ public class Rotator {
         rotator.setPower(power);
     }
 
-    public void stopRotator() {
+    public void stop() {
         rotator.setPower(0);
     }
 }

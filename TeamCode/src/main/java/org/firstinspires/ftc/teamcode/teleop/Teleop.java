@@ -116,7 +116,8 @@ public class Teleop extends OpMode {
         if (gamepad1.left_trigger > 0.1) {
             intake.run();
         } else if (gamepad1.right_trigger > 0.1) {
-            outtake.runOuttake();
+            outtake.shoot();
+            intake.run();
         } else {
             intake.stop();
             outtake.stopOuttake();
@@ -128,6 +129,8 @@ public class Teleop extends OpMode {
             rotator.rotateRight();
         } else if (gamepad1.left_stick_x < -0.3) {
             rotator.rotateLeft();
+        } else {
+            rotator.stop();
         }
 
 
@@ -138,20 +141,28 @@ public class Teleop extends OpMode {
         // STORER
 
         if (gamepad1.dpad_left){
-            storer.toInOne();
+            storer.toOne();
         } else if (gamepad1.dpad_up){
-            storer.toInTwo();
+            storer.toTwo();
         } else if (gamepad1.dpad_right){
-            storer.toInThree();
+            storer.toThree();
         }
-
-        if (gamepad1.x){
-            storer.toOutOne();
-        } else if (gamepad1.y){
-            storer.toOutTwo();
-        } else if (gamepad1.b){
-            storer.toOutThree();
-        }
+//        if (gamepad1.x){
+//            storer.toOne();
+//            outtake.runOuttake();
+//            intake.run();
+//        } else if (gamepad1.y){
+//            storer.toTwo();
+//            outtake.runOuttake();
+//            intake.run();
+//        } else if (gamepad1.b){
+//            storer.toThree();
+//            outtake.runOuttake();
+//            intake.run();
+//        } else {
+//            intake.stop();
+//            outtake.stopOuttake();
+//        }
     }
 
     public void move(float x, float y, float turn) {
