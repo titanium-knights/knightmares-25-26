@@ -53,19 +53,6 @@ public abstract class AutonMethods extends LinearOpMode {
      }
      //Arm Rotator
 
-    public void pullBall(double x){
-        double duration = 8000 * x;
-        intake.pullBall();
-        sleep((int)duration);
-        stopDrive();
-    }
-
-    public void pushBall(double x){
-        double duration = 8000 * x;
-        intake.pushBall();
-        sleep((int)duration);
-        stopDrive();
-    }
 
     public void turnRight(double d){
         double duration = d;
@@ -77,6 +64,16 @@ public abstract class AutonMethods extends LinearOpMode {
         double duration = d;
         swerveDrive.move(0,0,-1);
         sleep((int)duration);
+    }
+
+    public void intake() {
+        intake.run();
+        sleep((int) 1000);
+    }
+
+    public void outtake() {
+        outtake.runOuttake();
+        sleep((int) 1000);
     }
 
 
