@@ -33,11 +33,11 @@ public class shootLT extends AutonMethods {
 
 
         moveBackward(1.0);
-        moveRight(1.0);
         outtake();
         outtake();
         outtake();
         turnRight(45);
+        moveRight(1.0);
         if(ID == 21 && Team == true) {
             moveBackward(3.0);
             turnLeft(90); //degrees
