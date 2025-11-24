@@ -8,16 +8,17 @@ import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.utilities.Intake;
 import org.firstinspires.ftc.teamcode.utilities.Outtake;
 import org.firstinspires.ftc.teamcode.utilities.Rotator;
 import org.firstinspires.ftc.teamcode.utilities.SwerveDrive;
 import org.firstinspires.ftc.teamcode.utilities.Storer;
-//import org.firstinspires.ftc.teamcode.utilities.Rotator;
 
 @Configurable
 @TeleOp(name="DriveTrain Teleop")
 public class Teleop extends OpMode {
+
     Intake intake;
     Outtake outtake;
     SwerveDrive drive;
@@ -26,7 +27,6 @@ public class Teleop extends OpMode {
 
     final double normalPower = 0.9;
 
-    // in case of joystick drift, ignore very small values
     public float stick_margin = 0.7f;
 
     public boolean intakeState = false;
@@ -35,10 +35,11 @@ public class Teleop extends OpMode {
     private TelemetryManager telemetryM;
 
     enum ButtonPressState {
-        PRESSED_GOOD, //the first time we see the button pressed
-        DEPRESSED, //you haven't let go
-        UNPRESSED // its not pressed
+        PRESSED_GOOD,
+        DEPRESSED,
+        UNPRESSED
     }
+
     ButtonPressState intakeButton;
     ButtonPressState shootButton;
     ButtonPressState rotatorButton;
@@ -50,8 +51,8 @@ public class Teleop extends OpMode {
     boolean intakeRunning = false;
     boolean ballState = false;
 
-
     ElapsedTime runtime = new ElapsedTime();
+
     @Override
     public void init() {
         this.rotatorButton = ButtonPressState.UNPRESSED;
@@ -59,7 +60,6 @@ public class Teleop extends OpMode {
         this.shootButton = ButtonPressState.UNPRESSED;
         this.ballButton = ButtonPressState.UNPRESSED;
 
-//        this.rotator = new Rotator(hardwareMap, telemetry);
         this.intake = new Intake(hardwareMap, telemetry);
         this.drive = new SwerveDrive(hardwareMap, telemetry);
         this.storer = new Storer(hardwareMap, telemetry);
@@ -72,40 +72,19 @@ public class Teleop extends OpMode {
     @Override
     public void loop() {
 
-        //DRIVE
-        float x = gamepad2.left_stick_x;
-        float y = gamepad2.left_stick_y;
-        float turn = gamepad2.right_stick_x;
+        *
+        float x = gamepad1.left_stick_x;
+        float y = gamepad1.left_stick_y;
+        float turn = gamepad1.right_stick_x;
+
         stick_margin = 0.1f;
         move(x, y, turn);
-        //Subsystems
-        /*
-         Okay so these r the buttons
-
-         lt:intake            rt:outtake
-         lb:pusher            rb:puller
 
 
-         DPAD
-                  ^: in two
-         <:in one         >: in three
-                  v
 
-
-         XYAB
-                  Y:out two
-         X:out one        B:out three
-                  A
-
-         joystick left: rotate turret left
-         joystick right: rotate turret right
-         */
-
-        // INTAKE/OUTTAKE
-
-        if((gamepad1.left_bumper)){
+        if (gamepad1.left_bumper) {
             intake.pushBall();
-        } else if((gamepad1.right_bumper)){
+        } else if (gamepad1.right_bumper) {
             intake.pullBall();
         } else {
             telemetryM.addLine("default down");
@@ -123,7 +102,7 @@ public class Teleop extends OpMode {
             outtake.stopOuttake();
         }
 
-        // TURRET ROTATION
+
 
         if (gamepad1.left_stick_x > 0.3) {
             rotator.rotateRight();
@@ -135,45 +114,23 @@ public class Teleop extends OpMode {
 
 
 
-
-
-
-        // STORER
-
-        if (gamepad1.dpad_left){
+        if (gamepad1.dpad_left) {
             storer.toOne();
-        } else if (gamepad1.dpad_up){
+        } else if (gamepad1.dpad_up) {
             storer.toTwo();
-        } else if (gamepad1.dpad_right){
+        } else if (gamepad1.dpad_right) {
             storer.toThree();
         }
-//        if (gamepad1.x){
-//            storer.toOne();
-//            outtake.runOuttake();
-//            intake.run();
-//        } else if (gamepad1.y){
-//            storer.toTwo();
-//            outtake.runOuttake();
-//            intake.run();
-//        } else if (gamepad1.b){
-//            storer.toThree();
-//            outtake.runOuttake();
-//            intake.run();
-//        } else {
-//            intake.stop();
-//            outtake.stopOuttake();
-//        }
     }
 
     public void move(float x, float y, float turn) {
-        // if the stick movement is negligible, set STICK_MARGIN to 0
 
-        if (Math.abs(x) <= stick_margin) x = .0f;
-        if (Math.abs(y) <= stick_margin) y = .0f;
-        if (Math.abs(turn) <= stick_margin) turn = .0f;
+        if (Math.abs(x) <= stick_margin) x = 0f;
+        if (Math.abs(y) <= stick_margin) y = 0f;
+        if (Math.abs(turn) <= stick_margin) turn = 0f;
 
-        //Notation of a ? b : c means if a is true do b, else do c.
         double multiplier = normalPower;
+
         drive.move(-x * multiplier, y * multiplier, -turn * multiplier);
     }
 }
