@@ -66,7 +66,7 @@ public class SwerveDrive {
 
         // servos
 
-        if (Math.hypot(x,y) > 0.2){
+        if (Math.hypot(x,y) > 0.3){
 
             double targetAngle = fr_init + angle; // cuz they should all be the same anyway
 
@@ -77,27 +77,27 @@ public class SwerveDrive {
 
             // if its going backwards (deadzone) just go straight and run motors backwards
             if ((targetAngle > 360-tol && targetAngle <= 360) || (targetAngle >= 0 && targetAngle < tol)) {
-                frDrive.setPower(speed);
-                flDrive.setPower(speed);
+                frDrive.setPower(-speed);
+                flDrive.setPower(-speed);
                 blDrive.setPower(-speed);
                 brDrive.setPower(-speed);
             }
             else {
-                frDrive.setPower(-speed);
-                flDrive.setPower(-speed);
+                frDrive.setPower(speed);
+                flDrive.setPower(speed);
                 blDrive.setPower(speed);
                 brDrive.setPower(speed);
             }
         }
-        else if (Math.abs(turn) > 0.2){
-            findServoPos(frSteer, 135/1.1);
-            findServoPos(flSteer, 225/1.1);
-            findServoPos(blSteer, 315/1.1);
-            findServoPos(brSteer, 45/1.1);
+        else if (Math.abs(turn) > 0.1){
+            findServoPos(frSteer, 130);
+            findServoPos(flSteer, 39);
+            findServoPos(blSteer, 115);
+            findServoPos(brSteer, 39);
 
-            frDrive.setPower(-turnspeed);
+            frDrive.setPower(turnspeed);
             flDrive.setPower(turnspeed);
-            blDrive.setPower(turnspeed);
+            blDrive.setPower(-turnspeed);
             brDrive.setPower(-turnspeed);
         } else {
             findServoPos(frSteer, 180);
