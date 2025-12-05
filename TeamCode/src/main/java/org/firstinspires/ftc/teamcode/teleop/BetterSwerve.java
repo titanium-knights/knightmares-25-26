@@ -1,14 +1,17 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.pinpoint.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.utilities.BetterSwerveDrive;
-import org.firstinspires.ftc.teamcode.utilities.SwerveDrive;
 
-public class BetterSwerveDriveOpMode extends LinearOpMode {
+@Configurable
+@TeleOp(name="BetterSwerve")
+public class BetterSwerve extends LinearOpMode {
 
     BetterSwerveDrive drive;
     GoBildaPinpointDriver odo;

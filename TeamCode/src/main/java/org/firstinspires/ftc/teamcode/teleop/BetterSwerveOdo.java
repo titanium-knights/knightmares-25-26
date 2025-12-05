@@ -3,25 +3,17 @@ package org.firstinspires.ftc.teamcode.teleop;
 import static java.lang.Thread.sleep;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.utilities.BetterBetterSwerveDrive;
-import org.firstinspires.ftc.teamcode.utilities.CONFIG;
-import org.firstinspires.ftc.teamcode.utilities.SlidesState;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 @Configurable
-@TeleOp(name="Better Better Swerve Drive")
-public class BetterBetterSwerveDriveOpMode extends OpMode {
+@TeleOp(name="SwerveDriveOdo")
+public class BetterSwerveOdo extends OpMode {
     BetterBetterSwerveDrive drive;
 
     float stick_margin = 0.1f;

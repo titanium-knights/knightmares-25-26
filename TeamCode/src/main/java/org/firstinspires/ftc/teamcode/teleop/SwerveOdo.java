@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.pinpoint.GoBildaPinpointDriver;
 import java.util.Locale;
 
 @Configurable
-@TeleOp(name="Swerve Drive")
+@TeleOp(name="SwerveOdo")
 public class SwerveOdo extends LinearOpMode {
 
     SwerveDrive drive;

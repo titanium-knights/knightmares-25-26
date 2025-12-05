@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.utilities;
 
 import com.bylazar.telemetry.TelemetryManager;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -9,162 +10,248 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 
+import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
+import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+
+// Import for GoBilda Pinpoint Driver
+import org.firstinspires.ftc.teamcode.utilities.SwerveDriveConstants;
+
 public class BetterBetterSwerveDrive {
 
-    private static final int TICKS_PER_REV = 4096;
+    // Drive motors (GoBilda 6000 RPM)
+    private DcMotor leftFrontDrive;
+    private DcMotor leftBackDrive;
+    private DcMotor rightFrontDrive;
+    private DcMotor rightBackDrive;
 
-    // Drive motors
-    private DcMotor frDrive, flDrive, blDrive, brDrive;
+    // Rotation servos (Axon)
+    private Servo leftFrontRotation;
+    private Servo leftBackRotation;
+    private Servo rightFrontRotation;
+    private Servo rightBackRotation;
 
-    // turning motors/servos
-    private Servo frSteer, flSteer, blSteer, brSteer;
-    private TelemetryManager telemetryM;
-    private Telemetry telemetry;
+    // Pinpoint IMU for odometry
+    private GoBildaPinpointDriver pinpoint;
 
-    private IMU imu;
-    private boolean fieldCentric = true;
+    // Servo positions for angles (will need calibration)
+    private static final double SERVO_TICKS_PER_DEGREE = 1.0 / 360.0; // Adjust based on servo specs
 
-    // TODO: we might have to take into account the distance of the wheels from the edge of the robot
-    double L = 18.0; // robot length in inches
-    double W = 18.0; // robot width in inches
-    double R = Math.sqrt(L*L + W*W); // diagonal size
+    // Wheel base dimensions (adjust to your robot)
+    private static final double WHEEL_BASE_WIDTH = 12.0;  // inches
+    private static final double WHEEL_BASE_LENGTH = 12.0; // inches
 
-    public BetterBetterSwerveDrive(HardwareMap hmap, Telemetry telemetry) {
-        this.frDrive = hmap.dcMotor.get(CONFIG.FRONT_RIGHT);
-        this.flDrive = hmap.dcMotor.get(CONFIG.FRONT_LEFT);
-        this.blDrive = hmap.dcMotor.get(CONFIG.BACK_LEFT);
-        this.brDrive = hmap.dcMotor.get(CONFIG.BACK_RIGHT);
+    // Current target angles for each module
+    private double lfTargetAngle = 0;
+    private double lbTargetAngle = 0;
+    private double rfTargetAngle = 0;
+    private double rbTargetAngle = 0;
 
-        this.frSteer = hmap.servo.get(CONFIG.FR_STEER);
-        this.flSteer = hmap.servo.get(CONFIG.FL_STEER);
-        this.blSteer = hmap.servo.get(CONFIG.BL_STEER);
-        this.brSteer = hmap.servo.get(CONFIG.BR_STEER);
+    public BetterBetterSwerveDrive(HardwareMap hardwareMap) {
+        // Initialize drive motors
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "leftFrontDrive");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "leftBackDrive");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFrontDrive");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "rightBackDrive");
 
-        this.telemetry = telemetry;
-        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
+        // Set motor directions (adjust based on your robot)
+        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
 
-        initIMU(hmap);
+        // Set zero power behavior
+        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        telemetryM.debug("initted swerve");
-        telemetryM.update(telemetry);
-    }
+        // Initialize rotation servos
+        leftFrontRotation = hardwareMap.get(Servo.class, "leftFrontRotation");
+        leftBackRotation = hardwareMap.get(Servo.class, "leftBackRotation");
+        rightFrontRotation = hardwareMap.get(Servo.class, "rightFrontRotation");
+        rightBackRotation = hardwareMap.get(Servo.class, "rightBackRotation");
 
-    private void initIMU(HardwareMap hmap) {
-        imu = hmap.get(IMU.class, "imu");
-
-        // TODO: Adjust these parameters based on your Control Hub mounting
-        // LogoFacingDirection and UsbFacingDirection define the hub's physical orientation
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
-
-        imu.initialize(parameters);
-        resetHeading();
-    }
-
-    /**
-     * Reset the IMU heading to zero (call this at the start of matches)
-     */
-    public void resetHeading() {
-        imu.resetYaw();
-    }
-
-    /**
-     * Get the current robot heading in radians
-     * @return heading in radians, counter-clockwise positive
-     */
-    public double getHeading() {
-        return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-    }
-
-    /**
-     * Toggle between field-centric and robot-centric control
-     */
-    public void toggleFieldCentric() {
-        fieldCentric = !fieldCentric;
+        // Initialize Pinpoint IMU
+        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
+        pinpoint.setOffsets(50, -87, DistanceUnit.MM);; // Adjust offsets to your robot
+        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        pinpoint.setEncoderDirections(
+                GoBildaPinpointDriver.EncoderDirection.FORWARD,
+                GoBildaPinpointDriver.EncoderDirection.FORWARD
+        );
+        pinpoint.resetPosAndIMU();
     }
 
     /**
-     * Set field-centric mode
+     * Drive the robot using field-centric swerve drive
+     * @param strafeX Strafe speed (-1 to 1, left negative, right positive)
+     * @param strafeY Forward speed (-1 to 1, backward negative, forward positive)
+     * @param rotation Rotation speed (-1 to 1, CCW positive)
+     * @param fieldCentric Whether to use field-centric drive
      */
-    public void setFieldCentric(boolean enabled) {
-        fieldCentric = enabled;
-    }
+    public void drive(double strafeX, double strafeY, double rotation, boolean fieldCentric) {
+        // Update Pinpoint odometry
+        pinpoint.update();
 
-    /**
-     * Main drive method with IMU integration
-     * @param x strafe input (-1 to 1, right positive)
-     * @param y forward input (-1 to 1, forward positive)
-     * @param turn rotation input (-1 to 1, counter-clockwise positive)
-     */
-    public void move(double x, double y, double turn) {
+        // Get robot heading from Pinpoint
+        double robotHeading = pinpoint.getHeading();
+
         // Apply field-centric transformation if enabled
-        if (fieldCentric) {
-            double heading = getHeading();
+        double x = strafeX;
+        double y = strafeY;
 
-            // Rotate the input vector by the negative of the robot's heading
-            double temp = x * Math.cos(-heading) - y * Math.sin(-heading);
-            y = x * Math.sin(-heading) + y * Math.cos(-heading);
-            x = temp;
+        if (fieldCentric) {
+            double headingRad = Math.toRadians(robotHeading);
+            x = strafeX * Math.cos(-headingRad) - strafeY * Math.sin(-headingRad);
+            y = strafeX * Math.sin(-headingRad) + strafeY * Math.cos(-headingRad);
         }
 
-        telemetryM.debug("x", x);
-        telemetryM.debug("y", y);
-        telemetryM.debug("turn", turn);
-        telemetryM.debug("heading", Math.toDegrees(getHeading()));
-        telemetryM.debug("field-centric", fieldCentric);
-        telemetryM.update(telemetry);
+        // Calculate swerve module states
+        double r = Math.hypot(WHEEL_BASE_LENGTH, WHEEL_BASE_WIDTH);
 
-        // TODO: Ls and Ws might be switched
-        double A = x - turn * (L / R);
-        double B = x + turn * (L / R);
-        double C = y - turn * (W / R);
-        double D = y + turn * (W / R);
+        // Front left
+        double lfSpeed = Math.hypot(x - rotation * (WHEEL_BASE_LENGTH / r),
+                y + rotation * (WHEEL_BASE_WIDTH / r));
+        double lfAngle = Math.toDegrees(Math.atan2(y + rotation * (WHEEL_BASE_WIDTH / r),
+                x - rotation * (WHEEL_BASE_LENGTH / r)));
 
-        // TODO: the letters might be wrong lowk
-        double frSpeed = Math.hypot(A, D); // B, C
-        double flSpeed = Math.hypot(A, C); // B, D
-        double blSpeed = Math.hypot(B, C); // A, D
-        double brSpeed = Math.hypot(B, D); // A, C
+        // Front right
+        double rfSpeed = Math.hypot(x + rotation * (WHEEL_BASE_LENGTH / r),
+                y + rotation * (WHEEL_BASE_WIDTH / r));
+        double rfAngle = Math.toDegrees(Math.atan2(y + rotation * (WHEEL_BASE_WIDTH / r),
+                x + rotation * (WHEEL_BASE_LENGTH / r)));
 
-        // remember to change the letters for this too if you change it for speed
-        double frAngle = Math.atan2(A, D);
-        double flAngle = Math.atan2(A, C);
-        double blAngle = Math.atan2(B, C);
-        double brAngle = Math.atan2(B, D);
+        // Back left
+        double lbSpeed = Math.hypot(x - rotation * (WHEEL_BASE_LENGTH / r),
+                y - rotation * (WHEEL_BASE_WIDTH / r));
+        double lbAngle = Math.toDegrees(Math.atan2(y - rotation * (WHEEL_BASE_WIDTH / r),
+                x - rotation * (WHEEL_BASE_LENGTH / r)));
 
-        // Normalize speeds (so none > 1)
-        double max = Math.max(Math.max(frSpeed, flSpeed), Math.max(blSpeed, brSpeed));
-        if (max > 1.0) {
-            if (max > 0.8) {
-                frSpeed /= max;
-                flSpeed /= max;
-                blSpeed /= max;
-                brSpeed /= max;
-            }
-            frDrive.setPower(frSpeed);
-            flDrive.setPower(flSpeed);
-            blDrive.setPower(blSpeed);
-            brDrive.setPower(brSpeed);
+        // Back right
+        double rbSpeed = Math.hypot(x + rotation * (WHEEL_BASE_LENGTH / r),
+                y - rotation * (WHEEL_BASE_WIDTH / r));
+        double rbAngle = Math.toDegrees(Math.atan2(y - rotation * (WHEEL_BASE_WIDTH / r),
+                x + rotation * (WHEEL_BASE_LENGTH / r)));
 
-            setSteerAngle(frSteer, frAngle);
-            setSteerAngle(flSteer, flAngle);
-            setSteerAngle(blSteer, blAngle);
-            setSteerAngle(brSteer, brAngle);
+        // Normalize speeds
+        double maxSpeed = Math.max(Math.max(lfSpeed, rfSpeed), Math.max(lbSpeed, rbSpeed));
+        if (maxSpeed > 1.0) {
+            lfSpeed /= maxSpeed;
+            rfSpeed /= maxSpeed;
+            lbSpeed /= maxSpeed;
+            rbSpeed /= maxSpeed;
+        }
+
+        // Set module states
+        setModuleState(leftFrontDrive, leftFrontRotation, lfSpeed, lfAngle, 0);
+        setModuleState(rightFrontDrive, rightFrontRotation, rfSpeed, rfAngle, 1);
+        setModuleState(leftBackDrive, leftBackRotation, lbSpeed, lbAngle, 2);
+        setModuleState(rightBackDrive, rightBackRotation, rbSpeed, rbAngle, 3);
+    }
+
+    /**
+     * Set the state of a swerve module
+     */
+    private void setModuleState(DcMotor motor, Servo servo, double speed,
+                                double targetAngle, int moduleIndex) {
+        // Normalize angle to -180 to 180
+        targetAngle = normalizeAngle(targetAngle);
+
+        // Optimize angle (reverse if more than 90 degrees off)
+        double currentAngle = getModuleAngle(moduleIndex);
+        double angleDiff = normalizeAngle(targetAngle - currentAngle);
+
+        if (Math.abs(angleDiff) > 90) {
+            targetAngle = normalizeAngle(targetAngle + 180);
+            speed = -speed;
+        }
+
+        // Set rotation servo position
+        setServoAngle(servo, targetAngle);
+
+        // Set drive motor power
+        motor.setPower(speed);
+
+        // Update target angle for this module
+        updateModuleTargetAngle(moduleIndex, targetAngle);
+    }
+
+    /**
+     * Convert angle to servo position (needs calibration)
+     */
+    private void setServoAngle(Servo servo, double angle) {
+        // Convert -180 to 180 range to 0 to 1 servo range
+        double position = (angle + 180) / 360.0;
+        position = Range.clip(position, 0, 1);
+        servo.setPosition(position);
+    }
+
+    /**
+     * Get current module angle from Pinpoint or servo feedback
+     */
+    private double getModuleAngle(int moduleIndex) {
+        switch (moduleIndex) {
+            case 0: return lfTargetAngle;
+            case 1: return rfTargetAngle;
+            case 2: return lbTargetAngle;
+            case 3: return rbTargetAngle;
+            default: return 0;
         }
     }
 
-    private void setSteerAngle (Servo steerServo,double targetAngle){
-        // Normalize target angle to [0, 2π)
-        targetAngle = targetAngle % (2 * Math.PI);
-        if (targetAngle < 0) targetAngle += 2 * Math.PI;
+    /**
+     * Update stored target angle
+     */
+    private void updateModuleTargetAngle(int moduleIndex, double angle) {
+        switch (moduleIndex) {
+            case 0: lfTargetAngle = angle; break;
+            case 1: rfTargetAngle = angle; break;
+            case 2: lbTargetAngle = angle; break;
+            case 3: rbTargetAngle = angle; break;
+        }
+    }
 
-        // Convert radians → [0,1] servo position
-        double servoPos = targetAngle / (2 * Math.PI);
+    /**
+     * Normalize angle to -180 to 180 degrees
+     */
+    private double normalizeAngle(double angle) {
+        while (angle > 180) angle -= 360;
+        while (angle < -180) angle += 360;
+        return angle;
+    }
 
-        steerServo.setPosition(servoPos);
+    /**
+     * Get current robot pose from Pinpoint
+     */
+    public Pose2D getPose() {
+        return pinpoint.getPosition();
+    }
+
+    /**
+     * Reset odometry
+     */
+    public void resetOdometry() {
+        pinpoint.resetPosAndIMU();
+    }
+
+    /**
+     * Stop all motors
+     */
+    public void stop() {
+        leftFrontDrive.setPower(0);
+        leftBackDrive.setPower(0);
+        rightFrontDrive.setPower(0);
+        rightBackDrive.setPower(0);
     }
 }
