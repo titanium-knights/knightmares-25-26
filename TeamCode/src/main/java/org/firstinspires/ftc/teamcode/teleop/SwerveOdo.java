@@ -1,30 +1,15 @@
-/*   MIT License
- *   Copyright (c) [2025] [Base 10 Assets, LLC]
- *
- *   Permission is hereby granted, free of charge, to any person obtaining a copy
- *   of this software and associated documentation files (the "Software"), to deal
- *   in the Software without restriction, including without limitation the rights
- *   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *   copies of the Software, and to permit persons to whom the Software is
- *   furnished to do so, subject to the following conditions:
+package org.firstinspires.ftc.teamcode.teleop;
 
- *   The above copyright notice and this permission notice shall be included in all
- *   copies or substantial portions of the Software.
-
- *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- *   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- *   SOFTWARE.
- */
-
-package org.firstinspires.ftc.teamcode.pinpoint;
+import static java.lang.Thread.sleep;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.teamcode.utilities.SwerveDrive;
+
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -32,48 +17,39 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.pinpoint.GoBildaPinpointDriver;
 
-
 import java.util.Locale;
 
-/*
-This opmode shows how to use the goBILDA® Pinpoint Odometry Computer.
-The goBILDA Odometry Computer is a device designed to solve the Pose Exponential calculation
-commonly associated with Dead Wheel Odometry systems. It reads two encoders, and an integrated
-system of senors to determine the robot's current heading, X position, and Y position.
-
-it uses an ESP32-S3 as a main cpu, with an STM LSM6DSV16X IMU.
-It is validated with goBILDA "Dead Wheel" Odometry pods, but should be compatible with any
-quadrature rotary encoder. The ESP32 PCNT peripheral is speced to decode quadrature encoder signals
-at a maximum of 40mhz per channel. Though the maximum in-application tested number is 130khz.
-
-The device expects two perpendicularly mounted Dead Wheel pods. The encoder pulses are translated
-into mm and their readings are transformed by an "offset", this offset describes how far away
-the pods are from the "tracking point", usually the center of rotation of the robot.
-
-Dead Wheel pods should both increase in count when moved forwards and to the left.
-The gyro will report an increase in heading when rotated counterclockwise.
-
-The Pose Exponential algorithm used is described on pg 181 of this book:
-https://github.com/calcmogul/controls-engineering-in-frc
-
-For support, contact tech@gobilda.com
-
--Ethan Doak
- */
-
 @Configurable
-@TeleOp(name="goBILDA Pinpoint Example", group="Linear OpMode")
-//@Disabled
+@TeleOp(name="Swerve Drive")
+public class SwerveOdo extends LinearOpMode {
 
-public class SensorGoBildaPinpointExample extends LinearOpMode {
+    SwerveDrive drive;
+    GoBildaPinpointDriver odo;
 
-    GoBildaPinpointDriver odo; // Declare OpMode member for the Odometry Computer
-
+    float stick_margin = 0.1f;
+    final double normalPower = 0.9;
     double oldTime = 0;
+    private TelemetryManager telemetryM;
 
+    public void move(float x, float y, float turn) {
+        // if the stick movement is negligible, set STICK_MARGIN to 0
+
+        if (Math.abs(x) <= stick_margin) x = .15f;
+        if (Math.abs(y) <= stick_margin) y = .15f;
+        if (Math.abs(turn) <= stick_margin) turn = .15f;
+
+        //Notation of a ? b : c means if a is true do b, else do c.
+        double multiplier = normalPower;
+        drive.move(-x * multiplier, y * multiplier, -turn * multiplier);
+    }
 
     @Override
     public void runOpMode() {
+
+        this.drive = new SwerveDrive(hardwareMap, telemetry);
+
+        // this.telemetry = telemetry;
+        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
@@ -198,5 +174,17 @@ public class SensorGoBildaPinpointExample extends LinearOpMode {
             telemetry.addData("REV Hub Frequency: ", frequency); //prints the control system refresh rate
             telemetry.update();
 
+            float x = gamepad2.left_stick_x;
+            float y = gamepad2.left_stick_y;
+            float turn = gamepad2.right_stick_x;
+//        if (gamepad2.a) {
+//            telemetryM.debug("gaempad2.a pressed");
+//            telemetryM.update(telemetry);
+//            drive.move(0,0.5f,0);
+//        }
+            move(x, y, turn);
+
         }
-    }}
+    }
+
+}
