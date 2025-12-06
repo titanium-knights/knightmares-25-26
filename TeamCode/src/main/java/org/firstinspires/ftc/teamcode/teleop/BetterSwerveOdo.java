@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.teleop;
 import static java.lang.Thread.sleep;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -24,12 +25,12 @@ public class BetterSwerveOdo extends OpMode {
 
     @Override
     public void init() {
-        this.drive = new BetterBetterSwerveDrive(hardwareMap, telemetry);
+        this.drive = new BetterBetterSwerveDrive(hardwareMap);
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
         // Reset IMU heading at initialization
-        drive.resetHeading();
+        drive.resetOdometry();
 
         telemetryM.debug("Swerve Drive Initialized");
         telemetryM.debug("Press A to toggle field-centric mode");
@@ -39,16 +40,16 @@ public class BetterSwerveOdo extends OpMode {
     @Override
     public void loop() {
         // Toggle field-centric mode with A button (with debounce)
-        if (gamepad2.a && !lastAState) {
-            drive.toggleFieldCentric();
-        }
+//        if (gamepad2.a && !lastAState) {
+//            drive.toggleFieldCentric();
+//        }
         lastAState = gamepad2.a;
 
         // Reset heading with B button
-        if (gamepad2.b) {
-            drive.resetHeading();
-            telemetryM.debug("Heading reset!");
-        }
+//        if (gamepad2.b) {
+//            drive.resetHeading();
+//            telemetryM.debug("Heading reset!");
+//        }
 
         // DRIVE
         float x = gamepad2.left_stick_x;
@@ -66,6 +67,6 @@ public class BetterSwerveOdo extends OpMode {
 
         // Apply multiplier and drive
         double multiplier = normalPower;
-        drive.move(x * multiplier, y * multiplier, turn * multiplier);
+        drive.move(x * multiplier, y * multiplier, turn * multiplier, true); //false?
     }
 }

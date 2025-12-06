@@ -100,12 +100,12 @@ public class BetterBetterSwerveDrive {
      * @param rotation Rotation speed (-1 to 1, CCW positive)
      * @param fieldCentric Whether to use field-centric drive
      */
-    public void drive(double strafeX, double strafeY, double rotation, boolean fieldCentric) {
+    public void move(double strafeX, double strafeY, double rotation, boolean fieldCentric) {
         // Update Pinpoint odometry
         pinpoint.update();
 
         // Get robot heading from Pinpoint
-        double robotHeading = pinpoint.getHeading();
+        double robotHeading = pinpoint.getHeading(AngleUnit.DEGREES);
 
         // Apply field-centric transformation if enabled
         double x = strafeX;
