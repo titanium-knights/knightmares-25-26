@@ -9,6 +9,12 @@ import org.firstinspires.ftc.teamcode.utilities.BetterBetterSwerveDrive;
 public class SwerveCalibration extends LinearOpMode{
     private BetterBetterSwerveDrive swerveDrive;
 
+    // PID tuning variables
+    private double kP = 0.012;
+    private double kI = 0.0;
+    private double kD = 0.0008;
+    private boolean tuningMode = false;
+
     @Override
     public void runOpMode() {
         // Initialize swerve drive
@@ -51,6 +57,28 @@ public class SwerveCalibration extends LinearOpMode{
             // Toggle field-centric mode with B button
             boolean fieldCentric = !gamepad1.b;
 
+            // Toggle tuning mode with Y button
+            if (gamepad1.y) {
+                tuningMode = !tuningMode;
+                sleep(300); // Debounce
+            }
+
+            // PID tuning with gamepad2 (only in tuning mode)
+            if (tuningMode) {
+                if (gamepad2.dpad_up) kP += 0.001;
+                if (gamepad2.dpad_down) kP -= 0.001;
+                if (gamepad2.dpad_right) kD += 0.0001;
+                if (gamepad2.dpad_left) kD -= 0.0001;
+                if (gamepad2.a) kI += 0.0001;
+                if (gamepad2.b) kI -= 0.0001;
+
+                kP = Math.max(0, kP);
+                kI = Math.max(0, kI);
+                kD = Math.max(0, kD);
+
+                swerveDrive.setPIDGains(kP, kI, kD);
+            }
+
             // Allow recalibration during operation (press X)
             if (gamepad1.x) {
                 swerveDrive.calibrateModules();
@@ -64,17 +92,27 @@ public class SwerveCalibration extends LinearOpMode{
             // Telemetry
             telemetry.addData("Mode", fieldCentric ? "Field-Centric" : "Robot-Centric");
             telemetry.addData("Calibrated", swerveDrive.isCalibrated() ? "✓" : "✗");
-            telemetry.addData("Offsets", swerveDrive.getCalibrationInfo());
+            telemetry.addData("Tuning Mode", tuningMode ? "ON" : "OFF");
             telemetry.addLine();
-            telemetry.addData("Strafe X", "%.2f", strafeX);
-            telemetry.addData("Strafe Y", "%.2f", strafeY);
-            telemetry.addData("Rotation", "%.2f", rotation);
+            telemetry.addData("PID", "P=%.3f, I=%.3f, D=%.4f", kP, kI, kD);
+            telemetry.addData("Angles", swerveDrive.getCurrentAngles());
+            telemetry.addData("Errors", swerveDrive.getAngleErrors());
+            telemetry.addLine();
+            telemetry.addData("Offsets", swerveDrive.getCalibrationInfo());
             telemetry.addLine();
             telemetry.addLine("Controls:");
             telemetry.addLine("  Left Stick: Strafe");
             telemetry.addLine("  Right Stick X: Rotate");
             telemetry.addLine("  [B] Hold: Robot-Centric");
             telemetry.addLine("  [X]: Recalibrate");
+            telemetry.addLine("  [Y]: Toggle Tuning Mode");
+            if (tuningMode) {
+                telemetry.addLine();
+                telemetry.addLine("Tuning (GP2):");
+                telemetry.addLine("  D-Pad Up/Down: Adjust kP");
+                telemetry.addLine("  D-Pad Left/Right: Adjust kD");
+                telemetry.addLine("  A/B: Adjust kI");
+            }
             telemetry.update();
         }
 

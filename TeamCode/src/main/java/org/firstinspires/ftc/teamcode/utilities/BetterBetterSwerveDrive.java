@@ -4,7 +4,8 @@ import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -19,20 +20,35 @@ public class BetterBetterSwerveDrive {
     private DcMotor rightFrontDrive;
     private DcMotor rightBackDrive;
 
-    // Rotation servos (Axon)
-    private Servo leftFrontRotation;
-    private Servo leftBackRotation;
-    private Servo rightFrontRotation;
-    private Servo rightBackRotation;
+    // Rotation servos (Axon Continuous)
+    private CRServo leftFrontRotation;
+    private CRServo leftBackRotation;
+    private CRServo rightFrontRotation;
+    private CRServo rightBackRotation;
+
+    // Axon servo analog feedback (built into the servo)
+    private AnalogInput leftFrontEncoder;
+    private AnalogInput leftBackEncoder;
+    private AnalogInput rightFrontEncoder;
+    private AnalogInput rightBackEncoder;
 
     // Pinpoint IMU for odometry
     private GoBildaPinpointDriver pinpoint;
 
-    // Servo calibration offsets (stores the servo position when aligned to 0°)
-    private double lfServoOffset = 0;
-    private double rfServoOffset = 0;
-    private double lbServoOffset = 0;
-    private double rbServoOffset = 0;
+    // PID coefficients for rotation control - START HERE AND TUNE
+    private double kP = 0.012;  // Proportional gain
+    private double kI = 0.0;    // Integral gain (usually 0 for swerve)
+    private double kD = 0.0008; // Derivative gain
+
+    // Encoder calibration offsets (voltage when pointing at 0°)
+    private double lfEncoderOffset = 0;
+    private double rfEncoderOffset = 0;
+    private double lbEncoderOffset = 0;
+    private double rbEncoderOffset = 0;
+
+    // PID state for each module
+    private double[] lastError = new double[4];
+    private double[] integral = new double[4];
 
     // Flag to check if calibration has been done
     private boolean isCalibrated = false;
@@ -41,11 +57,10 @@ public class BetterBetterSwerveDrive {
     private static final double WHEEL_BASE_WIDTH = 12.0;  // inches
     private static final double WHEEL_BASE_LENGTH = 12.0; // inches
 
-    // Current target angles for each module
-    private double lfTargetAngle = 0;
-    private double lbTargetAngle = 0;
-    private double rfTargetAngle = 0;
-    private double rbTargetAngle = 0;
+    // Control parameters
+    private static final double ANGLE_TOLERANCE = 3.0; // degrees - drive motors only engage when within this
+    private static final double MIN_SERVO_POWER = 0.05; // Minimum power to overcome static friction
+    private static final double MAX_SERVO_POWER = 0.8; // Maximum servo speed
 
     public BetterBetterSwerveDrive(HardwareMap hardwareMap) {
         // Initialize drive motors
@@ -66,11 +81,18 @@ public class BetterBetterSwerveDrive {
         rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        // Initialize rotation servos
-        leftFrontRotation = hardwareMap.get(Servo.class, "leftFrontRotation");
-        leftBackRotation = hardwareMap.get(Servo.class, "leftBackRotation");
-        rightFrontRotation = hardwareMap.get(Servo.class, "rightFrontRotation");
-        rightBackRotation = hardwareMap.get(Servo.class, "rightBackRotation");
+        // Initialize Axon continuous rotation servos
+        leftFrontRotation = hardwareMap.get(CRServo.class, "leftFrontRotation");
+        leftBackRotation = hardwareMap.get(CRServo.class, "leftBackRotation");
+        rightFrontRotation = hardwareMap.get(CRServo.class, "rightFrontRotation");
+        rightBackRotation = hardwareMap.get(CRServo.class, "rightBackRotation");
+
+        // Initialize Axon analog feedback (connect servo analog output to analog input port)
+        // Wire: Axon servo analog pin -> Control/Expansion Hub analog input
+        leftFrontEncoder = hardwareMap.get(AnalogInput.class, "leftFrontEncoder");
+        leftBackEncoder = hardwareMap.get(AnalogInput.class, "leftBackEncoder");
+        rightFrontEncoder = hardwareMap.get(AnalogInput.class, "rightFrontEncoder");
+        rightBackEncoder = hardwareMap.get(AnalogInput.class, "rightBackEncoder");
 
         // Initialize Pinpoint IMU
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
@@ -87,15 +109,23 @@ public class BetterBetterSwerveDrive {
      * Calibrate all swerve modules to their current position as 0°
      * IMPORTANT: Manually align all wheels to point straight forward before calling this!
      *
-     * This should be called during initialization after physically aligning the wheels.
-     * The calibration offsets will be stored and used for all subsequent movements.
+     * Process:
+     * 1. Physically rotate each wheel so it points straight forward
+     * 2. Call this method to save the current encoder readings
+     * 3. These readings become your "zero" reference point
      */
     public void calibrateModules() {
-        // Store current servo positions as the "zero" position
-        lfServoOffset = leftFrontRotation.getPosition();
-        rfServoOffset = rightFrontRotation.getPosition();
-        lbServoOffset = leftBackRotation.getPosition();
-        rbServoOffset = rightBackRotation.getPosition();
+        // Store current encoder readings as the "zero" position
+        lfEncoderOffset = readRawEncoderVoltage(leftFrontEncoder);
+        rfEncoderOffset = readRawEncoderVoltage(rightFrontEncoder);
+        lbEncoderOffset = readRawEncoderVoltage(leftBackEncoder);
+        rbEncoderOffset = readRawEncoderVoltage(rightBackEncoder);
+
+        // Reset PID state
+        for (int i = 0; i < 4; i++) {
+            lastError[i] = 0;
+            integral[i] = 0;
+        }
 
         isCalibrated = true;
     }
@@ -111,8 +141,33 @@ public class BetterBetterSwerveDrive {
      * Get calibration offsets for telemetry/debugging
      */
     public String getCalibrationInfo() {
-        return String.format("LF: %.3f, RF: %.3f, LB: %.3f, RB: %.3f",
-                lfServoOffset, rfServoOffset, lbServoOffset, rbServoOffset);
+        return String.format("LF: %.2fV, RF: %.2fV, LB: %.2fV, RB: %.2fV",
+                lfEncoderOffset, rfEncoderOffset, lbEncoderOffset, rbEncoderOffset);
+    }
+
+    /**
+     * Get current angles for telemetry
+     */
+    public String getCurrentAngles() {
+        return String.format("LF: %.1f°, RF: %.1f°, LB: %.1f°, RB: %.1f°",
+                getModuleAngle(0), getModuleAngle(1), getModuleAngle(2), getModuleAngle(3));
+    }
+
+    /**
+     * Get angle errors for tuning
+     */
+    public String getAngleErrors() {
+        return String.format("LF: %.1f°, RF: %.1f°, LB: %.1f°, RB: %.1f°",
+                lastError[0], lastError[1], lastError[2], lastError[3]);
+    }
+
+    /**
+     * Update PID gains for tuning
+     */
+    public void setPIDGains(double p, double i, double d) {
+        this.kP = p;
+        this.kI = i;
+        this.kD = d;
     }
 
     /**
@@ -175,86 +230,112 @@ public class BetterBetterSwerveDrive {
             rbSpeed /= maxSpeed;
         }
 
-        // Set module states with calibration offsets
-        setModuleState(leftFrontDrive, leftFrontRotation, lfSpeed, lfAngle, 0, lfServoOffset);
-        setModuleState(rightFrontDrive, rightFrontRotation, rfSpeed, rfAngle, 1, rfServoOffset);
-        setModuleState(leftBackDrive, leftBackRotation, lbSpeed, lbAngle, 2, lbServoOffset);
-        setModuleState(rightBackDrive, rightBackRotation, rbSpeed, rbAngle, 3, rbServoOffset);
+        // Set module states with PID control
+        setModuleState(leftFrontDrive, leftFrontRotation, lfSpeed, lfAngle, 0);
+        setModuleState(rightFrontDrive, rightFrontRotation, rfSpeed, rfAngle, 1);
+        setModuleState(leftBackDrive, leftBackRotation, lbSpeed, lbAngle, 2);
+        setModuleState(rightBackDrive, rightBackRotation, rbSpeed, rbAngle, 3);
     }
 
     /**
-     * Set the state of a swerve module
+     * Set the state of a swerve module using PID control
      */
-    private void setModuleState(DcMotor motor, Servo servo, double speed,
-                                double targetAngle, int moduleIndex, double servoOffset) {
+    private void setModuleState(DcMotor motor, CRServo servo, double speed,
+                                double targetAngle, int moduleIndex) {
         // Normalize angle to -180 to 180
         targetAngle = normalizeAngle(targetAngle);
 
-        // Optimize angle (reverse if more than 90 degrees off)
+        // Get current angle from Axon encoder
         double currentAngle = getModuleAngle(moduleIndex);
-        double angleDiff = normalizeAngle(targetAngle - currentAngle);
 
+        // Optimize angle (reverse if more than 90 degrees off)
+        double angleDiff = normalizeAngle(targetAngle - currentAngle);
         if (Math.abs(angleDiff) > 90) {
             targetAngle = normalizeAngle(targetAngle + 180);
             speed = -speed;
+            angleDiff = normalizeAngle(targetAngle - currentAngle);
         }
 
-        // Set rotation servo position with calibration offset
-        setServoAngle(servo, targetAngle, servoOffset);
+        // Calculate PID output for servo
+        double error = normalizeAngle(targetAngle - currentAngle);
 
-        // Set drive motor power
-        motor.setPower(speed);
+        // PID calculations
+        integral[moduleIndex] += error;
+        integral[moduleIndex] = Range.clip(integral[moduleIndex], -100, 100); // Prevent windup
 
-        // Update target angle for this module
-        updateModuleTargetAngle(moduleIndex, targetAngle);
+        double derivative = error - lastError[moduleIndex];
+        lastError[moduleIndex] = error;
+
+        double servoPower = (kP * error) + (kI * integral[moduleIndex]) + (kD * derivative);
+
+        // Add minimum power to overcome static friction
+        if (Math.abs(servoPower) > 0.01) {
+            servoPower = Math.signum(servoPower) * Math.max(Math.abs(servoPower), MIN_SERVO_POWER);
+        }
+
+        // Clip to maximum safe speed
+        servoPower = Range.clip(servoPower, -MAX_SERVO_POWER, MAX_SERVO_POWER);
+
+        // Set servo power (continuous servo spins at this speed)
+        servo.setPower(servoPower);
+
+        // Only drive if close to target angle
+        if (Math.abs(error) < ANGLE_TOLERANCE) {
+            motor.setPower(speed);
+        } else {
+            motor.setPower(0); // Don't drive until aligned
+        }
     }
 
     /**
-     * Convert angle to servo position with calibration offset
+     * Read raw voltage from Axon servo analog output
+     * Axon servos output 0-3.3V representing 0-360° of rotation
      */
-    private void setServoAngle(Servo servo, double angle, double offset) {
-        // Convert -180 to 180 range to 0 to 1 servo range
-        double position = (angle + 180) / 360.0;
-
-        // Apply calibration offset
-        // The offset represents where the servo was when the wheel was at 0°
-        // We need to calculate relative position from that point
-        double calibratedPosition = position + offset;
-
-        // Handle wraparound
-        if (calibratedPosition > 1.0) {
-            calibratedPosition -= 1.0;
-        } else if (calibratedPosition < 0.0) {
-            calibratedPosition += 1.0;
-        }
-
-        calibratedPosition = Range.clip(calibratedPosition, 0, 1);
-        servo.setPosition(calibratedPosition);
+    private double readRawEncoderVoltage(AnalogInput encoder) {
+        return encoder.getVoltage();
     }
 
     /**
-     * Get current module angle from stored target
+     * Convert voltage to angle (0-360°)
+     */
+    private double voltageToAngle(double voltage) {
+        double maxVoltage = 3.3; // Axon servos use 3.3V range
+        return (voltage / maxVoltage) * 360.0;
+    }
+
+    /**
+     * Get current module angle with calibration applied
      */
     private double getModuleAngle(int moduleIndex) {
-        switch (moduleIndex) {
-            case 0: return lfTargetAngle;
-            case 1: return rfTargetAngle;
-            case 2: return lbTargetAngle;
-            case 3: return rbTargetAngle;
-            default: return 0;
-        }
-    }
+        double rawVoltage = 0;
+        double offsetVoltage = 0;
 
-    /**
-     * Update stored target angle
-     */
-    private void updateModuleTargetAngle(int moduleIndex, double angle) {
         switch (moduleIndex) {
-            case 0: lfTargetAngle = angle; break;
-            case 1: rfTargetAngle = angle; break;
-            case 2: lbTargetAngle = angle; break;
-            case 3: rbTargetAngle = angle; break;
+            case 0: // Left Front
+                rawVoltage = readRawEncoderVoltage(leftFrontEncoder);
+                offsetVoltage = lfEncoderOffset;
+                break;
+            case 1: // Right Front
+                rawVoltage = readRawEncoderVoltage(rightFrontEncoder);
+                offsetVoltage = rfEncoderOffset;
+                break;
+            case 2: // Left Back
+                rawVoltage = readRawEncoderVoltage(leftBackEncoder);
+                offsetVoltage = lbEncoderOffset;
+                break;
+            case 3: // Right Back
+                rawVoltage = readRawEncoderVoltage(rightBackEncoder);
+                offsetVoltage = rbEncoderOffset;
+                break;
         }
+
+        // Convert voltages to angles
+        double rawAngle = voltageToAngle(rawVoltage);
+        double offsetAngle = voltageToAngle(offsetVoltage);
+
+        // Apply calibration offset and normalize
+        double calibratedAngle = rawAngle - offsetAngle;
+        return normalizeAngle(calibratedAngle);
     }
 
     /**
@@ -281,12 +362,17 @@ public class BetterBetterSwerveDrive {
     }
 
     /**
-     * Stop all motors
+     * Stop all motors and servos
      */
     public void stop() {
         leftFrontDrive.setPower(0);
         leftBackDrive.setPower(0);
         rightFrontDrive.setPower(0);
         rightBackDrive.setPower(0);
+
+        leftFrontRotation.setPower(0);
+        leftBackRotation.setPower(0);
+        rightFrontRotation.setPower(0);
+        rightBackRotation.setPower(0);
     }
 }
