@@ -5,27 +5,11 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-
-import com.bylazar.telemetry.PanelsTelemetry;
-
-import org.firstinspires.ftc.robotcore.external.Const;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-
-// Import for GoBilda Pinpoint Driver
-import org.firstinspires.ftc.teamcode.utilities.SwerveDriveConstants;
+import com.qualcomm.robotcore.util.Range;
 
 public class BetterBetterSwerveDrive {
 
@@ -44,8 +28,14 @@ public class BetterBetterSwerveDrive {
     // Pinpoint IMU for odometry
     private GoBildaPinpointDriver pinpoint;
 
-    // Servo positions for angles (will need calibration)
-    private static final double SERVO_TICKS_PER_DEGREE = 1.0 / 360.0; // Adjust based on servo specs
+    // Servo calibration offsets (stores the servo position when aligned to 0°)
+    private double lfServoOffset = 0;
+    private double rfServoOffset = 0;
+    private double lbServoOffset = 0;
+    private double rbServoOffset = 0;
+
+    // Flag to check if calibration has been done
+    private boolean isCalibrated = false;
 
     // Wheel base dimensions (adjust to your robot)
     private static final double WHEEL_BASE_WIDTH = 12.0;  // inches
@@ -84,13 +74,45 @@ public class BetterBetterSwerveDrive {
 
         // Initialize Pinpoint IMU
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-        pinpoint.setOffsets(50, -87, DistanceUnit.MM);; // Adjust offsets to your robot
+        pinpoint.setOffsets(50, -87, DistanceUnit.MM);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(
                 GoBildaPinpointDriver.EncoderDirection.FORWARD,
                 GoBildaPinpointDriver.EncoderDirection.FORWARD
         );
         pinpoint.resetPosAndIMU();
+    }
+
+    /**
+     * Calibrate all swerve modules to their current position as 0°
+     * IMPORTANT: Manually align all wheels to point straight forward before calling this!
+     *
+     * This should be called during initialization after physically aligning the wheels.
+     * The calibration offsets will be stored and used for all subsequent movements.
+     */
+    public void calibrateModules() {
+        // Store current servo positions as the "zero" position
+        lfServoOffset = leftFrontRotation.getPosition();
+        rfServoOffset = rightFrontRotation.getPosition();
+        lbServoOffset = leftBackRotation.getPosition();
+        rbServoOffset = rightBackRotation.getPosition();
+
+        isCalibrated = true;
+    }
+
+    /**
+     * Check if the modules have been calibrated
+     */
+    public boolean isCalibrated() {
+        return isCalibrated;
+    }
+
+    /**
+     * Get calibration offsets for telemetry/debugging
+     */
+    public String getCalibrationInfo() {
+        return String.format("LF: %.3f, RF: %.3f, LB: %.3f, RB: %.3f",
+                lfServoOffset, rfServoOffset, lbServoOffset, rbServoOffset);
     }
 
     /**
@@ -153,18 +175,18 @@ public class BetterBetterSwerveDrive {
             rbSpeed /= maxSpeed;
         }
 
-        // Set module states
-        setModuleState(leftFrontDrive, leftFrontRotation, lfSpeed, lfAngle, 0);
-        setModuleState(rightFrontDrive, rightFrontRotation, rfSpeed, rfAngle, 1);
-        setModuleState(leftBackDrive, leftBackRotation, lbSpeed, lbAngle, 2);
-        setModuleState(rightBackDrive, rightBackRotation, rbSpeed, rbAngle, 3);
+        // Set module states with calibration offsets
+        setModuleState(leftFrontDrive, leftFrontRotation, lfSpeed, lfAngle, 0, lfServoOffset);
+        setModuleState(rightFrontDrive, rightFrontRotation, rfSpeed, rfAngle, 1, rfServoOffset);
+        setModuleState(leftBackDrive, leftBackRotation, lbSpeed, lbAngle, 2, lbServoOffset);
+        setModuleState(rightBackDrive, rightBackRotation, rbSpeed, rbAngle, 3, rbServoOffset);
     }
 
     /**
      * Set the state of a swerve module
      */
     private void setModuleState(DcMotor motor, Servo servo, double speed,
-                                double targetAngle, int moduleIndex) {
+                                double targetAngle, int moduleIndex, double servoOffset) {
         // Normalize angle to -180 to 180
         targetAngle = normalizeAngle(targetAngle);
 
@@ -177,8 +199,8 @@ public class BetterBetterSwerveDrive {
             speed = -speed;
         }
 
-        // Set rotation servo position
-        setServoAngle(servo, targetAngle);
+        // Set rotation servo position with calibration offset
+        setServoAngle(servo, targetAngle, servoOffset);
 
         // Set drive motor power
         motor.setPower(speed);
@@ -188,17 +210,30 @@ public class BetterBetterSwerveDrive {
     }
 
     /**
-     * Convert angle to servo position (needs calibration)
+     * Convert angle to servo position with calibration offset
      */
-    private void setServoAngle(Servo servo, double angle) {
+    private void setServoAngle(Servo servo, double angle, double offset) {
         // Convert -180 to 180 range to 0 to 1 servo range
         double position = (angle + 180) / 360.0;
-        position = Range.clip(position, 0, 1);
-        servo.setPosition(position);
+
+        // Apply calibration offset
+        // The offset represents where the servo was when the wheel was at 0°
+        // We need to calculate relative position from that point
+        double calibratedPosition = position + offset;
+
+        // Handle wraparound
+        if (calibratedPosition > 1.0) {
+            calibratedPosition -= 1.0;
+        } else if (calibratedPosition < 0.0) {
+            calibratedPosition += 1.0;
+        }
+
+        calibratedPosition = Range.clip(calibratedPosition, 0, 1);
+        servo.setPosition(calibratedPosition);
     }
 
     /**
-     * Get current module angle from Pinpoint or servo feedback
+     * Get current module angle from stored target
      */
     private double getModuleAngle(int moduleIndex) {
         switch (moduleIndex) {

@@ -122,6 +122,10 @@ public class Teleop extends OpMode {
         } else if (gamepad1.dpad_right) {
             storer.toThree();
         }
+
+        if (gamepad2.a) {
+
+        }
     }
 
     public void move(float x, float y, float turn) {
