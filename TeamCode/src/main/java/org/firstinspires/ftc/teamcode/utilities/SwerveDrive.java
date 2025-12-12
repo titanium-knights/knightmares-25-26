@@ -153,30 +153,7 @@ public class SwerveDrive {
 
     private void setServoPos(Servo steerServo, double servoPos) {
 
-        double currPos = steerServo.getPosition();
+        steerServo.setPosition(servoPos);
 
-        if ((currPos - servoPos) > 0) {
-            if ((currPos - servoPos) < 0.5) {
-                steerServo.setPosition(servoPos);
-            } else {
-                double midValue = currPos - 0.01;
-                while (midValue > servoPos) {
-                    steerServo.setPosition(midValue);
-                    midValue -= 0.01;
-                }
-                steerServo.setPosition(servoPos);
-            }
-        } else {
-            if ((servoPos - currPos) < 0.5) {
-                steerServo.setPosition(servoPos);
-            } else {
-                double midValue = currPos + 0.01;
-                while (midValue > servoPos) {
-                    steerServo.setPosition(midValue);
-                    midValue += 0.01;
-                }
-                steerServo.setPosition(servoPos);
-            }
-        }
     }
 }

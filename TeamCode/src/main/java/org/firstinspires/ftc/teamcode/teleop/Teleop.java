@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.pinpoint.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.utilities.Intake;
 import org.firstinspires.ftc.teamcode.utilities.Outtake;
 import org.firstinspires.ftc.teamcode.utilities.Rotator;
@@ -24,6 +25,7 @@ public class Teleop extends OpMode {
     SwerveDrive drive;
     Storer storer;
     Rotator rotator;
+    GoBildaPinpointDriver odo;
 
     final double normalPower = 0.9;
 
@@ -72,7 +74,6 @@ public class Teleop extends OpMode {
     @Override
     public void loop() {
 
-        *
         float x = gamepad1.left_stick_x;
         float y = gamepad1.left_stick_y;
         float turn = gamepad1.right_stick_x;
@@ -120,6 +121,10 @@ public class Teleop extends OpMode {
             storer.toTwo();
         } else if (gamepad1.dpad_right) {
             storer.toThree();
+        }
+
+        if (gamepad2.a) {
+
         }
     }
 

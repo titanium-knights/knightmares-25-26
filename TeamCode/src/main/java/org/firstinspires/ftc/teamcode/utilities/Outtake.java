@@ -35,9 +35,6 @@ public class Outtake {
         outtakeMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         outtakeMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         outtakeMotor1.setZeroPowerBehavior(BRAKE);
-        outtakeMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        outtakeMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        outtakeMotor2.setZeroPowerBehavior(BRAKE);
     }
 
     public void stopOuttake(){ // sets power to 0 - everything stops

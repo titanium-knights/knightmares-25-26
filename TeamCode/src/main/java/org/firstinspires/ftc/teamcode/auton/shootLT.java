@@ -150,5 +150,3 @@ public class shootLT extends AutonMethods {
 
     }
 }
-
-
