@@ -17,8 +17,8 @@ apply from: '../build.dependencies.gradle'
 
 android {
     namespace = 'org.firstinspires.ftc.teamcode'
+    compileSdk 34
 
-    compileSdk 36
 
     defaultConfig {
         minSdk 24
