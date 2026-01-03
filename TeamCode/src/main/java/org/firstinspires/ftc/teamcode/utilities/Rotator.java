@@ -29,12 +29,14 @@ public class Rotator {
 
     public static Telemetry telemetry;
 
-
-    public void rotateLeft() {
+    public void setPower(double newPower) {
+        rotator.setPower(-newPower);
+    }
+    public void rotateRight() {
         rotator.setPower(-power);
     }
 
-    public void rotateRight() {
+    public void rotateLeft() {
         rotator.setPower(power);
     }
 

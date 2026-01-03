@@ -30,23 +30,15 @@ public class shootLT extends AutonMethods {
         telemetry.update();
 
 
-        if (Team == true){
-            moveBackward(1.0);
-            outtake();
-            outtake();
-            outtake();
-            turnRight(45);
-            moveRight(1.0);
-        }
-        if (Team == false) {
-            moveBackward(1.0);
-            outtake();
-            outtake();
-            outtake();
-            turnLeft(45);
-        }
 
-        else if(ID == 21 && Team == true) {
+
+        moveBackward(1.0);
+        outtake();
+        outtake();
+        outtake();
+        turnRight(45);
+        moveRight(1.0);
+        if(ID == 21 && Team == true) {
             moveBackward(3.0);
             turnLeft(90); //degrees
             moveForward(0.8);
@@ -150,3 +142,5 @@ public class shootLT extends AutonMethods {
 
     }
 }
+
+
