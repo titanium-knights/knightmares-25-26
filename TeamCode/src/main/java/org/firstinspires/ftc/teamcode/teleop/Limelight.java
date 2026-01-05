@@ -22,11 +22,11 @@ public class Limelight extends OpMode {
     // Tolerance for "centered" (degrees)
     private static final double TARGET_TOLERANCE = 2.0;
 
-    // PD control constants
-    private static final double MIN_POWER = 0.15;  // Minimum power to overcome friction
-    private static final double MAX_POWER = 0.5;   // Maximum rotation power
-    private static final double KP = 0.02;         // Proportional gain
-    private static final double KD = 0.015;        // Derivative gain - adjust this to tune damping
+    // PD control constants (start with D = 0, tune P first)
+    private static final double MIN_POWER = 0.15;   // Minimum power to overcome friction
+    private static final double MAX_POWER = 0.5;    // Maximum rotation power
+    private static final double KP = 0.02;          // Proportional gain (tune this first)
+    private static final double KD = 0.0;           // Derivative gain (add later to damp)
 
     // For derivative calculation
     private double lastError = 0.0;
@@ -34,7 +34,10 @@ public class Limelight extends OpMode {
 
     @Override
     public void init() {
+        // Your Rotator wrapper for the turning motor
         this.rotator = new Rotator(hardwareMap, telemetry);
+
+        // If your FTControl version uses a different method, adjust this line
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -45,9 +48,11 @@ public class Limelight extends OpMode {
 
     @Override
     public void start() {
-        limelight.pipelineSwitch(0);
+        limelight.pipelineSwitch(0);   // Ensure AprilTag pipeline
         limelight.start();
+
         telemetry.setMsTransmissionInterval(11);
+
         lastTime = System.currentTimeMillis();
         lastError = 0.0;
     }
@@ -56,7 +61,7 @@ public class Limelight extends OpMode {
     public void loop() {
         LLResult result = limelight.getLatestResult();
 
-        // Detailed debug info
+        // Debug info
         telemetry.addData("=== Limelight Status ===", "");
         telemetry.addData("Limelight Object", limelight != null ? "Connected" : "NULL");
         telemetry.addData("Result Object", result != null ? "Received" : "NULL");
@@ -64,7 +69,6 @@ public class Limelight extends OpMode {
         if (result != null) {
             telemetry.addData("Result Valid", result.isValid() ? "YES" : "NO");
 
-            // Show raw result data for debugging
             if (result.isValid()) {
                 telemetry.addData("Target Count", "Targets detected");
             } else {
@@ -81,16 +85,16 @@ public class Limelight extends OpMode {
         }
 
         if (result != null && result.isValid()) {
-            double tx = result.getTx(); // Horizontal offset
+            double tx = result.getTx(); // Horizontal offset (deg)
             double ty = result.getTy();
-            Pose3D botpose = result.getBotpose();
+            Pose3D botpose = result.getBotpose(); // May be null
 
             telemetry.addData("=== AprilTag DETECTED ===", "");
 
-            // Calculate PD power based on error
+            // PD power based on tx error
             double power = calculateRotationPower(tx);
 
-            // Apply rotation with calculated power
+            // Apply rotation
             if (Math.abs(tx) > TARGET_TOLERANCE) {
                 rotator.setPower(power);
                 telemetry.addData("Action", power > 0 ? "Rotating Right" : "Rotating Left");
@@ -99,7 +103,7 @@ public class Limelight extends OpMode {
                 telemetry.addData("Action", "On Target");
             }
 
-            // Telemetry
+            // Telemetry for tuning
             telemetry.addData("=== AprilTag Data ===", "");
             telemetry.addData("tx (X offset)", "%.2f degrees", tx);
             telemetry.addData("ty (Y offset)", "%.2f degrees", ty);
@@ -107,13 +111,18 @@ public class Limelight extends OpMode {
             telemetry.addData("Target Tolerance", "%.2f degrees", TARGET_TOLERANCE);
             telemetry.addData("Calculated Power", "%.3f", power);
             telemetry.addData("On Target?", Math.abs(tx) < TARGET_TOLERANCE ? "YES" : "NO");
+
             telemetry.addData("=== Position ===", "");
-            telemetry.addData("Botpose X", "%.2f", botpose.getPosition().x);
-            telemetry.addData("Botpose Y", "%.2f", botpose.getPosition().y);
-            telemetry.addData("Botpose Z", "%.2f", botpose.getPosition().z);
+            if (botpose != null) {
+                telemetry.addData("Botpose X", "%.2f", botpose.getPosition().x);
+                telemetry.addData("Botpose Y", "%.2f", botpose.getPosition().y);
+                telemetry.addData("Botpose Z", "%.2f", botpose.getPosition().z);
+            } else {
+                telemetry.addData("Botpose", "Unavailable");
+            }
 
         } else {
-            // No valid target - stop rotation and reset derivative
+            // No valid target
             rotator.stop();
             lastError = 0.0;
             telemetry.addData("Status", "No AprilTag Detected");
@@ -128,25 +137,21 @@ public class Limelight extends OpMode {
      * D term: responds to rate of change, damping oscillations
      */
     private double calculateRotationPower(double tx) {
-        // Calculate time delta
         double currentTime = System.currentTimeMillis();
-        double dt = (currentTime - lastTime) / 1000.0; // Convert to seconds
+        double dt = (currentTime - lastTime) / 1000.0; // seconds
 
-        // Prevent division by zero
-        if (dt < 0.001) dt = 0.001;
+        if (dt < 0.001) dt = 0.001; // prevent div by 0
 
-        // Calculate derivative (rate of change of error)
         double derivative = (tx - lastError) / dt;
 
-        // PD control: proportional + derivative
         double pTerm = KP * tx;
         double dTerm = KD * derivative;
-        double power = pTerm + dTerm;
+        double power = pTerm + dTerm;  // flip sign here if robot turns wrong way
 
-        // Clamp to max power
+        // Clamp to max
         power = Math.max(-MAX_POWER, Math.min(MAX_POWER, power));
 
-        // Add minimum power to overcome friction (if not on target)
+        // Apply minimum power outside tolerance to overcome friction
         if (Math.abs(tx) > TARGET_TOLERANCE) {
             if (power > 0) {
                 power = Math.max(power, MIN_POWER);
@@ -155,7 +160,6 @@ public class Limelight extends OpMode {
             }
         }
 
-        // Update tracking variables
         lastError = tx;
         lastTime = currentTime;
 
