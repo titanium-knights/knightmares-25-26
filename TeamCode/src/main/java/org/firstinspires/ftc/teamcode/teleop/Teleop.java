@@ -10,11 +10,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pinpoint.GoBildaPinpointDriver;
+import org.firstinspires.ftc.teamcode.utilities.AprilTagWebcam;
 import org.firstinspires.ftc.teamcode.utilities.Intake;
 import org.firstinspires.ftc.teamcode.utilities.Outtake;
 import org.firstinspires.ftc.teamcode.utilities.Rotator;
 import org.firstinspires.ftc.teamcode.utilities.SwerveDrive;
 import org.firstinspires.ftc.teamcode.utilities.Storer;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @Configurable
 @TeleOp(name="DriveTrain Teleop")
@@ -35,6 +37,10 @@ public class Teleop extends OpMode {
     public boolean shootState = false;
 
     private TelemetryManager telemetryM;
+
+    protected int aprilTagTargetId = -1;
+    protected boolean aprilTagTrackingEnabled = false;
+    private AprilTagWebcam aprilTagWebcam;
 
     enum ButtonPressState {
         PRESSED_GOOD,
@@ -57,6 +63,11 @@ public class Teleop extends OpMode {
 
     @Override
     public void init() {
+        if (aprilTagTrackingEnabled && aprilTagTargetId > 0) {
+            aprilTagWebcam = new AprilTagWebcam();
+            aprilTagWebcam.init(hardwareMap, telemetry);
+        }
+
         this.rotatorButton = ButtonPressState.UNPRESSED;
         this.intakeButton = ButtonPressState.UNPRESSED;
         this.shootButton = ButtonPressState.UNPRESSED;
@@ -73,6 +84,17 @@ public class Teleop extends OpMode {
 
     @Override
     public void loop() {
+
+        if (aprilTagWebcam != null) {
+            aprilTagWebcam.update();
+            AprilTagDetection trackedTag = aprilTagWebcam.getTagBySpecificId(aprilTagTargetId);
+            if (trackedTag != null) {
+                telemetry.addData("AprilTag Target", aprilTagTargetId);
+                aprilTagWebcam.displayDetectionTelemetry(trackedTag);
+            } else {
+                telemetry.addData("AprilTag Target", "%d (not detected)", aprilTagTargetId);
+            }
+        }
 
         float x = gamepad1.left_stick_x;
         float y = gamepad1.left_stick_y;
@@ -126,6 +148,18 @@ public class Teleop extends OpMode {
         if (gamepad2.a) {
 
         }
+    }
+
+    @Override
+    public void stop() {
+        if (aprilTagWebcam != null) {
+            aprilTagWebcam.stop();
+        }
+    }
+
+    protected void setAprilTagTargetId(int tagId) {
+        aprilTagTargetId = tagId;
+        aprilTagTrackingEnabled = true;
     }
 
     public void move(float x, float y, float turn) {
