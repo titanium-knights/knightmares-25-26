@@ -74,9 +74,9 @@ public class Teleop extends OpMode {
     @Override
     public void loop() {
 
-        float x = gamepad1.left_stick_x;
-        float y = gamepad1.left_stick_y;
-        float turn = gamepad1.right_stick_x;
+        float x = gamepad2.left_stick_x;
+        float y = gamepad2.left_stick_y;
+        float turn = gamepad2.right_stick_x;
 
         stick_margin = 0.1f;
         move(x, y, turn);

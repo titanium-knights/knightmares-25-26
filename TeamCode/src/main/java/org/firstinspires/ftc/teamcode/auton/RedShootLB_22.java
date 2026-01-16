@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "RedShootLB_21", group = "Autonomous")
+@Autonomous(name = "RedShootLB_22", group = "Autonomous")
 @Configurable // Panels
 public class RedShootLB_22 extends OpMode {
 
