@@ -38,7 +38,7 @@ public class AprilTagWebcam {
                 .build();
 
         VisionPortal.Builder builder = new VisionPortal.Builder();
-        builder.setCamera(hwMap.get(WebcamName.class, "Webcam 1"));
+        builder.setCamera(hwMap.get(WebcamName.class, "limelight"));
         builder.setCameraResolution(new Size(1280, 960));
         builder.setStreamFormat(VisionPortal.StreamFormat.MJPEG);
         builder.addProcessor(aprilTagProcessor);
