@@ -14,7 +14,6 @@ public class Outtake {
     //DANIEL comment: For this, we don't really care about degrees so, we deal with
     //everything in encoder ticks or number of rotations
     DcMotor outtakeMotor1;
-    DcMotor outtakeMotor2;
 
 
     private TelemetryManager telemetryM;
@@ -23,7 +22,6 @@ public class Outtake {
 
     public Outtake(HardwareMap hmap, Telemetry telemetry) {
         this.outtakeMotor1 = hmap.dcMotor.get(CONFIG.outtake1);
-        this.outtakeMotor2 = hmap.dcMotor.get(CONFIG.outtake2);
 
         this.telemetry = telemetry;
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -38,15 +36,11 @@ public class Outtake {
     }
 
     public void stopOuttake(){ // sets power to 0 - everything stops
-        outtakeMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        outtakeMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//        pullUpMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        outtakeMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         setPower(0);
     }
     public void setPower(double power) {
         outtakeMotor1.setPower(power);
-        outtakeMotor2.setPower(power);
-//        pullUpMotor2.setPower(power);
     }
 
 
@@ -55,10 +49,7 @@ public class Outtake {
 
 
     public void shoot() {
-        outtakeMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         outtakeMotor1.setPower(-0.8);
-        outtakeMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        outtakeMotor2.setPower(-0.8);
     }
 
 }

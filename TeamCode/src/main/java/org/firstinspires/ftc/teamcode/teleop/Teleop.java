@@ -31,13 +31,12 @@ public class Teleop extends OpMode {
 
     final double normalPower = 0.9;
 
-    public float stick_margin = 0.7f;
+    public float stick_margin = 0.1f;
 
     public boolean intakeState = false;
     public boolean shootState = false;
 
     private TelemetryManager telemetryM;
-
     protected int aprilTagTargetId = -1;
     protected boolean aprilTagTrackingEnabled = false;
     private AprilTagWebcam aprilTagWebcam;
@@ -63,10 +62,10 @@ public class Teleop extends OpMode {
 
     @Override
     public void init() {
-        if (aprilTagTrackingEnabled && aprilTagTargetId > 0) {
-            aprilTagWebcam = new AprilTagWebcam();
-            aprilTagWebcam.init(hardwareMap, telemetry);
-        }
+//        if (aprilTagTrackingEnabled && aprilTagTargetId > 0) {
+//            aprilTagWebcam = new AprilTagWebcam();
+//            aprilTagWebcam.init(hardwareMap, telemetry);
+//        }
 
         this.rotatorButton = ButtonPressState.UNPRESSED;
         this.intakeButton = ButtonPressState.UNPRESSED;
@@ -87,16 +86,16 @@ public class Teleop extends OpMode {
     @Override
     public void loop() {
 
-        if (aprilTagWebcam != null) {
-            aprilTagWebcam.update();
-            AprilTagDetection trackedTag = aprilTagWebcam.getTagBySpecificId(aprilTagTargetId);
-            if (trackedTag != null) {
-                telemetry.addData("AprilTag Target", aprilTagTargetId);
-                aprilTagWebcam.displayDetectionTelemetry(trackedTag);
-            } else {
-                telemetry.addData("AprilTag Target", "%d (not detected)", aprilTagTargetId);
-            }
-        }
+//        if (aprilTagWebcam != null) {
+//            aprilTagWebcam.update();
+//            AprilTagDetection trackedTag = aprilTagWebcam.getTagBySpecificId(aprilTagTargetId);
+//            if (trackedTag != null) {
+//                telemetry.addData("AprilTag Target", aprilTagTargetId);
+//                aprilTagWebcam.displayDetectionTelemetry(trackedTag);
+//            } else {
+//                telemetry.addData("AprilTag Target", "%d (not detected)", aprilTagTargetId);
+//            }
+//        }
 
         float x = gamepad2.left_stick_x;
         float y = gamepad2.left_stick_y;
@@ -112,8 +111,6 @@ public class Teleop extends OpMode {
         } else if (gamepad1.right_bumper) {
             intake.pullBall();
         } else {
-            telemetryM.addLine("default down");
-            telemetryM.update();
             intake.pullBall();
         }
 
@@ -121,7 +118,6 @@ public class Teleop extends OpMode {
             intake.run();
         } else if (gamepad1.right_trigger > 0.1) {
             outtake.shoot();
-            intake.run();
         } else {
             intake.stop();
             outtake.stopOuttake();
@@ -154,9 +150,9 @@ public class Teleop extends OpMode {
 
     @Override
     public void stop() {
-        if (aprilTagWebcam != null) {
-            aprilTagWebcam.stop();
-        }
+//        if (aprilTagWebcam != null) {
+//            aprilTagWebcam.stop();
+//        }
     }
 
     protected void setAprilTagTargetId(int tagId) {

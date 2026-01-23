@@ -36,7 +36,8 @@ public class Intake {
 
 
     public void stop(){ // sets power to 0 - everything stops
-        intakeServo.setPower(0);
+        // intakeServo.setPower(0);
+        intakeServo.getController().pwmDisable();
     }
     public void run() {
         intakeServo.setPower(-power);
