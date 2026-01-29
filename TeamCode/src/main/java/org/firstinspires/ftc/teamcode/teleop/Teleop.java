@@ -119,7 +119,7 @@ public class Teleop extends OpMode {
         } else if (gamepad1.right_trigger > 0.1) {
             outtake.shoot();
         } else {
-            intake.stop();
+            intake.stopIntake();
             outtake.stopOuttake();
         }
 

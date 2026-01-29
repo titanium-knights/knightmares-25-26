@@ -19,7 +19,7 @@ public class Intake {
     Servo ballServo;
 
     double pullPos = 0.5; // 2000/2000
-    double pushPos = 0.80;
+    double pushPos = 0.90;
     private TelemetryManager telemetryM;
     private Telemetry telemetry;
     double power = 0.8;
@@ -35,9 +35,9 @@ public class Intake {
 
 
 
-    public void stop(){ // sets power to 0 - everything stops
-        // intakeServo.setPower(0);
-        intakeServo.getController().pwmDisable();
+    public void stopIntake(){ // sets power to 0 - everything stops
+         intakeServo.setPower(0);
+//        intakeServo.getController().pwmDisable();
     }
     public void run() {
         intakeServo.setPower(-power);

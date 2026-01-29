@@ -41,7 +41,7 @@ public class Rotator {
     }
 
     public void stop() {
-        // rotator.setPower(0);
-        rotator.getController().pwmDisable();
+         rotator.setPower(0);
+//        rotator.getController().pwmDisable();
     }
 }

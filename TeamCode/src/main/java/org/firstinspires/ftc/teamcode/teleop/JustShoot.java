@@ -21,6 +21,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 @Configurable
 @TeleOp(name="JustShoot")
 public class JustShoot extends OpMode{
+    Intake intake;
     Outtake outtake;
     Rotator rotator;
     private TelemetryManager telemetryM;
@@ -31,6 +32,7 @@ public class JustShoot extends OpMode{
 
         this.outtake = new Outtake(hardwareMap, telemetry);
         this.rotator = new Rotator(hardwareMap, telemetry);
+        this.intake = new Intake(hardwareMap, telemetry);
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
@@ -39,18 +41,30 @@ public class JustShoot extends OpMode{
     @Override
     public void loop() {
 
-        if (gamepad1.left_stick_x > 0.3) {
+        if (gamepad1.dpad_left) {
             rotator.rotateRight();
-        } else if (gamepad1.left_stick_x < -0.3) {
+            telemetryM.addLine("dpad left");
+            telemetryM.update();
+        } else if (gamepad1.dpad_right) {
             rotator.rotateLeft();
+            telemetryM.addLine("dpad right");
+            telemetryM.update();
         } else {
             rotator.stop();
         }
 
-        if (gamepad1.b) {
+        if (gamepad1.left_bumper) {
             outtake.shoot();
+            intake.run();
         } else {
             outtake.stopOuttake();
+            intake.stopIntake();
+        }
+
+        if (gamepad1.right_bumper) {
+            intake.pushBall();
+        } else {
+            intake.pullBall();
         }
     }
 }
