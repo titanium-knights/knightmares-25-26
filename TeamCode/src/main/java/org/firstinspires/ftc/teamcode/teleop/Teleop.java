@@ -102,8 +102,10 @@ public class Teleop extends OpMode {
         float turn = gamepad2.right_stick_x;
 
         stick_margin = 0.1f;
-        move(x, y, turn);
+        if (gamepad2.a) {
+            drive.moveBL(1, 1, 0);
 
+        }
 
 
         if (gamepad1.left_bumper) {

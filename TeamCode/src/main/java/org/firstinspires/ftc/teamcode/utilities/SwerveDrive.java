@@ -8,6 +8,7 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.teleop.Teleop;
 
 public class SwerveDrive {
 
@@ -145,12 +146,60 @@ public class SwerveDrive {
             blDrive.setPower(-turnPower);
             brDrive.setPower(-turnPower);
         }
-        // --- IDLE ---
         else {
             killMotors();
             killServos();
             driveUnlockTime = 0;
         }
+    }
+
+    public void moveBL(double x, double y, double turn) {
+        double magnitude = Math.hypot(x, y);
+
+        if (magnitude > JOYSTICK_DEADZONE) {
+            double targetAngle = Math.toDegrees(Math.atan2(y, -x)) + 180;
+            double angleDifference = Math.abs(targetAngle - lastTargetAngle);
+
+            if (angleDifference > 180) {
+                angleDifference = 360 - angleDifference;
+            }
+
+            if (angleDifference > 5.0) {
+                double servoMovement = angleDifference / GEAR_RATIO;
+                long waitTime = (long)(servoMovement * MS_PER_DEGREE);
+
+                driveUnlockTime = System.currentTimeMillis() + waitTime;
+                lastTargetAngle = targetAngle;
+            }
+
+            setServoAngle(blSteer, BL_OFFSET + targetAngle);
+
+            double speed = magnitude * MAX_SPEED;
+            boolean isReversing = isInReverseZone(targetAngle);
+            double power = isReversing ? -speed : speed;
+
+            if (System.currentTimeMillis() >= driveUnlockTime) {
+                blDrive.setPower(power);
+            } else {
+                setAllDrivePower(0);
+            }
+        }
+
+        else if (Math.abs(turn) > TURN_DEADZONE) {
+            driveUnlockTime = 0;
+
+            setServoAngle(brSteer, BR_TURN_ANGLE);
+            double turnPower = turn * TURN_SPEED;
+            blDrive.setPower(turnPower);
+        }
+        else {
+            killMotors();
+            killServos();
+            driveUnlockTime = 0;
+        }
+
+        telemetryM.debug("only back left running");
+        telemetryM.update(telemetry);
     }
 
     public void killMotors() {

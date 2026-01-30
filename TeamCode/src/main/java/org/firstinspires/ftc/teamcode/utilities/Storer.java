@@ -14,9 +14,9 @@ public class Storer {
 
     Servo storerServo;
 
-    double inpos1 = 0.20; // 2000/2000
-    double inpos2 = 0.44;
-    double inpos3 = 0.68; //SIX SEVEN
+    double inpos1 = 0.26; // 2000/2000
+    double inpos2 = 0.50;
+    double inpos3 = 0.74; //SIX SEVEN
 
     private TelemetryManager telemetryM;
     private Telemetry telemetry;
@@ -39,6 +39,7 @@ public class Storer {
         telemetryM.addLine("in position 1");
         telemetryM.update();
     }
+
     public void toTwo(){
         storerServo.setPosition(inpos2);
         telemetryM.addLine("in position 2");
