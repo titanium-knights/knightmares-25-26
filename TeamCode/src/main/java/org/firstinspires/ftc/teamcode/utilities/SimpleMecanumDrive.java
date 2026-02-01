@@ -2,7 +2,7 @@
 //
 //import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 //
-//import com.bylazar.configurables.annotations.Configurable;
+//import com.byla2zar.configurables.annotations.Configurable;
 //
 //import com.qualcomm.robotcore.hardware.DcMotor;
 //import com.qualcomm.robotcore.hardware.DcMotorSimple;

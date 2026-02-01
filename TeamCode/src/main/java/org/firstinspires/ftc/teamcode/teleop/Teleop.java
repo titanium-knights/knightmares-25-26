@@ -41,6 +41,19 @@ public class Teleop extends OpMode {
     protected boolean aprilTagTrackingEnabled = false;
     private AprilTagWebcam aprilTagWebcam;
 
+    // Tolerance for "centered" (degrees)
+    private static final double TARGET_TOLERANCE = 2.0;
+
+    // PD control constants (tune if needed)
+    private static final double MIN_POWER = 0.15;   // Minimum power to overcome friction
+    private static final double MAX_POWER = 0.5;    // Maximum rotation power
+    private static final double KP = 0.02;          // Proportional gain
+    private static final double KD = 0.0;           // Derivative gain
+
+    // For derivative calculation
+    private double lastError = 0.0;
+    private double lastTime;
+
     enum ButtonPressState {
         PRESSED_GOOD,
         DEPRESSED,
@@ -62,16 +75,15 @@ public class Teleop extends OpMode {
 
     @Override
     public void init() {
-//        if (aprilTagTrackingEnabled && aprilTagTargetId > 0) {
-//            aprilTagWebcam = new AprilTagWebcam();
-//            aprilTagWebcam.init(hardwareMap, telemetry);
-//        }
+        if (aprilTagTrackingEnabled && aprilTagTargetId > 0) {
+            aprilTagWebcam = new AprilTagWebcam();
+            aprilTagWebcam.init(hardwareMap, telemetry);
+        }
 
         this.rotatorButton = ButtonPressState.UNPRESSED;
         this.intakeButton = ButtonPressState.UNPRESSED;
         this.shootButton = ButtonPressState.UNPRESSED;
         this.ballButton = ButtonPressState.UNPRESSED;
-
         this.intake = new Intake(hardwareMap, telemetry);
         this.drive = new SwerveDrive(hardwareMap, telemetry);
         this.storer = new Storer(hardwareMap, telemetry);
@@ -81,21 +93,37 @@ public class Teleop extends OpMode {
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
         drive.setAllServos(0.0);
+
+        lastTime = System.currentTimeMillis();
+        lastError = 0.0;
     }
 
     @Override
     public void loop() {
-
-//        if (aprilTagWebcam != null) {
-//            aprilTagWebcam.update();
-//            AprilTagDetection trackedTag = aprilTagWebcam.getTagBySpecificId(aprilTagTargetId);
-//            if (trackedTag != null) {
-//                telemetry.addData("AprilTag Target", aprilTagTargetId);
-//                aprilTagWebcam.displayDetectionTelemetry(trackedTag);
-//            } else {
-//                telemetry.addData("AprilTag Target", "%d (not detected)", aprilTagTargetId);
-//            }
-//        }
+        AprilTagDetection trackedTag = null;
+        if (aprilTagWebcam != null) {
+            aprilTagWebcam.update();
+            telemetry.addData("AprilTag Count", aprilTagWebcam.getDetectedTags().size());
+            if (!aprilTagWebcam.getDetectedTags().isEmpty()) {
+                StringBuilder ids = new StringBuilder();
+                for (AprilTagDetection detection : aprilTagWebcam.getDetectedTags()) {
+                    if (ids.length() > 0) {
+                        ids.append(", ");
+                    }
+                    ids.append(detection.id);
+                }
+                telemetry.addData("AprilTag IDs", ids.toString());
+            }
+            trackedTag = aprilTagWebcam.getTagBySpecificId(aprilTagTargetId);
+            if (trackedTag != null) {
+                telemetry.addData("AprilTag Target", aprilTagTargetId);
+                aprilTagWebcam.displayDetectionTelemetry(trackedTag);
+            } else {
+                telemetry.addData("AprilTag Target", "%d (not detected)", aprilTagTargetId);
+            }
+        } else {
+            telemetry.addData("AprilTag Target", "%d (camera not initialized)", aprilTagTargetId);
+        }
 
         float x = gamepad2.left_stick_x;
         float y = gamepad2.left_stick_y;
@@ -125,14 +153,31 @@ public class Teleop extends OpMode {
             outtake.stopOuttake();
         }
 
+        boolean autoTurretActive = aprilTagTrackingEnabled && trackedTag != null;
+        if (autoTurretActive) {
+            double bearing = trackedTag.ftcPose.bearing; // degrees, +right / -left
+            double power = calculateRotationPower(bearing);
 
-
-        if (gamepad1.left_stick_x > 0.3) {
-            rotator.rotateRight();
-        } else if (gamepad1.left_stick_x < -0.3) {
-            rotator.rotateLeft();
+            if (Math.abs(bearing) > TARGET_TOLERANCE) {
+                rotator.setPower(power);
+                telemetry.addData("Turret", power > 0 ? "auto right" : "auto left");
+            } else {
+                rotator.stop();
+                telemetry.addData("Turret", "auto on target");
+            }
+            telemetry.addData("Turret Bearing", "%.2f deg", bearing);
+            telemetry.addData("Turret Power", "%.3f", power);
         } else {
-            rotator.stop();
+            if (gamepad1.left_stick_x > 0.3) {
+                rotator.rotateRight();
+                telemetry.addData("Turret", "rotate right");
+            } else if (gamepad1.left_stick_x < -0.3) {
+                rotator.rotateLeft();
+                telemetry.addData("Turret", "rotate left");
+            } else {
+                rotator.stop();
+                telemetry.addData("Turret", "stopped");
+            }
         }
 
 
@@ -152,9 +197,9 @@ public class Teleop extends OpMode {
 
     @Override
     public void stop() {
-//        if (aprilTagWebcam != null) {
-//            aprilTagWebcam.stop();
-//        }
+        if (aprilTagWebcam != null) {
+            aprilTagWebcam.stop();
+        }
     }
 
     protected void setAprilTagTargetId(int tagId) {
@@ -171,5 +216,36 @@ public class Teleop extends OpMode {
         double multiplier = normalPower;
 
         drive.move(-x * multiplier, y * multiplier, -turn * multiplier);
+    }
+
+    /**
+     * Calculate rotation power using PD control
+     */
+    private double calculateRotationPower(double error) {
+        double currentTime = System.currentTimeMillis();
+        double dt = (currentTime - lastTime) / 1000.0;
+
+        if (dt < 0.001) dt = 0.001;
+
+        double derivative = (error - lastError) / dt;
+
+        double pTerm = KP * error;
+        double dTerm = KD * derivative;
+        double power = pTerm + dTerm;
+
+        power = Math.max(-MAX_POWER, Math.min(MAX_POWER, power));
+
+        if (Math.abs(error) > TARGET_TOLERANCE) {
+            if (power > 0) {
+                power = Math.max(power, MIN_POWER);
+            } else if (power < 0) {
+                power = Math.min(power, -MIN_POWER);
+            }
+        }
+
+        lastError = error;
+        lastTime = currentTime;
+
+        return power;
     }
 }
