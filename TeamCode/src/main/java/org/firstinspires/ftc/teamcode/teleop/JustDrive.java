@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pinpoint.GoBildaPinpointDriver;
-import org.firstinspires.ftc.teamcode.utilities.SwerveDrive;
+import org.firstinspires.ftc.teamcode.utilities.MecanumDrive;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.pinpoint.GoBildaPinpointDriver;
 @TeleOp(name="JustDrive Teleop")
 public class JustDrive extends OpMode {
 
-    SwerveDrive drive;
+    MecanumDrive drive;
 
     //Set normal power constant to 1, no point in slowing the robot down
     final double normalPower = 1;
@@ -45,7 +45,7 @@ public class JustDrive extends OpMode {
 
     @Override
     public void init() {
-        this.drive = new SwerveDrive(hardwareMap, telemetry);
+        this.drive = new MecanumDrive(hardwareMap);
     }
 
     @Override

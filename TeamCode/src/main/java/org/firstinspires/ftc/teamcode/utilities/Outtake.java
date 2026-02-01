@@ -49,7 +49,7 @@ public class Outtake {
 
 
     public void shoot() {
-        outtakeMotor1.setPower(-0.8);
+        outtakeMotor1.setPower(-0.7);
     }
 
 }
