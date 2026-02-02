@@ -52,4 +52,18 @@ public class Storer {
         telemetryM.update();
     }
 
+    public double getPosition() {
+        return storerServo.getPosition();
+    }
+
+    public void rotateLeft() {
+        double currPosition = storerServo.getPosition();
+        storerServo.setPosition(currPosition-0.01);
+    }
+
+    public void rotateRight() {
+        double currPosition = storerServo.getPosition();
+        storerServo.setPosition(currPosition+0.01);
+    }
+
 }

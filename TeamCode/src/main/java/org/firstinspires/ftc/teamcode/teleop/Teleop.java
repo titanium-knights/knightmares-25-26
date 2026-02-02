@@ -137,7 +137,6 @@ public class Teleop extends OpMode {
             intake.pullBall();
         } else {
             intake.pullBall();
-
         }
 
         if (gamepad1.left_trigger > 0.1) {
@@ -185,6 +184,10 @@ public class Teleop extends OpMode {
             storer.toTwo();
         } else if (gamepad1.dpad_right) {
             storer.toThree();
+        } else if (gamepad1.right_stick_x < 0.1) {
+            storer.rotateLeft();
+        } else if (gamepad1.right_stick_x > 0.1) {
+            storer.rotateRight();
         }
     }
 
