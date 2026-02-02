@@ -12,9 +12,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.pinpoint.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.utilities.AprilTagWebcam;
 import org.firstinspires.ftc.teamcode.utilities.Intake;
+import org.firstinspires.ftc.teamcode.utilities.MecanumDrive;
 import org.firstinspires.ftc.teamcode.utilities.Outtake;
 import org.firstinspires.ftc.teamcode.utilities.Rotator;
-import org.firstinspires.ftc.teamcode.utilities.SwerveDrive;
 import org.firstinspires.ftc.teamcode.utilities.Storer;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
@@ -24,12 +24,12 @@ public class Teleop extends OpMode {
 
     Intake intake;
     Outtake outtake;
-    SwerveDrive drive;
     Storer storer;
+    MecanumDrive drive;
     Rotator rotator;
     GoBildaPinpointDriver odo;
 
-    final double normalPower = 0.9;
+    final double normalPower = 0.99;
 
     public float stick_margin = 0.1f;
 
@@ -85,14 +85,12 @@ public class Teleop extends OpMode {
         this.shootButton = ButtonPressState.UNPRESSED;
         this.ballButton = ButtonPressState.UNPRESSED;
         this.intake = new Intake(hardwareMap, telemetry);
-        this.drive = new SwerveDrive(hardwareMap, telemetry);
+        this.drive = new MecanumDrive(hardwareMap);
         this.storer = new Storer(hardwareMap, telemetry);
         this.outtake = new Outtake(hardwareMap, telemetry);
         this.rotator = new Rotator(hardwareMap, telemetry);
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
-
-        drive.setAllServos(0.0);
 
         lastTime = System.currentTimeMillis();
         lastError = 0.0;
@@ -130,10 +128,7 @@ public class Teleop extends OpMode {
         float turn = gamepad2.right_stick_x;
 
         stick_margin = 0.1f;
-        if (gamepad2.a) {
-            drive.moveBL(1, 1, 0);
-
-        }
+        move(x, y, turn);
 
 
         if (gamepad1.left_bumper) {
@@ -142,12 +137,14 @@ public class Teleop extends OpMode {
             intake.pullBall();
         } else {
             intake.pullBall();
+
         }
 
         if (gamepad1.left_trigger > 0.1) {
             intake.run();
         } else if (gamepad1.right_trigger > 0.1) {
             outtake.shoot();
+            // intake.run();
         } else {
             intake.stopIntake();
             outtake.stopOuttake();
@@ -188,10 +185,6 @@ public class Teleop extends OpMode {
             storer.toTwo();
         } else if (gamepad1.dpad_right) {
             storer.toThree();
-        }
-
-        if (gamepad2.a) {
-
         }
     }
 

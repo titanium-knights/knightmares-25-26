@@ -89,12 +89,15 @@ public class SensorGoBildaPinpointExample extends LinearOpMode {
         backwards is a negative number.
          */
 
-        // width: 16.375
-        // y-offset: -2.3125
-        // length: 17.125
-        // x-offset: 2.3625
+        // width: 16.875
+        // 5.875
+        // x-offset: 2.5625
 
-        odo.setOffsets(-58.7375, 60.0075, DistanceUnit.MM); //these are tuned for 3110-0002-0001 Product Insight #1
+        // length: 17.125
+        // 6.875
+        // y-offset: 1.6875
+
+        odo.setOffsets(65.0875, 42.8625, DistanceUnit.MM); //these are tuned for 3110-0002-0001 Product Insight #1
 
         /*
         Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either

@@ -7,7 +7,7 @@
 buildscript {
     repositories {
         maven {
-            url = "https://mymaven.bylazar.com/releases"
+url = "https://mymaven.bylazar.com/releases"
         }
         mavenCentral()
         google()
