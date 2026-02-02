@@ -25,9 +25,33 @@ public class AprilTagWebcam {
     private VisionPortal visionPortal;
     private List<AprilTagDetection> detectedTags = new ArrayList<>();
     private Telemetry telemetry;
+    private String cameraName = "limelight";
+
+    public void setCameraName(String cameraName) {
+        if (cameraName != null && !cameraName.isEmpty()) {
+            this.cameraName = cameraName;
+        }
+    }
 
     public void init(HardwareMap hwMap, Telemetry telemetry) {
         this.telemetry = telemetry;
+        WebcamName webcam = null;
+        try {
+            webcam = hwMap.get(WebcamName.class, cameraName);
+        } catch (IllegalArgumentException e) {
+            List<WebcamName> webcams = hwMap.getAll(WebcamName.class);
+            if (!webcams.isEmpty()) {
+                webcam = webcams.get(0);
+                if (telemetry != null) {
+                    telemetry.addData("AprilTag", "Webcam '%s' not found; using '%s'", cameraName, webcam.getDeviceName());
+                }
+            } else {
+                if (telemetry != null) {
+                    telemetry.addData("AprilTag", "No webcam configured");
+                }
+                return;
+            }
+        }
 
         aprilTagProcessor = new AprilTagProcessor.Builder()
                 .setDrawTagID(true)
@@ -38,7 +62,7 @@ public class AprilTagWebcam {
                 .build();
 
         VisionPortal.Builder builder = new VisionPortal.Builder();
-        builder.setCamera(hwMap.get(WebcamName.class, "limelight"));
+        builder.setCamera(webcam);
         builder.setCameraResolution(new Size(1280, 960));
         builder.setStreamFormat(VisionPortal.StreamFormat.MJPEG);
         builder.addProcessor(aprilTagProcessor);
@@ -46,6 +70,9 @@ public class AprilTagWebcam {
         visionPortal = builder.build();
     }
     public void update() {
+        if (aprilTagProcessor == null) {
+            return;
+        }
         detectedTags = aprilTagProcessor.getDetections();
     }
 
