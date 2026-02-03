@@ -25,7 +25,7 @@ public class AprilTagWebcam {
     private VisionPortal visionPortal;
     private List<AprilTagDetection> detectedTags = new ArrayList<>();
     private Telemetry telemetry;
-    private String cameraName = "limelight";
+    private String cameraName = "Webcam 1";
 
     public void setCameraName(String cameraName) {
         if (cameraName != null && !cameraName.isEmpty()) {
