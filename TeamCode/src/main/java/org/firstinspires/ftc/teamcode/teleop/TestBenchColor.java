@@ -37,6 +37,15 @@ public class TestBenchColor {
         BLUE =
          */
 
-        return detectedColor.UNKNOWN;
+        if (normRed < 0.25 && normGreen > 0.45 && normBlue < 0.35) {
+            return detectedColor.GREEN;
+        }
+        else if (normRed > 0.30 && normBlue > 0.30 && normGreen < 0.25
+                && Math.abs(normRed - normBlue) < 0.15) {
+            return detectedColor.PURPLE;
+        }
+        else {
+            return detectedColor.UNKNOWN;
+        }
     }
 }
