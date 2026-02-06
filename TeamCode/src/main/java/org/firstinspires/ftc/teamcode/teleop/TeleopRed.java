@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class TeleopRed extends Teleop {
     @Override
     public void init() {
-        setAprilTagTargetId(24);
         super.init();
+        setAprilTagTargetId(24);
     }
 }

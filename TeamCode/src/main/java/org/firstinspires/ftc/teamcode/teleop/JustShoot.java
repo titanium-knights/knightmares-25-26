@@ -49,8 +49,6 @@ public class JustShoot extends OpMode{
             rotator.rotateLeft();
             telemetryM.addLine("dpad right");
             telemetryM.update();
-        } else {
-            rotator.stop();
         }
 
         if (gamepad1.left_bumper) {

@@ -15,33 +15,48 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Configurable
 public class Rotator {
-    CRServo rotator;
+    Servo rotator;
+    public static final double MAX_POS = 1.0;
+    public static final double MIN_POS = 0.0;
+    public static final double MAX_INCREMENT = 0.008;
+    public static final double MIN_INCREMENT = 0.001;
+    public static final double MANUAL_INCREMENT = 0.003;
+    public static Telemetry telemetry;
+
     public Rotator(HardwareMap hmap, Telemetry telemetry) {
-        this.rotator = hmap.crservo.get(CONFIG.rot);
+        this.rotator = hmap.servo.get(CONFIG.rot);
         //rotatorServo.setDirection(Servo.Direction.REVERSE);
         //rotatorServo.setPosition(pickPos);
         this.telemetry = telemetry;
     }
 
-    // 0 is 1600 microseconds
-    //
-    double power = 0.5;
-
-    public static Telemetry telemetry;
-
-    public void setPower(double newPower) {
-        rotator.setPower(-newPower);
+    public double getPosition() {
+        return rotator.getPosition();
     }
+
     public void rotateRight() {
-        rotator.setPower(-power);
+        double current = rotator.getPosition();
+        rotator.setPosition(current - MANUAL_INCREMENT); // Assuming Right is decreasing, swap sign if needed
     }
 
     public void rotateLeft() {
-        rotator.setPower(power);
+        double current = rotator.getPosition();
+        rotator.setPosition(current + MANUAL_INCREMENT); // Assuming Left is increasing
     }
 
-    public void stop() {
-         rotator.setPower(0);
-//        rotator.getController().pwmDisable();
+    public void rotateRight(double tx) {
+        // tx range from -27 to 27
+        // (27, max) (0, min)
+        // inc = max-min/27*tx + min
+        // max and min
+        double increment = (MAX_INCREMENT-MIN_INCREMENT)/27*tx + MIN_INCREMENT;
+        double current = rotator.getPosition();
+        rotator.setPosition(current - increment); // Assuming Right is decreasing, swap sign if needed
+    }
+
+    public void rotateLeft(double tx) {
+        double increment = (MAX_INCREMENT-MIN_INCREMENT)/27*tx + MIN_INCREMENT;
+        double current = rotator.getPosition();
+        rotator.setPosition(current + increment); // Assuming Left is increasing
     }
 }

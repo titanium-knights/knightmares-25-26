@@ -91,16 +91,13 @@ public class Limelight extends OpMode {
 
             telemetry.addData("=== AprilTag DETECTED ===", "");
 
-            // PD power based on tx error
-            double power = calculateRotationPower(tx);
-
             // Apply rotation
-            if (Math.abs(tx) > TARGET_TOLERANCE) {
-                rotator.setPower(power);
-                telemetry.addData("Action", power > 0 ? "Rotating Right" : "Rotating Left");
-            } else {
-                rotator.stop();
-                telemetry.addData("Action", "On Target");
+            if (tx > TARGET_TOLERANCE) {
+                rotator.rotateRight();
+                telemetry.addLine("Rotating Right");
+            } else if (tx < TARGET_TOLERANCE) {
+                rotator.rotateLeft();
+                telemetry.addLine("Rotating Left");
             }
 
             // Telemetry for tuning
@@ -109,7 +106,6 @@ public class Limelight extends OpMode {
             telemetry.addData("ty (Y offset)", "%.2f degrees", ty);
             telemetry.addData("Distance from Center", "%.2f degrees", Math.abs(tx));
             telemetry.addData("Target Tolerance", "%.2f degrees", TARGET_TOLERANCE);
-            telemetry.addData("Calculated Power", "%.3f", power);
             telemetry.addData("On Target?", Math.abs(tx) < TARGET_TOLERANCE ? "YES" : "NO");
 
             telemetry.addData("=== Position ===", "");
@@ -121,54 +117,13 @@ public class Limelight extends OpMode {
                 telemetry.addData("Botpose", "Unavailable");
             }
 
-        } else {
-            // No valid target
-            rotator.stop();
-            lastError = 0.0;
-            telemetry.addData("Status", "No AprilTag Detected");
         }
 
         telemetry.update();
     }
 
-    /**
-     * Calculate rotation power using PD control
-     * P term: responds to current error
-     * D term: responds to rate of change, damping oscillations
-     */
-    private double calculateRotationPower(double tx) {
-        double currentTime = System.currentTimeMillis();
-        double dt = (currentTime - lastTime) / 1000.0; // seconds
-
-        if (dt < 0.001) dt = 0.001; // prevent div by 0
-
-        double derivative = (tx - lastError) / dt;
-
-        double pTerm = KP * tx;
-        double dTerm = KD * derivative;
-        double power = pTerm + dTerm;  // flip sign here if robot turns wrong way
-
-        // Clamp to max
-        power = Math.max(-MAX_POWER, Math.min(MAX_POWER, power));
-
-        // Apply minimum power outside tolerance to overcome friction
-        if (Math.abs(tx) > TARGET_TOLERANCE) {
-            if (power > 0) {
-                power = Math.max(power, MIN_POWER);
-            } else if (power < 0) {
-                power = Math.min(power, -MIN_POWER);
-            }
-        }
-
-        lastError = tx;
-        lastTime = currentTime;
-
-        return power;
-    }
-
     @Override
     public void stop() {
-        rotator.stop();
         limelight.stop();
     }
 }
