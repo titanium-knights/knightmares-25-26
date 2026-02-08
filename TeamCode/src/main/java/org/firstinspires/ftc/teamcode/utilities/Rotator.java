@@ -18,9 +18,9 @@ public class Rotator {
     Servo rotator;
     public static final double MAX_POS = 1.0;
     public static final double MIN_POS = 0.0;
-    public static final double MAX_INCREMENT = 0.008;
+    public static final double MAX_INCREMENT = 0.005;
     public static final double MIN_INCREMENT = 0.001;
-    public static final double MANUAL_INCREMENT = 0.003;
+    public static final double MANUAL_INCREMENT = 0.002;
     public static Telemetry telemetry;
 
     public Rotator(HardwareMap hmap, Telemetry telemetry) {
@@ -51,12 +51,16 @@ public class Rotator {
         // max and min
         double increment = (MAX_INCREMENT-MIN_INCREMENT)/27*tx + MIN_INCREMENT;
         double current = rotator.getPosition();
+        telemetry.addLine("rotating right increment: " + increment);
+        telemetry.update();
         rotator.setPosition(current - increment); // Assuming Right is decreasing, swap sign if needed
     }
 
     public void rotateLeft(double tx) {
-        double increment = (MAX_INCREMENT-MIN_INCREMENT)/27*tx + MIN_INCREMENT;
+        double increment = (MAX_INCREMENT-MIN_INCREMENT)/27*tx - MIN_INCREMENT;
         double current = rotator.getPosition();
-        rotator.setPosition(current + increment); // Assuming Left is increasing
+        telemetry.addLine("rotating left increment: " + increment);
+        telemetry.update();
+        rotator.setPosition(current - increment); // Assuming Left is increasing
     }
 }

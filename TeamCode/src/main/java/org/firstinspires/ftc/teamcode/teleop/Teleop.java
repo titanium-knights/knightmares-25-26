@@ -4,6 +4,7 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -43,8 +44,8 @@ public class Teleop extends OpMode {
     private double VISION_POLL_MS = 50;
 
     // Tolerance for "centered" (degrees)
-    private static final double TARGET_TOLERANCE = 2.0;
-
+    private static final double TARGET_TOLERANCE = 3.0;
+    private VoltageSensor voltageSensor;
 
     private double lastError = 0.0;
     private double lastTime;
@@ -93,6 +94,8 @@ public class Teleop extends OpMode {
         lastTime = System.currentTimeMillis();
         lastError = 0.0;
 
+        voltageSensor = hardwareMap.voltageSensor.iterator().next();
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
     }
@@ -119,8 +122,10 @@ public class Teleop extends OpMode {
         if (gamepad1.left_trigger > 0.1) {
             intake.run();
         } else if (gamepad1.right_trigger > 0.1) {
-            outtake.shoot();
-            // intake.run();
+            double basePower = 0.60; // Your tuned shooting power at nominal voltage
+            double currentVoltage = voltageSensor.getVoltage();
+            outtake.shoot(basePower, currentVoltage);
+            telemetry.addData("Voltage", "%.2f V", currentVoltage);
         } else {
             intake.stopIntake();
             outtake.stopOuttake();
@@ -148,8 +153,10 @@ public class Teleop extends OpMode {
         }
 
         // Use the 'latestResult' variable (cached) instead of calling hardware again
+        //if (latestResult != null && latestResult.isValid() && isTargetTag(latestResult)) {
         if (latestResult != null && latestResult.isValid()) {
             double tx = latestResult.getTx();
+            // double tx = getTargetTx(latestResult);
 
             // Apply rotation
             if (tx > TARGET_TOLERANCE) {
@@ -177,6 +184,41 @@ public class Teleop extends OpMode {
         aprilTagTargetId = tagId;
         aprilTagTrackingEnabled = true;
     }
+
+    protected void disableAprilTagTracking() {
+        aprilTagTrackingEnabled = false;
+        aprilTagTargetId = -1;
+    }
+
+    private boolean isTargetTag(LLResult result) {
+        if (!aprilTagTrackingEnabled || aprilTagTargetId < 0) {
+            return true; // Accept any tag if not filtering
+        }
+
+        // Check if result contains our target AprilTag ID
+        // You'll need to verify the correct method for your Limelight API version
+        if (result.getFiducialResults() != null) {
+            for (LLResultTypes.FiducialResult fiducial : result.getFiducialResults()) {
+                if (fiducial.getFiducialId() == aprilTagTargetId) {
+                    return true; // Found our target tag
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private Double getTargetTx(LLResult result) {
+        if (result.getFiducialResults() != null) {
+            for (LLResultTypes.FiducialResult fiducial : result.getFiducialResults()) {
+                if (fiducial.getFiducialId() == aprilTagTargetId) {
+                    return fiducial.getTargetXDegrees(); // or getTx() depending on API
+                }
+            }
+        }
+        return null; // Target not found
+    }
+
 
     @Override
     public void stop() {

@@ -44,12 +44,14 @@ public class Outtake {
     }
 
 
-    // pullUpMotor1 and 2 are reversed. If you want it to go up, power will be negative. If you want it to go down, power will be positive.
-    // update
-
-
     public void shoot() {
         outtakeMotor1.setPower(-0.7);
+    }
+    public void shoot(double power, double voltage) {
+        double nominalVoltage = 12.58; // The voltage you tuned your base power at
+        double compensatedPower = power * (nominalVoltage / voltage);
+        // Clamp to safe limits
+        outtakeMotor1.setPower(-compensatedPower);
     }
 
 }
