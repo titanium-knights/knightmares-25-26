@@ -47,11 +47,25 @@ public class Outtake {
     public void shoot() {
         outtakeMotor1.setPower(-0.7);
     }
-    public void shoot(double power, double voltage) {
-        double nominalVoltage = 12.58; // The voltage you tuned your base power at
-        double compensatedPower = power * (nominalVoltage / voltage);
-        // Clamp to safe limits
-        outtakeMotor1.setPower(-compensatedPower);
+    public void shootAtDistance(double distance) {
+        // Map distance to power - tune these values
+        double minDistance = 24.0;  // inches
+        double maxDistance = 130.0;  // inches
+        double minPower = 0.50;
+        double maxPower = 0.85;
+
+        // Linear interpolation
+        double power = minPower + (maxPower - minPower) *
+                ((distance - minDistance) / (maxDistance - minDistance));
+
+        // Clamp to valid range
+        power = Math.max(minPower, Math.min(maxPower, power));
+
+        shoot(power);
+    }
+
+    public void shoot(double power) {
+        outtakeMotor1.setPower(-power);
     }
 
 }

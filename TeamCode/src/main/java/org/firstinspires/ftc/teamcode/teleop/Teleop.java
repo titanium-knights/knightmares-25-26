@@ -18,6 +18,9 @@ import org.firstinspires.ftc.teamcode.utilities.MecanumDrive;
 import org.firstinspires.ftc.teamcode.utilities.Outtake;
 import org.firstinspires.ftc.teamcode.utilities.Rotator;
 import org.firstinspires.ftc.teamcode.utilities.Storer;
+import org.openftc.apriltag.AprilTagDetection;
+
+import java.util.List;
 
 @Configurable
 @TeleOp(name="DriveTrain Teleop")
@@ -122,10 +125,16 @@ public class Teleop extends OpMode {
         if (gamepad1.left_trigger > 0.1) {
             intake.run();
         } else if (gamepad1.right_trigger > 0.1) {
-            double basePower = 0.60; // Your tuned shooting power at nominal voltage
-            double currentVoltage = voltageSensor.getVoltage();
-            outtake.shoot(basePower, currentVoltage);
-            telemetry.addData("Voltage", "%.2f V", currentVoltage);
+            double distance = getAprilTagDistance(); // Get distance in inches
+
+            if (distance > 0) {
+                outtake.shootAtDistance(distance);
+                telemetry.addData("Distance", "%.1f in", distance);
+            } else {
+                // No AprilTag detected, use default power
+                outtake.shoot(0.60);
+                telemetry.addData("Status", "No target");
+            }
         } else {
             intake.stopIntake();
             outtake.stopOuttake();
@@ -219,6 +228,21 @@ public class Teleop extends OpMode {
         return null; // Target not found
     }
 
+    private double getAprilTagDistance() {
+        if (latestResult != null && latestResult.isValid()) {
+            List<LLResultTypes.FiducialResult> fiducials = latestResult.getFiducialResults();
+            if (fiducials != null && !fiducials.isEmpty()) {
+                Pose3D pose = fiducials.get(0).getCameraPoseTargetSpace();
+                if (pose != null) {
+                    double x = pose.getPosition().x;
+                    double y = pose.getPosition().y;
+                    double z = pose.getPosition().z;
+                    return Math.sqrt(x*x + y*y + z*z); // Total 3D distance
+                }
+            }
+        }
+        return -1;
+    }
 
     @Override
     public void stop() {
