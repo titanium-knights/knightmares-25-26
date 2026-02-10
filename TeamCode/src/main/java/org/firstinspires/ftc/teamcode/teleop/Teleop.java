@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pinpoint.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.utilities.AprilTagWebcam;
+import org.firstinspires.ftc.teamcode.utilities.BallColor;
+import org.firstinspires.ftc.teamcode.utilities.BallTracker;
 import org.firstinspires.ftc.teamcode.utilities.Intake;
 import org.firstinspires.ftc.teamcode.utilities.Outtake;
 import org.firstinspires.ftc.teamcode.utilities.Rotator;
@@ -28,6 +30,10 @@ public class Teleop extends OpMode {
     Storer storer;
     Rotator rotator;
     GoBildaPinpointDriver odo;
+
+    // Color sensing and ball tracking
+    TestBenchColor colorSensor;
+    BallTracker ballTracker;
 
     final double normalPower = 0.9;
 
@@ -79,6 +85,12 @@ public class Teleop extends OpMode {
         this.outtake = new Outtake(hardwareMap, telemetry);
         this.rotator = new Rotator(hardwareMap, telemetry);
 
+        // Initialize color sensor and ball tracker
+        this.colorSensor = new TestBenchColor();
+        this.colorSensor.init(hardwareMap);
+        this.ballTracker = new BallTracker(telemetry);
+        this.storer.setBallTracker(ballTracker);
+
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
     }
 
@@ -120,10 +132,19 @@ public class Teleop extends OpMode {
         } else if (gamepad1.right_trigger > 0.1) {
             outtake.shoot();
             intake.run();
+            // Mark the current slot as empty when shooting
+            ballTracker.clearCurrentSlot();
         } else {
             intake.stop();
             outtake.stopOuttake();
         }
+
+        // Update ball tracker with color sensor reading
+        BallColor detectedBall = colorSensor.getBallColor(telemetry);
+        if (detectedBall != BallColor.EMPTY) {
+            ballTracker.setColorAtCurrentSlot(detectedBall);
+        }
+        ballTracker.addTelemetry();
 
 
 
@@ -137,12 +158,16 @@ public class Teleop extends OpMode {
 
 
 
+        // Color-based storer controls:
+        // dpad_left  -> go to GREEN ball
+        // dpad_right -> go to PURPLE ball
+        // dpad_up    -> go to EMPTY slot (for intake)
         if (gamepad1.dpad_left) {
-            storer.toOne();
+            storer.goToGreen();
         } else if (gamepad1.dpad_up) {
-            storer.toTwo();
+            storer.goToEmpty();
         } else if (gamepad1.dpad_right) {
-            storer.toThree();
+            storer.goToPurple();
         }
 
         if (gamepad2.a) {

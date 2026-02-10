@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.utilities.BallColor;
 
 public class TestBenchColor {
     NormalizedColorSensor colorSensor;
@@ -17,35 +18,65 @@ public class TestBenchColor {
 
     public void init(HardwareMap hwMap) {
         colorSensor = hwMap.get(NormalizedColorSensor.class, "sensor_color_distance");
+        colorSensor.setGain(4);
     }
 
     public detectedColor getDetectedColor(Telemetry telemetry ) {
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
 
         float normRed, normGreen, normBlue;
-        normRed = colors.red / colors.alpha;
-        normBlue = colors.blue / colors.alpha;
-        normGreen = colors.green / colors.alpha;
+        normRed = colors.red / colors.alpha * 10;
+        normBlue = colors.blue / colors.alpha * 10;
+        normGreen = colors.green / colors.alpha * 10;
 
         telemetry.addData("red", normRed);
         telemetry.addData("green", normGreen);
         telemetry.addData("blue", normBlue);
 
         /*
-        RED =
-        GREEN =
-        BLUE =
+        PURPLE = <0.35, >0.35, <0.5
+        GREEN = <0.2, >0.45, <0.4
          */
 
-        if (normRed < 0.25 && normGreen > 0.45 && normBlue < 0.35) {
-            return detectedColor.GREEN;
-        }
-        else if (normRed > 0.30 && normBlue > 0.30 && normGreen < 0.25
-                && Math.abs(normRed - normBlue) < 0.15) {
+        if (normRed < 0.25 && normBlue > normGreen && normBlue > 0.30) {
             return detectedColor.PURPLE;
+        }
+        else if (normGreen > normRed && normGreen > normBlue && normGreen > 0.40) {
+            return detectedColor.GREEN;
         }
         else {
             return detectedColor.UNKNOWN;
+        }
+
+    }
+
+    /**
+     * Gets the detected color as a BallColor enum for use with BallTracker.
+     * @return BallColor.GREEN, BallColor.PURPLE, or BallColor.EMPTY
+     */
+    public BallColor getBallColor(Telemetry telemetry) {
+        detectedColor color = getDetectedColor(telemetry);
+        switch (color) {
+            case GREEN:
+                return BallColor.GREEN;
+            case PURPLE:
+                return BallColor.PURPLE;
+            default:
+                return BallColor.EMPTY;
+        }
+    }
+
+    /**
+     * Converts a detectedColor to BallColor.
+     */
+    public static BallColor toBallColor(detectedColor color) {
+        switch (color) {
+            case GREEN:
+                return BallColor.GREEN;
+            case PURPLE:
+                return BallColor.PURPLE;
+            default:
+                return BallColor.EMPTY;
         }
     }
 }
