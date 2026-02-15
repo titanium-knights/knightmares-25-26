@@ -36,7 +36,7 @@ public class shoot6_bn extends OpMode{
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(72, 8, Math.toRadians(90)));
+        follower.setStartingPose(new Pose(26, 130, Math.toRadians(144)));
 
         paths = new Paths(follower); // Build paths
 
@@ -64,37 +64,49 @@ public class shoot6_bn extends OpMode{
 
     public static class Paths {
         public PathChain Path1;
+        public PathChain Path2;
         public PathChain Path3;
-        public PathChain Path4;
+        public PathChain line4;
         public PathChain Path5;
-        public PathChain line5;
+        public PathChain Path6;
+        public PathChain Path7;
 
         public Paths(Follower follower) {
             Path1 = follower.pathBuilder().addPath(
                             new BezierLine(
                                     new Pose(26.000, 130.000),
 
-                                    new Pose(50.000, 110.000)
+                                    new Pose(60.000, 100.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(144), Math.toRadians(148))
+                    ).setLinearHeadingInterpolation(Math.toRadians(144), Math.toRadians(90))
+
+                    .build();
+
+            Path2 = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    new Pose(60.000, 100.000),
+
+                                    new Pose(60.000, 100.000)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(144), Math.toRadians(144))
 
                     .build();
 
             Path3 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(50.000, 110.000),
+                                    new Pose(60.000, 100.000),
 
-                                    new Pose(50.000, 84.000)
+                                    new Pose(39.000, 84.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(148), Math.toRadians(180))
+                    ).setLinearHeadingInterpolation(Math.toRadians(144), Math.toRadians(180))
 
                     .build();
 
-            Path4 = follower.pathBuilder().addPath(
+            line4 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(50.000, 84.000),
+                                    new Pose(39.000, 84.000),
 
-                                    new Pose(25.000, 84.000)
+                                    new Pose(34.000, 84.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
 
@@ -102,21 +114,31 @@ public class shoot6_bn extends OpMode{
 
             Path5 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(25.000, 84.000),
+                                    new Pose(34.000, 84.000),
 
-                                    new Pose(50.000, 84.000)
+                                    new Pose(29.500, 84.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                    ).setTangentHeadingInterpolation()
 
                     .build();
 
-            line5 = follower.pathBuilder().addPath(
+            Path6 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(50.000, 84.000),
+                                    new Pose(29.500, 84.000),
 
-                                    new Pose(50.000, 110.000)
+                                    new Pose(24.000, 84.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(144))
+                    ).setTangentHeadingInterpolation()
+
+                    .build();
+
+            Path7 = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    new Pose(24.000, 84.000),
+
+                                    new Pose(60.000, 100.000)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(142))
 
                     .build();
         }
@@ -131,33 +153,47 @@ public class shoot6_bn extends OpMode{
 
             case 1: // Wait for Path 1, then start Path 3
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.Path3);
+                    follower.followPath(paths.Path2);
                     setPathState(2);
                 }
                 break;
 
             case 2: // Wait for Path 3, then start Path 4
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.Path4);
+                    follower.followPath(paths.Path3);
                     setPathState(3);
                 }
                 break;
 
             case 3: // Wait for Path 4, then start Path 5
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.Path5);
+                    follower.followPath(paths.line4);
                     setPathState(4);
                 }
                 break;
 
-            case 4: // Wait for Path 5, then start line5
+            case 4: // Wait for Path 4, then start Path 5
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.line5);
+                    follower.followPath(paths.Path5);
                     setPathState(5);
                 }
                 break;
 
-            case 5: // Final check
+            case 5: // Wait for Path 4, then start Path 5
+                if (!follower.isBusy()) {
+                    follower.followPath(paths.Path6);
+                    setPathState(6);
+                }
+                break;
+
+            case 6: // Wait for Path 4, then start Path 5
+                if (!follower.isBusy()) {
+                    follower.followPath(paths.Path7);
+                    setPathState(7);
+                }
+                break;
+
+            case 7: // Final check
                 if (!follower.isBusy()) {
                     setPathState(-1); // Autonomous Complete
                 }
