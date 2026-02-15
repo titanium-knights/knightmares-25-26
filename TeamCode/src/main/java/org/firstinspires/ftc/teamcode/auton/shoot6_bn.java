@@ -17,6 +17,12 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.geometry.Pose;
 
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+
+import java.util.List;
+
 @Autonomous(name = "shoot6_bn", group = "Autonomous")
 @Configurable
 public class shoot6_bn extends OpMode{
@@ -29,6 +35,11 @@ public class shoot6_bn extends OpMode{
     Outtake outtake;
     Storer storer;
     Intake intake;
+
+    // Limelight AprilTag detection
+    private Limelight3A limelight;
+    private int detectedAprilTagId = -1; // Stores the detected AprilTag ID after Path 1
+    private boolean aprilTagRead = false; // Whether we've successfully read an AprilTag
 
     @Override
     public void init() {
@@ -46,6 +57,11 @@ public class shoot6_bn extends OpMode{
         this.outtake = new Outtake(hardwareMap, telemetry);
         this.intake = new Intake(hardwareMap, telemetry);
         this.storer = new Storer(hardwareMap, telemetry);
+
+        // Initialize Limelight for AprilTag detection
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(0); // AprilTag pipeline
+        limelight.start();
     }
 
     @Override
@@ -58,7 +74,23 @@ public class shoot6_bn extends OpMode{
         panelsTelemetry.debug("X", follower.getPose().getX());
         panelsTelemetry.debug("Y", follower.getPose().getY());
         panelsTelemetry.debug("Heading", follower.getPose().getHeading());
+        panelsTelemetry.debug("AprilTag ID", detectedAprilTagId);
+        panelsTelemetry.debug("AprilTag Read", aprilTagRead);
         panelsTelemetry.update(telemetry);
+    }
+
+    /**
+     * Returns the detected AprilTag ID from the obelisk after Path 1.
+     * Returns -1 if no tag was detected.
+     */
+    public int getDetectedAprilTagId() {
+        return detectedAprilTagId;
+    }
+
+    @Override
+    public void stop() {
+        limelight.stop();
+        super.stop();
     }
 
 
@@ -151,14 +183,43 @@ public class shoot6_bn extends OpMode{
                 setPathState(1);
                 break;
 
-            case 1: // Wait for Path 1, then start Path 3
+            case 1: // Wait for Path 1 to finish, then read AprilTag
                 if (!follower.isBusy()) {
+                    // Path 1 ends facing 90° (north/forward toward obelisk)
+                    // Now read the AprilTag from the Limelight
+                    setPathState(100); // Go to AprilTag reading state
+                }
+                break;
+
+            case 100: // Read AprilTag from Limelight
+                LLResult result = limelight.getLatestResult();
+                if (result != null && result.isValid()) {
+                    List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
+                    if (fiducials != null && !fiducials.isEmpty()) {
+                        // Read the first detected AprilTag ID
+                        detectedAprilTagId = fiducials.get(0).getFiducialId();
+                        aprilTagRead = true;
+                        panelsTelemetry.debug("AprilTag Detected", detectedAprilTagId);
+                        // AprilTag read successfully, continue to Path 2
+                        follower.followPath(paths.Path2);
+                        setPathState(2);
+                    } else if (pathTimer.getElapsedTimeSeconds() > 2.0) {
+                        // Timeout after 2 seconds — no fiducials found, continue anyway
+                        panelsTelemetry.debug("AprilTag", "Timeout - no fiducials");
+                        aprilTagRead = false;
+                        follower.followPath(paths.Path2);
+                        setPathState(2);
+                    }
+                } else if (pathTimer.getElapsedTimeSeconds() > 2.0) {
+                    // Timeout after 2 seconds — no valid result, continue anyway
+                    panelsTelemetry.debug("AprilTag", "Timeout - no result");
+                    aprilTagRead = false;
                     follower.followPath(paths.Path2);
                     setPathState(2);
                 }
                 break;
 
-            case 2: // Wait for Path 3, then start Path 4
+            case 2: // Wait for Path 2, then start Path 3
                 if (!follower.isBusy()) {
                     follower.followPath(paths.Path3);
                     setPathState(3);
