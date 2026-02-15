@@ -14,9 +14,9 @@ public class Storer {
 
     Servo storerServo;
 
-    double inpos1 = 0.27; // 2000/2000
-    double inpos2 = inpos1 + 0.235;
-    double inpos3 = inpos2 + 0.235; //SIX SEVEN
+    double inpos1 = 0.22; // 2000/2000
+    double inpos2 = inpos1 + 0.24;
+    double inpos3 = inpos2 + 0.23; //SIX SEVEN
 
     private TelemetryManager telemetryM;
     private Telemetry telemetry;

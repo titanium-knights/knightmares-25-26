@@ -187,7 +187,7 @@ public class shoot6_bn extends OpMode{
                 if (!follower.isBusy()) {
                     // Path 1 ends facing 90° (north/forward toward obelisk)
                     // Now read the AprilTag from the Limelight
-                    setPathState(100); // Go to AprilTag reading state
+                    setPathState(2); // Go to AprilTag reading state
                 }
                 break;
 
