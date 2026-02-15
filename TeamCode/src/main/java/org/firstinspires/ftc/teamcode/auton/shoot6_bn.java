@@ -200,33 +200,26 @@ public class shoot6_bn extends OpMode{
                         detectedAprilTagId = fiducials.get(0).getFiducialId();
                         aprilTagRead = true;
                         panelsTelemetry.debug("AprilTag Detected", detectedAprilTagId);
-                        // AprilTag read successfully, continue to Path 2
-                        follower.followPath(paths.Path2);
-                        setPathState(2);
+                        // AprilTag read successfully, skip Path2 (zero-length) and go to Path3
+                        follower.followPath(paths.Path3);
+                        setPathState(3);
                     } else if (pathTimer.getElapsedTimeSeconds() > 2.0) {
                         // Timeout after 2 seconds — no fiducials found, continue anyway
                         panelsTelemetry.debug("AprilTag", "Timeout - no fiducials");
                         aprilTagRead = false;
-                        follower.followPath(paths.Path2);
-                        setPathState(2);
+                        follower.followPath(paths.Path3);
+                        setPathState(3);
                     }
                 } else if (pathTimer.getElapsedTimeSeconds() > 2.0) {
                     // Timeout after 2 seconds — no valid result, continue anyway
                     panelsTelemetry.debug("AprilTag", "Timeout - no result");
                     aprilTagRead = false;
-                    follower.followPath(paths.Path2);
-                    setPathState(2);
-                }
-                break;
-
-            case 2: // Wait for Path 2, then start Path 3
-                if (!follower.isBusy()) {
                     follower.followPath(paths.Path3);
                     setPathState(3);
                 }
                 break;
 
-            case 3: // Wait for Path 4, then start Path 5
+            case 3: // Wait for Path 3, then start line4
                 if (!follower.isBusy()) {
                     follower.followPath(paths.line4);
                     setPathState(4);
