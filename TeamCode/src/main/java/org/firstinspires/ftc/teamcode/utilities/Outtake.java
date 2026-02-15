@@ -62,6 +62,10 @@ public class Outtake {
         power = Math.max(minPower, Math.min(maxPower, power));
 
         shoot(power);
+
+        telemetry.addLine("shooting distance: " + distance);
+        telemetry.addLine("shooting power: " + power);
+        telemetry.update();
     }
 
     public void shoot(double power) {

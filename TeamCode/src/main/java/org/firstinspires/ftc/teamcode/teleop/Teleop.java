@@ -162,22 +162,20 @@ public class Teleop extends OpMode {
         }
 
         // Use the 'latestResult' variable (cached) instead of calling hardware again
-        //if (latestResult != null && latestResult.isValid() && isTargetTag(latestResult)) {
-        if (latestResult != null && latestResult.isValid()) {
-            double tx = latestResult.getTx();
-            // double tx = getTargetTx(latestResult);
-
-            // Apply rotation
-            if (tx > TARGET_TOLERANCE) {
-                rotator.rotateRight(tx);
-                telemetry.addLine("Rotating Right");
-            } else if (tx < -TARGET_TOLERANCE) {
-                rotator.rotateLeft(tx);
-                telemetry.addLine("Rotating Left");
-            } else {
-                lastError = 0; // Reset error to stop wind-up
-                telemetry.addData("Action", "On Target");
-            }
+        if (latestResult != null && latestResult.isValid() && isTargetTag(latestResult)) {
+             Double tx = getTargetTx(latestResult);
+             if (tx != null) {
+                 if (tx > TARGET_TOLERANCE) {
+                     rotator.rotateRight(tx);
+                     telemetry.addLine("Rotating Right");
+                 } else if (tx < -TARGET_TOLERANCE) {
+                     rotator.rotateLeft(tx);
+                     telemetry.addLine("Rotating Left");
+                 } else {
+                     lastError = 0; // Reset error to stop wind-up
+                     telemetry.addData("Action", "On Target");
+                 }
+             }
 
             // Minimal Telemetry to save bandwidth
             telemetry.addData("LL tx", "%.2f", tx);

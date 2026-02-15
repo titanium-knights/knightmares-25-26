@@ -94,10 +94,10 @@ public class SensorGoBildaPinpointExample extends LinearOpMode {
         // x-offset: 2.5625
 
         // length: 17.125
-        // 6.875
-        // y-offset: 1.6875
+        // 6
+        // y-offset: 2.56
 
-        odo.setOffsets(65.0875, 42.8625, DistanceUnit.MM); //these are tuned for 3110-0002-0001 Product Insight #1
+        odo.setOffsets(65.0875, 65.024, DistanceUnit.MM); //these are tuned for 3110-0002-0001 Product Insight #1
 
         /*
         Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either

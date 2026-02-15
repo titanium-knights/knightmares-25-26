@@ -19,7 +19,7 @@ public class Intake {
     Servo ballServo;
 
     double pullPos = 0.55; // 2000/2000
-    double pushPos = 0.90;
+    double pushPos = 0.80;
     private TelemetryManager telemetryM;
     private Telemetry telemetry;
     double power = 0.9;
