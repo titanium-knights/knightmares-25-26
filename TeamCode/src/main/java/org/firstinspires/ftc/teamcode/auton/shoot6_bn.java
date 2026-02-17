@@ -109,65 +109,61 @@ public class shoot6_bn extends OpMode {
                 setPathState(1);
                 break;
 
-            case 1: // Wait for Path 1, then start Path 2
+            case 1: // Driving Path1, scan AprilTag while turning to 90°
                 if (!follower.isBusy()) {
                     follower.followPath(paths.Path2);
                     setPathState(2);
-                }
-                break;
-
-            case 2: // Wait for Path 2, then scan AprilTag
-                if (!follower.isBusy()) {
-                    setPathState(3);
-                }
-                break;
-
-            case 3: // Read AprilTag
-                LLResult result = limelight.getLatestResult();
-                boolean tagFound = false;
-
-                if (result != null && result.isValid()) {
-                    List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
-                    if (fiducials != null && !fiducials.isEmpty()) {
-                        detectedAprilTagId = fiducials.get(0).getFiducialId();
-                        tagFound = true;
+                } else {
+                    // Scan while driving Path1
+                    LLResult result = limelight.getLatestResult();
+                    if (result != null && result.isValid()) {
+                        List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
+                        if (fiducials != null && !fiducials.isEmpty()) {
+                            detectedAprilTagId = fiducials.get(0).getFiducialId();
+                        }
                     }
                 }
+                break;
 
-                // If tag found OR 2 seconds passed
-                if (tagFound || pathTimer.getElapsedTimeSeconds() > 2.0) {
-                    follower.followPath(paths.Path3);
+            case 2: // Driving Path2 (turning back to 144°), keep scanning if not yet found
+                if (!follower.isBusy()) {
+                    // Path2 done, robot is at 144° — start complex sequence
+                    outtake.shoot();
+                    setPathState(3);
+                } else {
+                    // Still turning, keep trying to read tag if not found yet
+                    if (detectedAprilTagId == -1) {
+                        LLResult result = limelight.getLatestResult();
+                        if (result != null && result.isValid()) {
+                            List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
+                            if (fiducials != null && !fiducials.isEmpty()) {
+                                detectedAprilTagId = fiducials.get(0).getFiducialId();
+                            }
+                        }
+                    }
+                }
+                break;
+
+            case 3: // Shooting Buffer
+                if (pathTimer.getElapsedTimeSeconds() > 2) {
                     setPathState(4);
                 }
                 break;
 
-            case 4: // Drive to Shooting Position
-                if (!follower.isBusy()) {
-                    setPathState(5);
-                }
-                break;
-
-            case 5: // Shooting Buffer
-                outtake.shoot();
-                if (pathTimer.getElapsedTimeSeconds() > 0.8) {
-                    setPathState(6);
-                }
-                break;
-
-            case 6: // Complex Sequence
-                if (pathTimer.getElapsedTimeSeconds() > 2.5) {
+            case 4: // Complex Sequence
+                if (pathTimer.getElapsedTimeSeconds() > 3.5) {
                     outtake.stopOuttake();
-                    follower.followPath(paths.line4);
-                    setPathState(7);
-                } else if (pathTimer.getElapsedTimeSeconds() > 2.0) {
+                    follower.followPath(paths.Path3);
+                    setPathState(5);
+                } else if (pathTimer.getElapsedTimeSeconds() > 3.0) {
                     // intake.pullBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 1.7) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 2.5) {
                     // intake.pushBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 1.4) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 2.0) {
                     storer.toThree();
-                } else if (pathTimer.getElapsedTimeSeconds() > 1.1) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 1.5) {
                     // intake.pullBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 0.8) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 1.0) {
                     // intake.pushBall();
                 } else if (pathTimer.getElapsedTimeSeconds() > 0.5) {
                     storer.toTwo();
@@ -176,33 +172,42 @@ public class shoot6_bn extends OpMode {
                 }
                 break;
 
-            case 7: // Driving line4
+            case 5:
+                if (!follower.isBusy()) {
+                    follower.setMaxPower(0.4);
+                    follower.followPath(paths.line4);
+                    setPathState(6);
+                }
+                break;
+
+            case 6: // Driving line4
                 if (!follower.isBusy()) {
                     follower.followPath(paths.Path5);
-                    setPathState(8);
+                    setPathState(7);
                 } else {
                     storer.toOne();
                     intake.run();
                 }
                 break;
 
-            case 8: // Driving Path5
+            case 7: // Driving Path5
                 if (!follower.isBusy()) {
                     follower.followPath(paths.Path6);
-                    setPathState(9);
+                    setPathState(8);
                 } else {
                     storer.toTwo();
                 }
                 break;
 
-            case 9: // Driving Path6
+            case 8: // Driving Path6
                 if (!follower.isBusy()) {
+                    follower.setMaxPower(1.0);
                     follower.followPath(paths.Path7);
-                    setPathState(10);
+                    setPathState(9);
                 }
                 break;
 
-            case 10: // Final check
+            case 9: // Final check
                 if (!follower.isBusy()) {
                     setPathState(-1);
                 }
