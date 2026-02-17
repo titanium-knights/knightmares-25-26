@@ -11,7 +11,6 @@ import org.firstinspires.ftc.teamcode.utilities.Intake;
 import org.firstinspires.ftc.teamcode.utilities.Outtake;
 import org.firstinspires.ftc.teamcode.utilities.Storer;
 
-import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.paths.PathChain;
@@ -23,23 +22,22 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 
 import java.util.List;
 
-@Autonomous(name = "shoot6_bn", group = "Autonomous")
+@Autonomous(name = "shoot6_bn_FIXED", group = "Autonomous")
 @Configurable
-public class shoot6_bn extends OpMode{
-    private TelemetryManager panelsTelemetry; // Panels Telemetry instance
+public class shoot6_bn extends OpMode {
+    private TelemetryManager panelsTelemetry;
     private Timer pathTimer;
-    public Follower follower; // Pedro Pathing follower instance
-    private int pathState; // Current autonomous path state (state machine)
-    private Paths paths; // Paths defined in the Paths class
+    public Follower follower;
+    private int pathState;
+    private Paths paths;
 
     Outtake outtake;
     Storer storer;
     Intake intake;
 
-    // Limelight AprilTag detection
     private Limelight3A limelight;
-    private int detectedAprilTagId = -1; // Stores the detected AprilTag ID after Path 1
-    private boolean aprilTagRead = false; // Whether we've successfully read an AprilTag
+    private int detectedAprilTagId = -1;
+    private boolean aprilTagRead = false;
 
     @Override
     public void init() {
@@ -49,42 +47,26 @@ public class shoot6_bn extends OpMode{
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(26, 130, Math.toRadians(144)));
 
-        paths = new Paths(follower); // Build paths
-
-        panelsTelemetry.debug("Status", "Initialized");
-        panelsTelemetry.update(telemetry);
+        paths = new Paths(follower);
 
         this.outtake = new Outtake(hardwareMap, telemetry);
         this.intake = new Intake(hardwareMap, telemetry);
         this.storer = new Storer(hardwareMap, telemetry);
 
-        // Initialize Limelight for AprilTag detection
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(0); // AprilTag pipeline
+        limelight.pipelineSwitch(0);
         limelight.start();
     }
 
     @Override
     public void loop() {
-        follower.update(); // Update Pedro Pathing
-        autonomousPathUpdate(); // Update autonomous state machine
+        follower.update();
+        autonomousPathUpdate();
 
-        // Log values to Panels and Driver Station
         panelsTelemetry.debug("Path State", pathState);
-        panelsTelemetry.debug("X", follower.getPose().getX());
-        panelsTelemetry.debug("Y", follower.getPose().getY());
-        panelsTelemetry.debug("Heading", follower.getPose().getHeading());
+        panelsTelemetry.debug("Timer", pathTimer.getElapsedTimeSeconds());
         panelsTelemetry.debug("AprilTag ID", detectedAprilTagId);
-        panelsTelemetry.debug("AprilTag Read", aprilTagRead);
         panelsTelemetry.update(telemetry);
-    }
-
-    /**
-     * Returns the detected AprilTag ID from the obelisk after Path 1.
-     * Returns -1 if no tag was detected.
-     */
-    public int getDetectedAprilTagId() {
-        return detectedAprilTagId;
     }
 
     @Override
@@ -93,86 +75,30 @@ public class shoot6_bn extends OpMode{
         super.stop();
     }
 
-
     public static class Paths {
-        public PathChain Path1;
-        public PathChain Path2;
-        public PathChain Path3;
-        public PathChain line4;
-        public PathChain Path5;
-        public PathChain Path6;
-        public PathChain Path7;
+        public PathChain Path1, Path2, Path3, line4, Path5, Path6, Path7;
 
         public Paths(Follower follower) {
-            Path1 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(26.000, 130.000),
+            Path1 = follower.pathBuilder().addPath(new BezierLine(new Pose(26, 130), new Pose(60, 100)))
+                    .setLinearHeadingInterpolation(Math.toRadians(144), Math.toRadians(90)).build();
 
-                                    new Pose(60.000, 100.000)
-                            )
-                    ).setLinearHeadingInterpolation(Math.toRadians(144), Math.toRadians(90))
+            Path2 = follower.pathBuilder().addPath(new BezierLine(new Pose(60, 100), new Pose(61, 100)))
+                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(144)).build();
 
-                    .build();
+            Path3 = follower.pathBuilder().addPath(new BezierLine(new Pose(61, 100), new Pose(39, 84)))
+                    .setLinearHeadingInterpolation(Math.toRadians(144), Math.toRadians(180)).build();
 
-            Path2 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(60.000, 100.000),
+            line4 = follower.pathBuilder().addPath(new BezierLine(new Pose(39, 84), new Pose(34, 84)))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180)).build();
 
-                                    new Pose(60.000, 100.000)
-                            )
-                    ).setLinearHeadingInterpolation(Math.toRadians(144), Math.toRadians(144))
+            Path5 = follower.pathBuilder().addPath(new BezierLine(new Pose(34, 84), new Pose(29.5, 84)))
+                    .setTangentHeadingInterpolation().build();
 
-                    .build();
+            Path6 = follower.pathBuilder().addPath(new BezierLine(new Pose(29.5, 84), new Pose(24, 84)))
+                    .setTangentHeadingInterpolation().build();
 
-            Path3 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(60.000, 100.000),
-
-                                    new Pose(39.000, 84.000)
-                            )
-                    ).setLinearHeadingInterpolation(Math.toRadians(144), Math.toRadians(180))
-
-                    .build();
-
-            line4 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(39.000, 84.000),
-
-                                    new Pose(34.000, 84.000)
-                            )
-                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
-
-                    .build();
-
-            Path5 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(34.000, 84.000),
-
-                                    new Pose(29.500, 84.000)
-                            )
-                    ).setTangentHeadingInterpolation()
-
-                    .build();
-
-            Path6 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(29.500, 84.000),
-
-                                    new Pose(24.000, 84.000)
-                            )
-                    ).setTangentHeadingInterpolation()
-
-                    .build();
-
-            Path7 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(24.000, 84.000),
-
-                                    new Pose(60.000, 100.000)
-                            )
-                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(142))
-
-                    .build();
+            Path7 = follower.pathBuilder().addPath(new BezierLine(new Pose(24, 84), new Pose(60, 100)))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(142)).build();
         }
     }
 
@@ -183,73 +109,102 @@ public class shoot6_bn extends OpMode{
                 setPathState(1);
                 break;
 
-            case 1: // Wait for Path 1 to finish, then read AprilTag
+            case 1: // Wait for Path 1, then start Path 2
                 if (!follower.isBusy()) {
-                    // Path 1 ends facing 90° (north/forward toward obelisk)
-                    // Now read the AprilTag from the Limelight
-                    setPathState(2); // Go to AprilTag reading state
+                    follower.followPath(paths.Path2);
+                    setPathState(2);
                 }
                 break;
 
-            case 100: // Read AprilTag from Limelight
-                LLResult result = limelight.getLatestResult();
-                if (result != null && result.isValid()) {
-                    List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
-                    if (fiducials != null && !fiducials.isEmpty()) {
-                        // Read the first detected AprilTag ID
-                        detectedAprilTagId = fiducials.get(0).getFiducialId();
-                        aprilTagRead = true;
-                        panelsTelemetry.debug("AprilTag Detected", detectedAprilTagId);
-                        // AprilTag read successfully, skip Path2 (zero-length) and go to Path3
-                        follower.followPath(paths.Path3);
-                        setPathState(3);
-                    } else if (pathTimer.getElapsedTimeSeconds() > 2.0) {
-                        // Timeout after 2 seconds — no fiducials found, continue anyway
-                        panelsTelemetry.debug("AprilTag", "Timeout - no fiducials");
-                        aprilTagRead = false;
-                        follower.followPath(paths.Path3);
-                        setPathState(3);
-                    }
-                } else if (pathTimer.getElapsedTimeSeconds() > 2.0) {
-                    // Timeout after 2 seconds — no valid result, continue anyway
-                    panelsTelemetry.debug("AprilTag", "Timeout - no result");
-                    aprilTagRead = false;
-                    follower.followPath(paths.Path3);
+            case 2: // Wait for Path 2, then scan AprilTag
+                if (!follower.isBusy()) {
                     setPathState(3);
                 }
                 break;
 
-            case 3: // Wait for Path 3, then start line4
-                if (!follower.isBusy()) {
-                    follower.followPath(paths.line4);
+            case 3: // Read AprilTag
+                LLResult result = limelight.getLatestResult();
+                boolean tagFound = false;
+
+                if (result != null && result.isValid()) {
+                    List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
+                    if (fiducials != null && !fiducials.isEmpty()) {
+                        detectedAprilTagId = fiducials.get(0).getFiducialId();
+                        tagFound = true;
+                    }
+                }
+
+                // If tag found OR 2 seconds passed
+                if (tagFound || pathTimer.getElapsedTimeSeconds() > 2.0) {
+                    follower.followPath(paths.Path3);
                     setPathState(4);
                 }
                 break;
 
-            case 4: // Wait for Path 4, then start Path 5
+            case 4: // Drive to Shooting Position
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.Path5);
                     setPathState(5);
                 }
                 break;
 
-            case 5: // Wait for Path 4, then start Path 5
-                if (!follower.isBusy()) {
-                    follower.followPath(paths.Path6);
+            case 5: // Shooting Buffer
+                outtake.shoot();
+                if (pathTimer.getElapsedTimeSeconds() > 0.8) {
                     setPathState(6);
                 }
                 break;
 
-            case 6: // Wait for Path 4, then start Path 5
-                if (!follower.isBusy()) {
-                    follower.followPath(paths.Path7);
+            case 6: // Complex Sequence
+                if (pathTimer.getElapsedTimeSeconds() > 2.5) {
+                    outtake.stopOuttake();
+                    follower.followPath(paths.line4);
                     setPathState(7);
+                } else if (pathTimer.getElapsedTimeSeconds() > 2.0) {
+                    // intake.pullBall();
+                } else if (pathTimer.getElapsedTimeSeconds() > 1.7) {
+                    // intake.pushBall();
+                } else if (pathTimer.getElapsedTimeSeconds() > 1.4) {
+                    storer.toThree();
+                } else if (pathTimer.getElapsedTimeSeconds() > 1.1) {
+                    // intake.pullBall();
+                } else if (pathTimer.getElapsedTimeSeconds() > 0.8) {
+                    // intake.pushBall();
+                } else if (pathTimer.getElapsedTimeSeconds() > 0.5) {
+                    storer.toTwo();
+                } else {
+                    storer.toOne();
                 }
                 break;
 
-            case 7: // Final check
+            case 7: // Driving line4
                 if (!follower.isBusy()) {
-                    setPathState(-1); // Autonomous Complete
+                    follower.followPath(paths.Path5);
+                    setPathState(8);
+                } else {
+                    storer.toOne();
+                    intake.run();
+                }
+                break;
+
+            case 8: // Driving Path5
+                if (!follower.isBusy()) {
+                    follower.followPath(paths.Path6);
+                    setPathState(9);
+                } else {
+                    storer.toTwo();
+                }
+                break;
+
+            case 9: // Driving Path6
+                if (!follower.isBusy()) {
+                    follower.followPath(paths.Path7);
+                    setPathState(10);
+                }
+                break;
+
+            case 10: // Final check
+                if (!follower.isBusy()) {
+                    setPathState(-1);
                 }
                 break;
         }
