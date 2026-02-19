@@ -54,7 +54,7 @@ public class TestBenchColor {
         if ((normRed1 < 0.35 && normRed1 > 0.25 && normGreen1 > 0.35 && normGreen1 < 0.50 && normBlue1 < 0.50 && normBlue1 > 0.40) || (normRed2 < 0.35 && normRed2 > 0.25 && normGreen2 > 0.35 && normGreen2 < 0.50 && normBlue2 < 0.50 && normBlue2 > 0.40)) {
             return detectedColor.PURPLE;
         }
-        else if ((normRed1 < 0.4 && normRed1 > 0.2 && normGreen1 > 0.50 && normGreen1 < 0.65 && normBlue1 > 0.35 && normBlue1 < 0.50) || (normRed2 < 0.4 && normRed2 > 0.2 && normGreen2 > 0.50 && normGreen2 < 0.65 && normBlue2 > 0.35 && normBlue2 < 0.50)) {
+        else if ((normRed1 < 0.4 && normRed1 > 0.15 && normGreen1 > 0.50 && normGreen1 < 0.65 && normBlue1 > 0.35 && normBlue1 < 0.50) || (normRed2 < 0.4 && normRed2 > 0.2 && normGreen2 > 0.50 && normGreen2 < 0.65 && normBlue2 > 0.35 && normBlue2 < 0.50)) {
             return detectedColor.GREEN;
         }
         else {
