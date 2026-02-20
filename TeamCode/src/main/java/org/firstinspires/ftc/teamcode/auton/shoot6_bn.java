@@ -79,13 +79,13 @@ public class shoot6_bn extends OpMode {
         public PathChain Path1, Path2, Path3, line4, Path5, Path6, Path7;
 
         public Paths(Follower follower) {
-            Path1 = follower.pathBuilder().addPath(new BezierLine(new Pose(26, 130), new Pose(60, 100)))
+            Path1 = follower.pathBuilder().addPath(new BezierLine(new Pose(26, 130), new Pose(57, 100)))
                     .setLinearHeadingInterpolation(Math.toRadians(144), Math.toRadians(90)).build();
 
-            Path2 = follower.pathBuilder().addPath(new BezierLine(new Pose(60, 100), new Pose(61, 100)))
+            Path2 = follower.pathBuilder().addPath(new BezierLine(new Pose(57, 100), new Pose(58, 100)))
                     .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(144)).build();
 
-            Path3 = follower.pathBuilder().addPath(new BezierLine(new Pose(61, 100), new Pose(39, 84)))
+            Path3 = follower.pathBuilder().addPath(new BezierLine(new Pose(58, 100), new Pose(39, 84)))
                     .setLinearHeadingInterpolation(Math.toRadians(144), Math.toRadians(180)).build();
 
             line4 = follower.pathBuilder().addPath(new BezierLine(new Pose(39, 84), new Pose(34, 84)))
@@ -97,7 +97,7 @@ public class shoot6_bn extends OpMode {
             Path6 = follower.pathBuilder().addPath(new BezierLine(new Pose(29.5, 84), new Pose(24, 84)))
                     .setTangentHeadingInterpolation().build();
 
-            Path7 = follower.pathBuilder().addPath(new BezierLine(new Pose(24, 84), new Pose(60, 100)))
+            Path7 = follower.pathBuilder().addPath(new BezierLine(new Pose(24, 84), new Pose(57, 100)))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(142)).build();
         }
     }
@@ -151,11 +151,12 @@ public class shoot6_bn extends OpMode {
                 break;
 
             case 4: // Complex Sequence
-                if (pathTimer.getElapsedTimeSeconds() > 7.2) {
+                if (pathTimer.getElapsedTimeSeconds() > 7.4) {
                     outtake.stopOuttake();
+                    intake.run();
                     follower.followPath(paths.Path3);
                     setPathState(5);
-                } else if (pathTimer.getElapsedTimeSeconds() > 6.4) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 6.2) {
                     intake.pullBall();
                 } else if (pathTimer.getElapsedTimeSeconds() > 5.8) {
                     intake.pushBall();
@@ -190,7 +191,6 @@ public class shoot6_bn extends OpMode {
                     setPathState(7);
                 } else {
                     storer.toOne();
-                    intake.run();
                 }
                 break;
 
@@ -206,8 +206,11 @@ public class shoot6_bn extends OpMode {
             case 8: // Driving Path6
                 if (!follower.isBusy()) {
                     follower.setMaxPower(1.0);
+                    intake.stopIntake();
                     follower.followPath(paths.Path7);
                     setPathState(9);
+                } else {
+                    storer.toThree();
                 }
                 break;
 

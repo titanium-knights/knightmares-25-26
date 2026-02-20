@@ -14,7 +14,7 @@ public class Storer {
 
     Servo storerServo;
 
-    double inpos1 = 0.12; // 2000/2000
+    double inpos1 = 0.26; // 2000/2000
     double inpos2 = inpos1 + 0.234;
     double inpos3 = inpos2 + 0.23; //SIX SEVEN
 
@@ -31,7 +31,7 @@ public class Storer {
     }
 
     public void setInit() {
-        // makes it so the motor is not loose when power is 0
+        toOne();
     }
 
     public void toOne(){
