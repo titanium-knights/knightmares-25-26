@@ -13,10 +13,11 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Storer {
 
     Servo storerServo;
-
-    double inpos1 = 0.26; // 2000/2000
-    double inpos2 = inpos1 + 0.234;
-    double inpos3 = inpos2 + 0.23; //SIX SEVEN
+    
+    static final double SLOT_SPACING = 0.232; // equal spacing between all slots
+    double inpos1 = 0.26;
+    double inpos2 = inpos1 + SLOT_SPACING;
+    double inpos3 = inpos2 + SLOT_SPACING;
 
     private TelemetryManager telemetryM;
     private Telemetry telemetry;
@@ -32,6 +33,7 @@ public class Storer {
 
     public void setInit() {
         toOne();
+        storerServo.setPosition(inpos1);
     }
 
     public void toOne(){

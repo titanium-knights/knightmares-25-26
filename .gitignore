@@ -82,3 +82,6 @@ lint/tmp/
 
 eocvsim_workspace.json
 **/*.lock
+
+
+local.properties
