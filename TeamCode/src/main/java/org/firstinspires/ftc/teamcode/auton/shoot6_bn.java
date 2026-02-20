@@ -145,28 +145,32 @@ public class shoot6_bn extends OpMode {
                 break;
 
             case 3: // Shooting Buffer
-                if (pathTimer.getElapsedTimeSeconds() > 2) {
+                if (pathTimer.getElapsedTimeSeconds() > 4) {
                     setPathState(4);
                 }
                 break;
 
             case 4: // Complex Sequence
-                if (pathTimer.getElapsedTimeSeconds() > 3.5) {
+                if (pathTimer.getElapsedTimeSeconds() > 7.2) {
                     outtake.stopOuttake();
                     follower.followPath(paths.Path3);
                     setPathState(5);
-                } else if (pathTimer.getElapsedTimeSeconds() > 3.0) {
-                    // intake.pullBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 2.5) {
-                    // intake.pushBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 2.0) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 6.4) {
+                    intake.pullBall();
+                } else if (pathTimer.getElapsedTimeSeconds() > 5.8) {
+                    intake.pushBall();
+                } else if (pathTimer.getElapsedTimeSeconds() > 5.0) {
                     storer.toThree();
-                } else if (pathTimer.getElapsedTimeSeconds() > 1.5) {
-                    // intake.pullBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 1.0) {
-                    // intake.pushBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 0.5) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 4.2) {
+                    intake.pullBall();
+                } else if (pathTimer.getElapsedTimeSeconds() > 3.4) {
+                    intake.pushBall();
+                } else if (pathTimer.getElapsedTimeSeconds() > 2.6) {
                     storer.toTwo();
+                } else if (pathTimer.getElapsedTimeSeconds() > 1.8) {
+                    intake.pullBall();
+                } else if (pathTimer.getElapsedTimeSeconds() > 1) {
+                    intake.pushBall();
                 } else {
                     storer.toOne();
                 }

@@ -45,15 +45,11 @@ public class Rotator {
     }
 
     public void rotateRight(double tx) {
-        // tx range from -27 to 27
-        // (27, max) (0, min)
-        // inc = max-min/27*tx + min
-        // max and min
         double increment = (MAX_INCREMENT-MIN_INCREMENT)/27*tx + MIN_INCREMENT;
         double current = rotator.getPosition();
         telemetry.addLine("rotating right increment: " + increment);
         telemetry.update();
-        rotator.setPosition(current - increment); // Assuming Right is decreasing, swap sign if needed
+        rotator.setPosition(current - increment);
     }
 
     public void rotateLeft(double tx) {

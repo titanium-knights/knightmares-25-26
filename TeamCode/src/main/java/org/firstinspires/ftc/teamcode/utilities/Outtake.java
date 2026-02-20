@@ -48,17 +48,14 @@ public class Outtake {
         outtakeMotor1.setPower(-0.7);
     }
     public void shootAtDistance(double distance) {
-        // Map distance to power - tune these values
         double minDistance = 24.0;  // inches
         double maxDistance = 130.0;  // inches
         double minPower = 0.50;
         double maxPower = 0.85;
 
-        // Linear interpolation
         double power = minPower + (maxPower - minPower) *
                 ((distance - minDistance) / (maxDistance - minDistance));
 
-        // Clamp to valid range
         power = Math.max(minPower, Math.min(maxPower, power));
 
         shoot(power);
