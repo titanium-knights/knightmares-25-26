@@ -14,9 +14,10 @@ public class Storer {
 
     Servo storerServo;
 
-    double inpos1 = 0.12; // 2000/2000
-    double inpos2 = inpos1 + 0.234;
-    double inpos3 = inpos2 + 0.23; //SIX SEVEN
+    static final double SLOT_SPACING = 0.232; // equal spacing between all slots
+    double inpos1 = 0.12;
+    double inpos2 = inpos1 + SLOT_SPACING;
+    double inpos3 = inpos2 + SLOT_SPACING;
 
     private TelemetryManager telemetryM;
     private Telemetry telemetry;
@@ -31,7 +32,13 @@ public class Storer {
     }
 
     public void setInit() {
-        // makes it so the motor is not loose when power is 0
+        // drive servo to home position so it starts aligned every time
+        storerServo.setPosition(inpos1);
+    }
+
+    /** Reset spindexer back to slot 1 — call between shooting cycles */
+    public void home() {
+        storerServo.setPosition(inpos1);
     }
 
     public void toOne(){
