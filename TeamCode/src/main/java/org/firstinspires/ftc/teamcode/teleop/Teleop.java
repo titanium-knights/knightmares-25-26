@@ -73,8 +73,8 @@ public class Teleop extends OpMode {
     // Exponential ramp-up fields
     private ElapsedTime moveTimer = new ElapsedTime();
     private boolean wasMoving = false;
-    private static final double RAMP_DURATION = 2.0;  // seconds to reach full speed
-    private static final double RAMP_K = 3.0;         // exponential curve steepness
+    private static final double RAMP_DURATION = 1.0;  // seconds to reach full speed
+    private static final double RAMP_K = 1.5;          // exponential curve steepness (lower = faster start)
 
     ElapsedTime runtime = new ElapsedTime();
     private LLResult latestResult = null; // Store result to use between checks
@@ -261,25 +261,27 @@ public class Teleop extends OpMode {
         if (Math.abs(y) <= stick_margin) y = 0f;
         if (Math.abs(turn) <= stick_margin) turn = 0f;
 
-        boolean isMoving = (x != 0f || y != 0f || turn != 0f);
+        // Only track translation (x/y) for ramp — turn is excluded
+        boolean isTranslating = (x != 0f || y != 0f);
 
-        // Reset the ramp timer when movement begins from a standstill
-        if (isMoving && !wasMoving) {
+        // Reset the ramp timer when translation begins from a standstill
+        if (isTranslating && !wasMoving) {
             moveTimer.reset();
         }
-        wasMoving = isMoving;
+        wasMoving = isTranslating;
 
-        // Exponential ramp: (e^(k*t/T) - 1) / (e^k - 1), clamped to 1.0 after RAMP_DURATION
-        double power;
+        // Exponential ramp for translation only
+        double drivePower;
         double elapsed = moveTimer.seconds();
-        if (elapsed >= RAMP_DURATION) {
-            power = normalPower;
+        if (!isTranslating || elapsed >= RAMP_DURATION) {
+            drivePower = normalPower;
         } else {
             double rampFraction = (Math.exp(RAMP_K * elapsed / RAMP_DURATION) - 1.0)
                                 / (Math.exp(RAMP_K) - 1.0);
-            power = normalPower * rampFraction;
+            drivePower = normalPower * rampFraction;
         }
 
-        drive.move(-x * power, y * power, -turn * power);
+        // Turn always uses full constant speed
+        drive.move(-x * drivePower, y * drivePower, -turn * normalPower);
     }
 }
