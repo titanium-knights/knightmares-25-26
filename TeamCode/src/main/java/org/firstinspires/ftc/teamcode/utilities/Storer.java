@@ -15,9 +15,11 @@ public class Storer {
     Servo storerServo;
     
     static final double SLOT_SPACING = 0.232; // equal spacing between all slots
-    double inpos1 = 0.26;
+    double inpos1 = 0.22;
     double inpos2 = inpos1 + SLOT_SPACING;
     double inpos3 = inpos2 + SLOT_SPACING;
+
+    double INC = 0.01;
 
     private TelemetryManager telemetryM;
     private Telemetry telemetry;
@@ -34,6 +36,11 @@ public class Storer {
     public void setInit() {
         toOne();
         storerServo.setPosition(inpos1);
+    }
+
+    public void overridePos(double pos) {
+        while ((pos - SLOT_SPACING) > 0) pos -= SLOT_SPACING;
+        inpos1 = pos;
     }
 
     public void toOne(){
@@ -60,12 +67,12 @@ public class Storer {
 
     public void rotateLeft() {
         double currPosition = storerServo.getPosition();
-        storerServo.setPosition(currPosition-0.01);
+        storerServo.setPosition(currPosition - INC);
     }
 
     public void rotateRight() {
         double currPosition = storerServo.getPosition();
-        storerServo.setPosition(currPosition+0.01);
+        storerServo.setPosition(currPosition + INC);
     }
 
 }

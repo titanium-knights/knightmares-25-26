@@ -152,22 +152,25 @@ public class Teleop extends OpMode {
             rotator.rotateRight();
         }
 
-        if (gamepad1.dpad_left) storer.toOne();
+        // SPINDEXER
+
         if (gamepad1.dpad_left) storer.toOne();
         else if (gamepad1.dpad_up) storer.toTwo();
         else if (gamepad1.dpad_right) storer.toThree();
-//        else if (gamepad1.right_stick_x < 0.1) storer.rotateLeft();
-//        else if (gamepad1.right_stick_x > 0.1) storer.rotateRight();
+
+        else if (gamepad1.right_stick_x < 0.1) storer.rotateLeft();
+        else if (gamepad1.right_stick_x > 0.1) storer.rotateRight();
+
+        if (gamepad1.b) storer.overridePos(storer.getPosition());
 
 
-        // 3. LIMELIGHT OPTIMIZATION
-        // Only ask hardware for data every 50ms, not every loop
+        // LIMELIGHT
+
         if (limelightTimer.milliseconds() > VISION_POLL_MS) {
             latestResult = limelight.getLatestResult();
             limelightTimer.reset();
         }
 
-        // Use the 'latestResult' variable (cached) instead of calling hardware again
         if (latestResult != null && latestResult.isValid() && isTargetTag(latestResult)) {
              Double tx = getTargetTx(latestResult);
              if (tx != null) {
@@ -183,7 +186,6 @@ public class Teleop extends OpMode {
                  }
              }
 
-            // Minimal Telemetry to save bandwidth
             telemetry.addData("LL tx", "%.2f", tx);
         } else {
             lastError = 0.0;
