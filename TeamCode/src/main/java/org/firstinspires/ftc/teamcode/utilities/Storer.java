@@ -22,6 +22,8 @@ public class Storer {
     // 0 = empty, 1 = green, 2 = purple
     int[] slots = {0, 0, 0};
 
+    double INC = 0.01;
+
     private TelemetryManager telemetryM;
     private Telemetry telemetry;
 
@@ -35,8 +37,14 @@ public class Storer {
     }
 
     public void setInit() {
+        toOne();
         // drive servo to home position so it starts aligned every time
         storerServo.setPosition(inpos1);
+    }
+
+    public void overridePos(double pos) {
+        while ((pos - SLOT_SPACING) > 0) pos -= SLOT_SPACING;
+        inpos1 = pos;
     }
 
     /** Reset spindexer back to slot 1 — call between shooting cycles */
@@ -68,46 +76,12 @@ public class Storer {
 
     public void rotateLeft() {
         double currPosition = storerServo.getPosition();
-        storerServo.setPosition(currPosition-0.01);
+        storerServo.setPosition(currPosition-INC);
     }
 
     public void rotateRight() {
         double currPosition = storerServo.getPosition();
-        storerServo.setPosition(currPosition+0.01);
-    }
-
-    public void updateSlot(int slotIndex, int colorValue) {
-        if (slotIndex >= 0 && slotIndex < slots.length) {
-            slots[slotIndex] = colorValue;
-        }
-    }
-
-    public int getCurrentSlotIndex() {
-        double pos = storerServo.getPosition();
-        double dist1 = Math.abs(pos - inpos1);
-        double dist2 = Math.abs(pos - inpos2);
-        double dist3 = Math.abs(pos - inpos3);
-
-        if (dist1 <= dist2 && dist1 <= dist3) return 0;
-        if (dist2 <= dist3) return 1;
-        return 2;
-    }
-
-    public void goToColor(int colorValue) {
-        for (int i = 0; i < slots.length; i++) {
-            if (slots[i] == colorValue) {
-                switch (i) {
-                    case 0: toOne(); break;
-                    case 1: toTwo(); break;
-                    case 2: toThree(); break;
-                }
-                return;
-            }
-        }
-    }
-
-    public int[] getSlots() {
-        return slots;
+        storerServo.setPosition(currPosition+INC);
     }
 
 }
