@@ -7,6 +7,7 @@ import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -21,6 +22,11 @@ public class Storer {
 
     // 0 = empty, 1 = green, 2 = purple
     int[] slots = {0, 0, 0};
+
+    private boolean scanComplete = false;
+    private int scanStep = 0;
+    private ElapsedTime scanTimer = new ElapsedTime();
+    private static final double SCAN_SETTLE_MS = 400;
 
     double INC = 0.0005;
 
@@ -80,10 +86,64 @@ public class Storer {
         storerServo.setPosition(currPosition+INC);
     }
 
-    public void updateSlot(int slotIndex, int colorValue) {
-        if (slotIndex >= 0 && slotIndex < slots.length) {
-            slots[slotIndex] = colorValue;
+    // Scan states:
+    // 0 = start, move to slot 1
+    // 1 = waiting at slot 1
+    // 2 = settled at slot 1, read color, move to slot 2
+    // 3 = waiting at slot 2
+    // 4 = settled at slot 2, read color, move to slot 3
+    // 5 = waiting at slot 3
+    // 6 = settled at slot 3, read color, move back to slot 1
+    // 7 = waiting to return to slot 1
+    // 8 = done
+    public boolean runScan(int colorAtIntake) {
+        if (scanComplete) return false;
+
+        switch (scanStep) {
+            case 0:
+                toOne();
+                scanTimer.reset();
+                scanStep = 1;
+                break;
+            case 1:
+                if (scanTimer.milliseconds() >= SCAN_SETTLE_MS) scanStep = 2;
+                break;
+            case 2:
+                slots[0] = colorAtIntake;
+                toTwo();
+                scanTimer.reset();
+                scanStep = 3;
+                break;
+            case 3:
+                if (scanTimer.milliseconds() >= SCAN_SETTLE_MS) scanStep = 4;
+                break;
+            case 4:
+                slots[1] = colorAtIntake;
+                toThree();
+                scanTimer.reset();
+                scanStep = 5;
+                break;
+            case 5:
+                if (scanTimer.milliseconds() >= SCAN_SETTLE_MS) scanStep = 6;
+                break;
+            case 6:
+                slots[2] = colorAtIntake;
+                toOne();
+                scanTimer.reset();
+                scanStep = 7;
+                break;
+            case 7:
+                if (scanTimer.milliseconds() >= SCAN_SETTLE_MS) {
+                    scanComplete = true;
+                }
+                break;
         }
+        return !scanComplete;
+    }
+
+    public void updateSlots(int colorAtIntake) {
+        int idx = getCurrentSlotIndex();
+        slots[idx] = colorAtIntake;
     }
 
     public int getCurrentSlotIndex() {
