@@ -98,7 +98,7 @@ public class shoot6_bn extends OpMode {
                     .setTangentHeadingInterpolation().build();
 
             Path7 = follower.pathBuilder().addPath(new BezierLine(new Pose(24, 84), new Pose(57, 100)))
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(142)).build();
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(140)).build();
         }
     }
 

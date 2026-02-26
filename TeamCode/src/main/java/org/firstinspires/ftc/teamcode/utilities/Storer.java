@@ -15,14 +15,14 @@ public class Storer {
     Servo storerServo;
 
     static final double SLOT_SPACING = 0.232; // equal spacing between all slots
-    double inpos1 = 0.12;
+    double inpos1 = 0.22;
     double inpos2 = inpos1 + SLOT_SPACING;
     double inpos3 = inpos2 + SLOT_SPACING;
 
     // 0 = empty, 1 = green, 2 = purple
     int[] slots = {0, 0, 0};
 
-    double INC = 0.01;
+    double INC = 0.0005;
 
     private TelemetryManager telemetryM;
     private Telemetry telemetry;
@@ -38,13 +38,15 @@ public class Storer {
 
     public void setInit() {
         toOne();
-        // drive servo to home position so it starts aligned every time
-        storerServo.setPosition(inpos1);
     }
 
     public void overridePos(double pos) {
         while ((pos - SLOT_SPACING) > 0) pos -= SLOT_SPACING;
+        telemetryM.addData("new position: ", pos);
+        telemetryM.update();
         inpos1 = pos;
+        inpos2 = inpos1 + SLOT_SPACING;
+        inpos3 = inpos2 + SLOT_SPACING;
     }
 
     /** Reset spindexer back to slot 1 — call between shooting cycles */
@@ -54,20 +56,14 @@ public class Storer {
 
     public void toOne(){
         storerServo.setPosition(inpos1);
-        telemetryM.addLine("in position 1");
-        telemetryM.update();
     }
 
     public void toTwo(){
         storerServo.setPosition(inpos2);
-        telemetryM.addLine("in position 2");
-        telemetryM.update();
     }
 
     public void toThree(){
         storerServo.setPosition(inpos3);
-        telemetryM.addLine("in position 3");
-        telemetryM.update();
     }
 
     public double getPosition() {
