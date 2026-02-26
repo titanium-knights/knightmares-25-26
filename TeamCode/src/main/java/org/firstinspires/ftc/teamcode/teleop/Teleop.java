@@ -150,18 +150,19 @@ public class Teleop extends OpMode {
             rotator.rotateRight();
         }
 
-        // Update slot array with current color sensor reading
-        TestBenchColor.detectedColor detected = colorSensor.getDetectedColor(telemetry);
-        int currentSlot = storer.getCurrentSlotIndex();
-        int colorValue = 0; // UNKNOWN = empty
-        if (detected == TestBenchColor.detectedColor.GREEN) colorValue = 1;
-        else if (detected == TestBenchColor.detectedColor.PURPLE) colorValue = 2;
-        storer.updateSlot(currentSlot, colorValue);
+        int colorValue = readColorSensor();
+
+        if (storer.runScan(colorValue)) {
+            telemetry.addData("Status", "Scanning slots...");
+            telemetry.update();
+            return;
+        }
+
+        storer.updateSlots(colorValue);
 
         telemetry.addData("Slots", "[%d, %d, %d]",
                 storer.getSlots()[0], storer.getSlots()[1], storer.getSlots()[2]);
 
-        // dpad_left = green, dpad_up = empty, dpad_right = purple
         if (gamepad1.dpad_left) storer.goToColor(1);
         else if (gamepad1.dpad_up) storer.goToColor(0);
         else if (gamepad1.dpad_right) storer.goToColor(2);
@@ -261,6 +262,13 @@ public class Teleop extends OpMode {
     public void stop() {
         limelight.stop();
         super.stop();
+    }
+
+    private int readColorSensor() {
+        TestBenchColor.detectedColor detected = colorSensor.getDetectedColor(telemetry);
+        if (detected == TestBenchColor.detectedColor.GREEN) return 1;
+        if (detected == TestBenchColor.detectedColor.PURPLE) return 2;
+        return 0;
     }
 
     public void move(float x, float y, float turn) {
