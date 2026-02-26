@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.utilities.MecanumDrive;
 import org.firstinspires.ftc.teamcode.utilities.Outtake;
 import org.firstinspires.ftc.teamcode.utilities.Rotator;
 import org.firstinspires.ftc.teamcode.utilities.Storer;
+import org.firstinspires.ftc.teamcode.teleop.TestBenchColor;
 import org.openftc.apriltag.AprilTagDetection;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class Teleop extends OpMode {
     Storer storer;
     MecanumDrive drive;
     Rotator rotator;
+    TestBenchColor colorSensor;
     GoBildaPinpointDriver odo;
     private Limelight3A limelight;
 
@@ -86,6 +88,8 @@ public class Teleop extends OpMode {
         this.storer = new Storer(hardwareMap, telemetry);
         this.outtake = new Outtake(hardwareMap, telemetry);
         this.rotator = new Rotator(hardwareMap, telemetry);
+        this.colorSensor = new TestBenchColor();
+        this.colorSensor.init(hardwareMap);
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
@@ -146,12 +150,21 @@ public class Teleop extends OpMode {
             rotator.rotateRight();
         }
 
-        if (gamepad1.dpad_left) storer.toOne();
-        if (gamepad1.dpad_left) storer.toOne();
-        else if (gamepad1.dpad_up) storer.toTwo();
-        else if (gamepad1.dpad_right) storer.toThree();
-//        else if (gamepad1.right_stick_x < 0.1) storer.rotateLeft();
-//        else if (gamepad1.right_stick_x > 0.1) storer.rotateRight();
+        // Update slot array with current color sensor reading
+        TestBenchColor.detectedColor detected = colorSensor.getDetectedColor(telemetry);
+        int currentSlot = storer.getCurrentSlotIndex();
+        int colorValue = 0; // UNKNOWN = empty
+        if (detected == TestBenchColor.detectedColor.GREEN) colorValue = 1;
+        else if (detected == TestBenchColor.detectedColor.PURPLE) colorValue = 2;
+        storer.updateSlot(currentSlot, colorValue);
+
+        telemetry.addData("Slots", "[%d, %d, %d]",
+                storer.getSlots()[0], storer.getSlots()[1], storer.getSlots()[2]);
+
+        // dpad_left = green, dpad_up = empty, dpad_right = purple
+        if (gamepad1.dpad_left) storer.goToColor(1);
+        else if (gamepad1.dpad_up) storer.goToColor(0);
+        else if (gamepad1.dpad_right) storer.goToColor(2);
 
 
         // 3. LIMELIGHT OPTIMIZATION

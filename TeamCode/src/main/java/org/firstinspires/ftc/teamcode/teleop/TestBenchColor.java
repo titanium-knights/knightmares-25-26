@@ -23,7 +23,7 @@ public class TestBenchColor {
         colorSensor2.setGain(4);
     }
 
-    public detectedColor getDetectedColor(Telemetry telemetry ) {
+    public detectedColor getDetectedColor(Telemetry telemetry) {
         NormalizedRGBA colors1 = colorSensor1.getNormalizedColors();
         NormalizedRGBA colors2 = colorSensor2.getNormalizedColors();
 
