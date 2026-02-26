@@ -158,6 +158,10 @@ public class Storer {
         }
     }
 
+    public void updateCurrentSlot(int colorValue) {
+        slots[0] = colorValue;
+    }
+
     public int[] getSlots() {
         return slots;
     }
