@@ -158,8 +158,6 @@ public class Teleop extends OpMode {
             return;
         }
 
-        storer.updateSlots(colorValue);
-
         telemetry.addData("Slots", "[%d, %d, %d]",
                 storer.getSlots()[0], storer.getSlots()[1], storer.getSlots()[2]);
 
