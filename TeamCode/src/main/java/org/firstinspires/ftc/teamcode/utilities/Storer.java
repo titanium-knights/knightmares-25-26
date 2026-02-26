@@ -84,4 +84,38 @@ public class Storer {
         storerServo.setPosition(currPosition+INC);
     }
 
+    public void updateSlot(int slotIndex, int colorValue) {
+        if (slotIndex >= 0 && slotIndex < slots.length) {
+            slots[slotIndex] = colorValue;
+        }
+    }
+
+    public int getCurrentSlotIndex() {
+        double pos = storerServo.getPosition();
+        double dist1 = Math.abs(pos - inpos1);
+        double dist2 = Math.abs(pos - inpos2);
+        double dist3 = Math.abs(pos - inpos3);
+
+        if (dist1 <= dist2 && dist1 <= dist3) return 0;
+        if (dist2 <= dist3) return 1;
+        return 2;
+    }
+
+    public void goToColor(int colorValue) {
+        for (int i = 0; i < slots.length; i++) {
+            if (slots[i] == colorValue) {
+                switch (i) {
+                    case 0: toOne(); break;
+                    case 1: toTwo(); break;
+                    case 2: toThree(); break;
+                }
+                return;
+            }
+        }
+    }
+
+    public int[] getSlots() {
+        return slots;
+    }
+
 }
