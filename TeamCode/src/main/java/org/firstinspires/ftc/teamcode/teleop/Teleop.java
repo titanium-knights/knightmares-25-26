@@ -165,6 +165,8 @@ public class Teleop extends OpMode {
         if (gamepad1.dpad_left) storer.goToColor(1);
         else if (gamepad1.dpad_up) storer.goToColor(0);
         else if (gamepad1.dpad_right) storer.goToColor(2);
+        else if (gamepad1.right_stick_x < -0.1) storer.rotateLeft();
+        else if (gamepad1.right_stick_x > 0.1) storer.rotateRight();
 
 
         // 3. LIMELIGHT OPTIMIZATION
