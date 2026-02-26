@@ -83,10 +83,10 @@ public class shoot6_bn extends OpMode {
                     .setLinearHeadingInterpolation(Math.toRadians(144), Math.toRadians(90)).build();
 
             Path2 = follower.pathBuilder().addPath(new BezierLine(new Pose(57, 100), new Pose(58, 100)))
-                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(144)).build();
+                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(140)).build();
 
             Path3 = follower.pathBuilder().addPath(new BezierLine(new Pose(58, 100), new Pose(39, 84)))
-                    .setLinearHeadingInterpolation(Math.toRadians(144), Math.toRadians(180)).build();
+                    .setLinearHeadingInterpolation(Math.toRadians(140), Math.toRadians(180)).build();
 
             line4 = follower.pathBuilder().addPath(new BezierLine(new Pose(39, 84), new Pose(34, 84)))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180)).build();
@@ -214,7 +214,34 @@ public class shoot6_bn extends OpMode {
                 }
                 break;
 
-            case 9: // Final check
+            case 9: // Complex Sequence
+                if (pathTimer.getElapsedTimeSeconds() > 7.4) {
+                    outtake.stopOuttake();
+                    intake.run();
+                    follower.followPath(paths.Path3);
+                    setPathState(10);
+                } else if (pathTimer.getElapsedTimeSeconds() > 6.2) {
+                    intake.pullBall();
+                } else if (pathTimer.getElapsedTimeSeconds() > 5.8) {
+                    intake.pushBall();
+                } else if (pathTimer.getElapsedTimeSeconds() > 5.0) {
+                    storer.toThree();
+                } else if (pathTimer.getElapsedTimeSeconds() > 4.2) {
+                    intake.pullBall();
+                } else if (pathTimer.getElapsedTimeSeconds() > 3.4) {
+                    intake.pushBall();
+                } else if (pathTimer.getElapsedTimeSeconds() > 2.6) {
+                    storer.toTwo();
+                } else if (pathTimer.getElapsedTimeSeconds() > 1.8) {
+                    intake.pullBall();
+                } else if (pathTimer.getElapsedTimeSeconds() > 1) {
+                    intake.pushBall();
+                } else {
+                    storer.toOne();
+                }
+                break;
+
+            case 10: // Final check
                 if (!follower.isBusy()) {
                     setPathState(-1);
                 }
