@@ -1,10 +1,7 @@
 package org.firstinspires.ftc.teamcode.utilities;
 
-import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
-
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -15,7 +12,7 @@ public class Storer {
 
     Servo storerServo;
 
-    static final double SLOT_SPACING = 0.232; // equal spacing between all slots
+    static final double SLOT_SPACING = 0.232;
     double inpos1 = 0.22;
     double inpos2 = inpos1 + SLOT_SPACING;
     double inpos3 = inpos2 + SLOT_SPACING;
@@ -25,9 +22,11 @@ public class Storer {
 
     private boolean scanComplete = false;
     private int scanStep = 0;
-    private boolean moving = false;
     private ElapsedTime moveTimer = new ElapsedTime();
     private static final double SETTLE_MS = 600;
+
+    private double lastCommandedPos = -1;
+    private boolean isMoving = false;
 
     double INC = 0.0005;
 
@@ -56,7 +55,6 @@ public class Storer {
         inpos3 = inpos2 + SLOT_SPACING;
     }
 
-    /** Reset spindexer back to slot 1 — call between shooting cycles */
     public void home() {
         storerServo.setPosition(inpos1);
     }
@@ -132,6 +130,26 @@ public class Storer {
         return !scanComplete;
     }
 
+    public void track(int colorAtIntake) {
+        double currentPos = storerServo.getPosition();
+
+        if (Math.abs(currentPos - lastCommandedPos) > 0.001) {
+            lastCommandedPos = currentPos;
+            isMoving = true;
+            moveTimer.reset();
+        } else if (isMoving && moveTimer.milliseconds() >= SETTLE_MS) {
+            isMoving = false;
+        }
+
+        if (!isMoving) {
+            slots[getCurrentSlotIndex()] = colorAtIntake;
+        }
+    }
+
+    public boolean isMoving() {
+        return isMoving;
+    }
+
     public int getCurrentSlotIndex() {
         double pos = storerServo.getPosition();
         double dist1 = Math.abs(pos - inpos1);
@@ -151,15 +169,9 @@ public class Storer {
                     case 1: toTwo(); break;
                     case 2: toThree(); break;
                 }
-                moving = true;
-                moveTimer.reset();
                 return;
             }
         }
-    }
-
-    public void updateCurrentSlot(int colorValue) {
-        slots[getCurrentSlotIndex()] = colorValue;
     }
 
     public int[] getSlots() {
