@@ -8,7 +8,7 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.VoltageSensor; // Added for voltage protection
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
@@ -48,7 +48,6 @@ public class Teleop extends OpMode {
     private ElapsedTime limelightTimer = new ElapsedTime();
     private double VISION_POLL_MS = 50;
 
-    // Tolerance for "centered" (degrees)
     private static final double TARGET_TOLERANCE = 3.0;
     private VoltageSensor voltageSensor;
 
@@ -73,7 +72,7 @@ public class Teleop extends OpMode {
     boolean ballState = false;
 
     ElapsedTime runtime = new ElapsedTime();
-    private LLResult latestResult = null; // Store result to use between checks
+    private LLResult latestResult = null;
 
     @Override
     public void init() {
@@ -129,13 +128,12 @@ public class Teleop extends OpMode {
         if (gamepad1.left_trigger > 0.1) {
             intake.run();
         } else if (gamepad1.right_trigger > 0.1) {
-            double distance = getAprilTagDistance(); // Get distance in inches
+            double distance = getAprilTagDistance();
 
             if (distance > 0) {
                 outtake.shootAtDistance(distance);
                 telemetry.addData("Distance", "%.1f in", distance);
             } else {
-                // No AprilTag detected, use default power
                 outtake.shoot(0.60);
                 telemetry.addData("Status", "No target");
             }
@@ -158,25 +156,24 @@ public class Teleop extends OpMode {
             return;
         }
 
+        storer.track(colorValue);
+
         telemetry.addData("Slots", "[%d, %d, %d]",
                 storer.getSlots()[0], storer.getSlots()[1], storer.getSlots()[2]);
+        telemetry.addData("Moving", storer.isMoving());
 
         if (gamepad1.dpad_left) storer.goToColor(1);
         else if (gamepad1.dpad_up) storer.goToColor(0);
         else if (gamepad1.dpad_right) storer.goToColor(2);
-        else if (gamepad1.dpad_down) storer.updateCurrentSlot(colorValue);
         else if (gamepad1.right_stick_x < -0.1) storer.rotateLeft();
         else if (gamepad1.right_stick_x > 0.1) storer.rotateRight();
 
 
-        // 3. LIMELIGHT OPTIMIZATION
-        // Only ask hardware for data every 50ms, not every loop
         if (limelightTimer.milliseconds() > VISION_POLL_MS) {
             latestResult = limelight.getLatestResult();
             limelightTimer.reset();
         }
 
-        // Use the 'latestResult' variable (cached) instead of calling hardware again
         if (latestResult != null && latestResult.isValid() && isTargetTag(latestResult)) {
              Double tx = getTargetTx(latestResult);
              if (tx != null) {
@@ -187,12 +184,11 @@ public class Teleop extends OpMode {
                      rotator.rotateLeft(tx);
                      telemetry.addLine("Rotating Left");
                  } else {
-                     lastError = 0; // Reset error to stop wind-up
+                     lastError = 0;
                      telemetry.addData("Action", "On Target");
                  }
              }
 
-            // Minimal Telemetry to save bandwidth
             telemetry.addData("LL tx", "%.2f", tx);
         } else {
             lastError = 0.0;
@@ -214,15 +210,13 @@ public class Teleop extends OpMode {
 
     private boolean isTargetTag(LLResult result) {
         if (!aprilTagTrackingEnabled || aprilTagTargetId < 0) {
-            return true; // Accept any tag if not filtering
+            return true;
         }
 
-        // Check if result contains our target AprilTag ID
-        // You'll need to verify the correct method for your Limelight API version
         if (result.getFiducialResults() != null) {
             for (LLResultTypes.FiducialResult fiducial : result.getFiducialResults()) {
                 if (fiducial.getFiducialId() == aprilTagTargetId) {
-                    return true; // Found our target tag
+                    return true;
                 }
             }
         }
@@ -234,11 +228,11 @@ public class Teleop extends OpMode {
         if (result.getFiducialResults() != null) {
             for (LLResultTypes.FiducialResult fiducial : result.getFiducialResults()) {
                 if (fiducial.getFiducialId() == aprilTagTargetId) {
-                    return fiducial.getTargetXDegrees(); // or getTx() depending on API
+                    return fiducial.getTargetXDegrees();
                 }
             }
         }
-        return null; // Target not found
+        return null;
     }
 
     private double getAprilTagDistance() {
