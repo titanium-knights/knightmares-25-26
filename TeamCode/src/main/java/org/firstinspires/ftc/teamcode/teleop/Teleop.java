@@ -117,7 +117,6 @@ public class Teleop extends OpMode {
         stick_margin = 0.1f;
         move(x, y, turn);
 
-
         if (gamepad1.left_bumper) {
             intake.pushBall();
         } else if (gamepad1.right_bumper) {
