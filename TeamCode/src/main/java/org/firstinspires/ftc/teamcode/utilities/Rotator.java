@@ -47,16 +47,12 @@ public class Rotator {
     public void rotateRight(double tx) {
         double increment = (MAX_INCREMENT-MIN_INCREMENT)/27*tx + MIN_INCREMENT;
         double current = rotator.getPosition();
-        telemetry.addLine("rotating right increment: " + increment);
-        telemetry.update();
         rotator.setPosition(current - increment);
     }
 
     public void rotateLeft(double tx) {
         double increment = (MAX_INCREMENT-MIN_INCREMENT)/27*tx - MIN_INCREMENT;
         double current = rotator.getPosition();
-        telemetry.addLine("rotating left increment: " + increment);
-        telemetry.update();
         rotator.setPosition(current - increment); // Assuming Left is increasing
     }
 }

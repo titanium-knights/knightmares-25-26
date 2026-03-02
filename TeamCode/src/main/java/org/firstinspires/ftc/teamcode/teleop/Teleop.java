@@ -48,7 +48,7 @@ public class Teleop extends OpMode {
     private ElapsedTime limelightTimer = new ElapsedTime();
     private double VISION_POLL_MS = 50;
 
-    private static final double TARGET_TOLERANCE = 3.0;
+    private static double target_tolerance = 3;
     private VoltageSensor voltageSensor;
 
     private double lastError = 0.0;
@@ -128,10 +128,10 @@ public class Teleop extends OpMode {
             intake.run();
         } else if (gamepad1.right_trigger > 0.1) {
             double distance = getAprilTagDistance();
+            telemetry.addData("distance", distance);
 
             if (distance > 0) {
                 outtake.shootAtDistance(distance);
-                telemetry.addData("Distance", "%.1f in", distance);
             } else {
                 outtake.shoot(0.60);
                 telemetry.addData("Status", "No target");
@@ -149,12 +149,6 @@ public class Teleop extends OpMode {
 
         int colorValue = readColorSensor();
 
-        if (storer.runScan(colorValue)) {
-            telemetry.addData("Status", "Scanning slots...");
-            telemetry.update();
-            return;
-        }
-
         storer.track(colorValue);
 
         telemetry.addData("Slots", "[%d, %d, %d]",
@@ -167,6 +161,8 @@ public class Teleop extends OpMode {
         else if (gamepad1.right_stick_x < -0.1) storer.rotateLeft();
         else if (gamepad1.right_stick_x > 0.1) storer.rotateRight();
 
+        if (gamepad1.b) storer.overridePos(storer.getPosition());
+
 
         if (limelightTimer.milliseconds() > VISION_POLL_MS) {
             latestResult = limelight.getLatestResult();
@@ -176,15 +172,12 @@ public class Teleop extends OpMode {
         if (latestResult != null && latestResult.isValid() && isTargetTag(latestResult)) {
              Double tx = getTargetTx(latestResult);
              if (tx != null) {
-                 if (tx > TARGET_TOLERANCE) {
+                 if (tx > target_tolerance) {
                      rotator.rotateRight(tx);
-                     telemetry.addLine("Rotating Right");
-                 } else if (tx < -TARGET_TOLERANCE) {
+                 } else if (tx < -target_tolerance) {
                      rotator.rotateLeft(tx);
-                     telemetry.addLine("Rotating Left");
                  } else {
                      lastError = 0;
-                     telemetry.addData("Action", "On Target");
                  }
              }
 
@@ -194,7 +187,7 @@ public class Teleop extends OpMode {
             telemetry.addData("Status", "No AprilTag Detected");
         }
 
-        telemetry.update();
+        telemetry.addData("storer position", storer.getPosition());
     }
 
     protected void setAprilTagTargetId(int tagId) {
@@ -263,11 +256,28 @@ public class Teleop extends OpMode {
         return 0;
     }
 
+    public void calculateTolerance(double distance) {
+        double minDistance = 0.7;  // inches
+        double maxDistance = 3.45;  // inches
+        double minTolerance = 1.0;
+        double maxTolerance = 3.0;
+
+        double tol = minTolerance + (maxTolerance - minTolerance) *
+                ((maxDistance - distance) / (maxDistance - minDistance));
+
+        tol = Math.max(minTolerance, Math.min(maxTolerance, tol));
+
+        target_tolerance = tol;
+
+        telemetry.addLine("shooting distance: " + distance);
+        telemetry.addLine("shooting tolerance: " + tol);
+    }
+
     public void move(float x, float y, float turn) {
         if (Math.abs(x) <= stick_margin) x = 0f;
         if (Math.abs(y) <= stick_margin) y = 0f;
         if (Math.abs(turn) <= stick_margin) turn = 0f;
 
-        drive.move(-x * normalPower, y * normalPower, -turn * normalPower);
+        drive.move(-x * normalPower, y * normalPower, turn * normalPower);
     }
 }

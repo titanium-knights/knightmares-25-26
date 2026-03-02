@@ -48,9 +48,9 @@ public class Outtake {
         outtakeMotor1.setPower(-0.7);
     }
     public void shootAtDistance(double distance) {
-        double minDistance = 24.0;  // inches
-        double maxDistance = 130.0;  // inches
-        double minPower = 0.60;
+        double minDistance = 0.7;  // inches
+        double maxDistance = 3.45;  // inches
+        double minPower = 0.52;
         double maxPower = 0.85;
 
         double power = minPower + (maxPower - minPower) *
@@ -62,7 +62,6 @@ public class Outtake {
 
         telemetry.addLine("shooting distance: " + distance);
         telemetry.addLine("shooting power: " + power);
-        telemetry.update();
     }
 
     public void shoot(double power) {
