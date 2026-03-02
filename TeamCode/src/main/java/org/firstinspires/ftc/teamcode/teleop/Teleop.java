@@ -149,6 +149,12 @@ public class Teleop extends OpMode {
 
         int colorValue = readColorSensor();
 
+        if (storer.runScan(colorValue)) {
+            telemetry.addData("Status", "Scanning slots...");
+            telemetry.update();
+            return;
+        }
+
         storer.track(colorValue);
 
         telemetry.addData("Slots", "[%d, %d, %d]",
