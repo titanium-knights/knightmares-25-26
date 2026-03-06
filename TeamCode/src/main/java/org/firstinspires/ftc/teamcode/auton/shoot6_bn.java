@@ -151,24 +151,24 @@ public class shoot6_bn extends OpMode {
                 break;
 
             case 4: // Complex Sequence
-                if (pathTimer.getElapsedTimeSeconds() > 7.4) {
+                if (pathTimer.getElapsedTimeSeconds() > 8) {
                     outtake.stopOuttake();
                     intake.run();
                     follower.followPath(paths.Path3);
                     setPathState(5);
-                } else if (pathTimer.getElapsedTimeSeconds() > 6.2) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 7.8) {
                     intake.pullBall();
+                } else if (pathTimer.getElapsedTimeSeconds() > 6.6) {
+                    intake.pushBall();
                 } else if (pathTimer.getElapsedTimeSeconds() > 5.8) {
-                    intake.pushBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 5.0) {
                     storer.toThree();
-                } else if (pathTimer.getElapsedTimeSeconds() > 4.2) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 5.0) {
                     intake.pullBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 3.4) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 3.8) {
                     intake.pushBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 2.6) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 3.0) {
                     storer.toTwo();
-                } else if (pathTimer.getElapsedTimeSeconds() > 1.8) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 2.2) {
                     intake.pullBall();
                 } else if (pathTimer.getElapsedTimeSeconds() > 1) {
                     intake.pushBall();
@@ -179,7 +179,7 @@ public class shoot6_bn extends OpMode {
 
             case 5:
                 if (!follower.isBusy()) {
-                    follower.setMaxPower(0.4);
+                    follower.setMaxPower(0.1);
                     follower.followPath(paths.line4);
                     setPathState(6);
                 }
