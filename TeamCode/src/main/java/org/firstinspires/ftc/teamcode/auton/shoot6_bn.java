@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.auton;
 
+import com.bylazar.ftcontrol.panels.plugins.html.primitives.P;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -76,7 +77,7 @@ public class shoot6_bn extends OpMode {
     }
 
     public static class Paths {
-        public PathChain Path1, Path2, Path3, line4, Path5, Path6, Path7;
+        public PathChain Path1, Path2, Path3, line4, Path5, Path6, Path7, Path8, line9, Path10, Path11;
 
         public Paths(Follower follower) {
             Path1 = follower.pathBuilder().addPath(new BezierLine(new Pose(26, 130), new Pose(57, 100)))
@@ -85,20 +86,32 @@ public class shoot6_bn extends OpMode {
             Path2 = follower.pathBuilder().addPath(new BezierLine(new Pose(57, 100), new Pose(58, 100)))
                     .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(148)).build();
 
-            Path3 = follower.pathBuilder().addPath(new BezierLine(new Pose(58, 100), new Pose(41, 84)))
+            Path3 = follower.pathBuilder().addPath(new BezierLine(new Pose(58, 100), new Pose(39, 84)))
                     .setLinearHeadingInterpolation(Math.toRadians(148), Math.toRadians(180)).build();
 
-            line4 = follower.pathBuilder().addPath(new BezierLine(new Pose(41, 84), new Pose(36, 84)))
+            line4 = follower.pathBuilder().addPath(new BezierLine(new Pose(39, 84), new Pose(35, 84)))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180)).build();
 
-            Path5 = follower.pathBuilder().addPath(new BezierLine(new Pose(36, 84), new Pose(32.5, 84)))
+            Path5 = follower.pathBuilder().addPath(new BezierLine(new Pose(35, 84), new Pose(32, 84)))
                     .setTangentHeadingInterpolation().build();
 
-            Path6 = follower.pathBuilder().addPath(new BezierLine(new Pose(32.5, 84), new Pose(24, 84)))
+            Path6 = follower.pathBuilder().addPath(new BezierLine(new Pose(32, 84), new Pose(24, 84)))
                     .setTangentHeadingInterpolation().build();
 
             Path7 = follower.pathBuilder().addPath(new BezierLine(new Pose(24, 84), new Pose(57, 100)))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(140)).build();
+
+            Path8 = follower.pathBuilder().addPath(new BezierLine(new Pose(57, 100), new Pose(39, 60)))
+                    .setLinearHeadingInterpolation(Math.toRadians(140), Math.toRadians(180)).build();
+
+            line9 = follower.pathBuilder().addPath(new BezierLine(new Pose(39, 60), new Pose(35, 60)))
+                    .setLinearHeadingInterpolation(Math.toRadians(140), Math.toRadians(180)).build();
+
+            Path10 = follower.pathBuilder().addPath(new BezierLine(new Pose(35, 60), new Pose(32, 60)))
+                    .setTangentHeadingInterpolation().build();
+
+            Path11 = follower.pathBuilder().addPath(new BezierLine(new Pose(32, 60), new Pose(24, 60)))
+                    .setTangentHeadingInterpolation().build();
         }
     }
 
@@ -129,6 +142,7 @@ public class shoot6_bn extends OpMode {
                 if (!follower.isBusy()) {
                     // Path2 done, robot is at 144° — start complex sequence
                     outtake.shoot();
+
                     setPathState(3);
                 } else {
                     // Still turning, keep trying to read tag if not found yet
@@ -180,7 +194,7 @@ public class shoot6_bn extends OpMode {
 
             case 5:
                 if (!follower.isBusy()) {
-                    follower.setMaxPower(0.35);
+                    follower.setMaxPower(0.4);
                     follower.followPath(paths.line4);
                     setPathState(6);
                 }
@@ -190,7 +204,6 @@ public class shoot6_bn extends OpMode {
                 if (!follower.isBusy()) {
                     follower.followPath(paths.Path5);
                     setPathState(7);
-                    storer.toTwo();
                 }
                 break;
 
@@ -198,7 +211,8 @@ public class shoot6_bn extends OpMode {
                 if (!follower.isBusy()) {
                     follower.followPath(paths.Path6);
                     setPathState(8);
-                    storer.toThree();
+                } else {
+                    storer.toTwo();
                 }
                 break;
 
@@ -206,39 +220,73 @@ public class shoot6_bn extends OpMode {
                 if (!follower.isBusy()) {
                     follower.setMaxPower(1.0);
                     intake.stopIntake();
+                    outtake.shoot();
                     follower.followPath(paths.Path7);
                     setPathState(9);
+                } else {
+                    storer.toThree();
                 }
                 break;
 
-            case 9: // Complex Sequence
-                if (pathTimer.getElapsedTimeSeconds() > 7.4) {
+            case 9: // Shooting Buffer
+                if (pathTimer.getElapsedTimeSeconds() > 4) {
+                    setPathState(10);
+                }
+                break;
+
+            case 10: // Complex Sequence
+                if (pathTimer.getElapsedTimeSeconds() > 7.2) {
+                    storer.toOne();
                     outtake.stopOuttake();
                     intake.run();
-                    follower.followPath(paths.Path3);
-                    setPathState(10);
-                } else if (pathTimer.getElapsedTimeSeconds() > 6.2) {
+                    follower.followPath(paths.Path8);
+                    setPathState(11);
+                } else if (pathTimer.getElapsedTimeSeconds() > 6.4) {
                     intake.pullBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 5.8) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 5.2) {
                     intake.pushBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 5.0) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 4.8) {
                     storer.toThree();
-                } else if (pathTimer.getElapsedTimeSeconds() > 4.2) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 4.0) {
                     intake.pullBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 3.4) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 2.8) {
                     intake.pushBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 2.6) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 2.4) {
                     storer.toTwo();
-                } else if (pathTimer.getElapsedTimeSeconds() > 1.8) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 1.6) {
                     intake.pullBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 1) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 0.4) {
                     intake.pushBall();
                 } else {
                     storer.toOne();
                 }
                 break;
 
-            case 10: // Final check
+            case 11:
+                if (!follower.isBusy()) {
+                    follower.setMaxPower(0.4);
+                    follower.followPath(paths.line9);
+                    setPathState(12);
+                }
+                break;
+
+            case 12:
+                if (!follower.isBusy()) {
+                    follower.followPath(paths.Path10);
+                    setPathState(13);
+                }
+                break;
+
+            case 13: // Driving Path5
+                if (!follower.isBusy()) {
+                    follower.followPath(paths.Path11);
+                    setPathState(14);
+                } else {
+                    storer.toTwo();
+                }
+                break;
+
+            case 14: // Final check
                 if (!follower.isBusy()) {
                     setPathState(-1);
                 }
