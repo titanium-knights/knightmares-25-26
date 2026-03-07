@@ -46,29 +46,29 @@ public class TestBenchColor {
 //        telemetry.addData("blue", normBlue2);
 
         double lowboundRedP, lowboundGreenP, lowboundBlueP;
-        lowboundRedP = 0.19324914922263414;
-        lowboundGreenP = 0.4933766266789853;
-        lowboundBlueP = 0.3658716642056435;
+        lowboundRedP = 0.2761;
+        lowboundGreenP = 0.3759;
+        lowboundBlueP = 0.4301;
 
         double highboundRedP, highboundGreenP, highboundBlueP;
-        highboundRedP = 0.2783390860714835;
-        highboundGreenP = 0.5814939615563087;
-        highboundBlueP = 0.4429636299120035;
+        highboundRedP = 0.3622;
+        highboundGreenP = 0.5227;
+        highboundBlueP = 0.5170;
 
         double lowboundRedG, lowboundGreenG, lowboundBlueG;
-        lowboundRedG = 0.2602375054861798;
-        lowboundGreenG = 0.34857312230581816;
-        lowboundBlueG = 0.41227083642843665;
+        lowboundRedG = 0.2031;
+        lowboundGreenG = 0.2031;
+        lowboundBlueG = 0.3758;
 
         double highboundRedG, highboundGreenG, highboundBlueG;
-        highboundRedG = 0.33320864835997405;
-        highboundGreenG = 0.46428841615572036;
-        highboundBlueG = 0.4816060866484865;
+        highboundRedG = 0.2809;
+        highboundGreenG = 0.5937;
+        highboundBlueG = 0.4486;
 
 
         /*
-        PURPLE = {'red': 0.19324914922263414, 'green': 0.4933766266789853, 'blue': 0.3658716642056435} to {'red': 0.2783390860714835, 'green': 0.5814939615563087, 'blue': 0.4429636299120035}
-        GREEN = {'red': 0.2602375054861798, 'green': 0.34857312230581816, 'blue': 0.41227083642843665} to {'red': 0.33320864835997405, 'green': 0.46428841615572036, 'blue': 0.4816060866484865}
+        GREEN = Optimal Range (1 Std): {'red': 0.20317296871737778, 'green': 0.5071065338674015, 'blue': 0.3758602966363657} to {'red': 0.28095295720854824, 'green': 0.5937156883548207, 'blue': 0.4486508144747455}
+        PURPLE = Optimal Range (1 Std): {'red': 0.27610521219442485, 'green': 0.37590743470879934, 'blue': 0.4301736147680556} to {'red': 0.36221330632409354, 'green': 0.522737009735645, 'blue': 0.5170115704171295}
         nothing = 0.4655, 0.7672, 0.5845
          */
 
