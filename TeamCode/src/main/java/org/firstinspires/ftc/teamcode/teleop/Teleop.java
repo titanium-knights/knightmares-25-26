@@ -54,6 +54,8 @@ public class Teleop extends OpMode {
     private double lastError = 0.0;
     private double lastTime;
 
+    private boolean dpadDownWasPressed = false;
+
     enum ButtonPressState {
         PRESSED_GOOD,
         DEPRESSED,
@@ -164,8 +166,14 @@ public class Teleop extends OpMode {
         if (gamepad1.dpad_left) storer.goToColor(1);
         else if (gamepad1.dpad_up) storer.goToColor(0);
         else if (gamepad1.dpad_right) storer.goToColor(2);
-        else if (gamepad1.right_stick_x < -0.1) storer.rotateLeft();
+        else if (gamepad1.dpad_down) {
+            if (!dpadDownWasPressed) {
+                storer.nextSlot();
+                dpadDownWasPressed = true;
+            }
+        }
         else if (gamepad1.right_stick_x > 0.1) storer.rotateRight();
+        else dpadDownWasPressed = false;
 
         if (gamepad1.b) storer.overridePos(storer.getPosition());
 

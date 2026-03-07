@@ -13,9 +13,11 @@ public class Storer {
     Servo storerServo;
 
     static final double SLOT_SPACING = 0.232;
-    double inpos1 = 0.0;
+    double inpos1 = 0.1178;
     double inpos2 = inpos1 + SLOT_SPACING;
     double inpos3 = inpos2 + SLOT_SPACING;
+    int currPos = 0;
+    int currentSlotTarget = 0;
 
     // 0 = empty, 1 = green, 2 = purple
     int[] slots = {0, 0, 0};
@@ -55,10 +57,6 @@ public class Storer {
         inpos3 = inpos2 + SLOT_SPACING;
     }
 
-    public void home() {
-        storerServo.setPosition(inpos1);
-    }
-
     public void toOne(){
         storerServo.setPosition(inpos1);
     }
@@ -69,6 +67,15 @@ public class Storer {
 
     public void toThree(){
         storerServo.setPosition(inpos3);
+    }
+
+    public void nextSlot() {
+        currentSlotTarget = (currentSlotTarget + 1) % 3;
+        switch (currentSlotTarget) {
+            case 0: toOne(); break;
+            case 1: toTwo(); break;
+            case 2: toThree(); break;
+        }
     }
 
     public double getPosition() {
