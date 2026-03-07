@@ -37,24 +37,45 @@ public class TestBenchColor {
         normBlue2 = colors2.blue / colors2.alpha * 10;
         normGreen2 = colors2.green / colors2.alpha * 10;
 
-        telemetry.addData("red", normRed1);
-        telemetry.addData("green", normGreen1);
-        telemetry.addData("blue", normBlue1);
+//        telemetry.addData("red", normRed1);
+//        telemetry.addData("green", normGreen1);
+//        telemetry.addData("blue", normBlue1);
+//
+//        telemetry.addData("red", normRed2);
+//        telemetry.addData("green", normGreen2);
+//        telemetry.addData("blue", normBlue2);
 
-        telemetry.addData("red", normRed2);
-        telemetry.addData("green", normGreen2);
-        telemetry.addData("blue", normBlue2);
+        double lowboundRedP, lowboundGreenP, lowboundBlueP;
+        lowboundRedP = 0.19324914922263414;
+        lowboundGreenP = 0.4933766266789853;
+        lowboundBlueP = 0.3658716642056435;
+
+        double highboundRedP, highboundGreenP, highboundBlueP;
+        highboundRedP = 0.2783390860714835;
+        highboundGreenP = 0.5814939615563087;
+        highboundBlueP = 0.4429636299120035;
+
+        double lowboundRedG, lowboundGreenG, lowboundBlueG;
+        lowboundRedG = 0.2602375054861798;
+        lowboundGreenG = 0.34857312230581816;
+        lowboundBlueG = 0.41227083642843665;
+
+        double highboundRedG, highboundGreenG, highboundBlueG;
+        highboundRedG = 0.33320864835997405;
+        highboundGreenG = 0.46428841615572036;
+        highboundBlueG = 0.4816060866484865;
+
 
         /*
-        PURPLE = <0.35, >0.35, <0.5
-        GREEN = 0.35, 0.62, 0.4675
+        PURPLE = {'red': 0.19324914922263414, 'green': 0.4933766266789853, 'blue': 0.3658716642056435} to {'red': 0.2783390860714835, 'green': 0.5814939615563087, 'blue': 0.4429636299120035}
+        GREEN = {'red': 0.2602375054861798, 'green': 0.34857312230581816, 'blue': 0.41227083642843665} to {'red': 0.33320864835997405, 'green': 0.46428841615572036, 'blue': 0.4816060866484865}
         nothing = 0.4655, 0.7672, 0.5845
          */
 
-        if ((normRed1 < 0.35 && normRed1 > 0.25 && normGreen1 > 0.35 && normGreen1 < 0.50 && normBlue1 < 0.50 && normBlue1 > 0.40) || (normRed2 < 0.35 && normRed2 > 0.25 && normGreen2 > 0.35 && normGreen2 < 0.50 && normBlue2 < 0.50 && normBlue2 > 0.40)) {
+        if ((normRed1 < highboundRedP && normRed1 > lowboundRedP && normGreen1 > lowboundGreenP && normGreen1 < highboundGreenP && normBlue1 < highboundBlueP && normBlue1 > lowboundBlueP) || (normRed2 < highboundRedP && normRed2 > lowboundRedP && normGreen2 > lowboundGreenP && normGreen2 < highboundGreenP && normBlue2 < highboundBlueP && normBlue2 > lowboundBlueP)) {
             return detectedColor.PURPLE;
         }
-        else if ((normRed1 < 0.4 && normRed1 > 0.15 && normGreen1 > 0.50 && normGreen1 < 0.65 && normBlue1 > 0.35 && normBlue1 < 0.50) || (normRed2 < 0.4 && normRed2 > 0.2 && normGreen2 > 0.50 && normGreen2 < 0.65 && normBlue2 > 0.35 && normBlue2 < 0.50)) {
+        else if ((normRed1 < highboundRedG && normRed1 > lowboundRedG && normGreen1 > lowboundGreenG && normGreen1 < highboundGreenG && normBlue1 > lowboundBlueG && normBlue1 < highboundBlueG) || (normRed2 < highboundRedG && normRed2 > lowboundRedG && normGreen2 > lowboundGreenG && normGreen2 < highboundGreenG && normBlue2 > lowboundBlueG && normBlue2 < highboundBlueG)) {
             return detectedColor.GREEN;
         }
         else {
