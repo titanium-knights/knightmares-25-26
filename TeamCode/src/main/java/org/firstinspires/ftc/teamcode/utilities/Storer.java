@@ -13,7 +13,7 @@ public class Storer {
     Servo storerServo;
 
     static final double SLOT_SPACING = 0.232;
-    double inpos1 = 0.177;
+    double inpos1 = 0.0828;
     double inpos2 = inpos1 + SLOT_SPACING;
     double inpos3 = inpos2 + SLOT_SPACING;
 
