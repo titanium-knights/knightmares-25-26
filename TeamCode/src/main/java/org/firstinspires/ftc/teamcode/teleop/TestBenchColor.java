@@ -45,32 +45,26 @@ public class TestBenchColor {
         telemetry.addData("green", normGreen2);
         telemetry.addData("blue", normBlue2);
 
-        double lowboundRedP, lowboundGreenP, lowboundBlueP;
-        lowboundRedP = 0.2761;
-        lowboundGreenP = 0.3759;
-        lowboundBlueP = 0.4301;
+        // Purple telemetry: red=[0.284,0.2944] green=[0.3268,0.3754] blue=[0.4273,0.4636]
+        double lowboundRedP = 0.25;
+        double lowboundGreenP = 0.29;
+        double lowboundBlueP = 0.39;
 
-        double highboundRedP, highboundGreenP, highboundBlueP;
-        highboundRedP = 0.3622;
-        highboundGreenP = 0.5227;
-        highboundBlueP = 0.5170;
+        double highboundRedP = 0.33;
+        double highboundGreenP = 0.41;
+        double highboundBlueP = 0.50;
 
-        double lowboundRedG, lowboundGreenG, lowboundBlueG;
-        lowboundRedG = 0.2031;
-        lowboundGreenG = 0.2031;
-        lowboundBlueG = 0.3758;
+        // Green telemetry: red=[0.3736,0.3913] green=[0.6127,0.6272] blue=[0.4064,0.4433]
+        double lowboundRedG = 0.34;
+        double lowboundGreenG = 0.58;
+        double lowboundBlueG = 0.37;
 
-        double highboundRedG, highboundGreenG, highboundBlueG;
-        highboundRedG = 0.2809;
-        highboundGreenG = 0.5937;
-        highboundBlueG = 0.4486;
+        double highboundRedG = 0.42;
+        double highboundGreenG = 0.66;
+        double highboundBlueG = 0.48;
 
-
-        /*
-        PURPLE = Optimal Range (1 Std): {'red': 0.27610521219442485, 'green': 0.37590743470879934, 'blue': 0.4301736147680556} to {'red': 0.36221330632409354, 'green': 0.522737009735645, 'blue': 0.5170115704171295}
-        GREEN = Optimal Range (1 Std): {'red': 0.20317296871737778, 'green': 0.5071065338674015, 'blue': 0.3758602966363657} to {'red': 0.28095295720854824, 'green': 0.5937156883548207, 'blue': 0.4486508144747455}
-        nothing = 0.4655, 0.7672, 0.5845
-         */
+        // Empty telemetry: red=[0.3147,0.4539] green=[0.4431,0.5364] blue=[0.2804,0.3301]
+        // Empty excluded by: green too low for Green range, blue too low for Purple range
 
         if ((normRed1 < highboundRedP && normRed1 > lowboundRedP && normGreen1 > lowboundGreenP && normGreen1 < highboundGreenP && normBlue1 < highboundBlueP && normBlue1 > lowboundBlueP) || (normRed2 < highboundRedP && normRed2 > lowboundRedP && normGreen2 > lowboundGreenP && normGreen2 < highboundGreenP && normBlue2 < highboundBlueP && normBlue2 > lowboundBlueP)) {
             telemetry.addData("Detected Color", "Purple");
