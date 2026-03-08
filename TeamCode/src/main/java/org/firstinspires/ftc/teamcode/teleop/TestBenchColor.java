@@ -66,13 +66,13 @@ public class TestBenchColor {
         // Empty telemetry: red=[0.3147,0.4539] green=[0.4431,0.5364] blue=[0.2804,0.3301]
         // Empty excluded by: green too low for Green range, blue too low for Purple range
 
-        if ((normRed1 < highboundRedP && normRed1 > lowboundRedP && normGreen1 > lowboundGreenP && normGreen1 < highboundGreenP && normBlue1 < highboundBlueP && normBlue1 > lowboundBlueP) || (normRed2 < highboundRedP && normRed2 > lowboundRedP && normGreen2 > lowboundGreenP && normGreen2 < highboundGreenP && normBlue2 < highboundBlueP && normBlue2 > lowboundBlueP)) {
-            telemetry.addData("Detected Color", "Purple");
-            return detectedColor.PURPLE;
-        }
-        else if ((normRed1 < highboundRedG && normRed1 > lowboundRedG && normGreen1 > lowboundGreenG && normGreen1 < highboundGreenG && normBlue1 > lowboundBlueG && normBlue1 < highboundBlueG) || (normRed2 < highboundRedG && normRed2 > lowboundRedG && normGreen2 > lowboundGreenG && normGreen2 < highboundGreenG && normBlue2 > lowboundBlueG && normBlue2 < highboundBlueG)) {
+        if ((normRed1 < highboundRedG && normRed1 > lowboundRedG && normGreen1 > lowboundGreenG && normGreen1 < highboundGreenG && normBlue1 > lowboundBlueG && normBlue1 < highboundBlueG) || (normRed2 < highboundRedG && normRed2 > lowboundRedG && normGreen2 > lowboundGreenG && normGreen2 < highboundGreenG && normBlue2 > lowboundBlueG && normBlue2 < highboundBlueG)) {
             telemetry.addData("Detected Color", "Green");
             return detectedColor.GREEN;
+        }
+        else if ((normRed1 < highboundRedP && normRed1 > lowboundRedP && normGreen1 > lowboundGreenP && normGreen1 < highboundGreenP && normBlue1 < highboundBlueP && normBlue1 > lowboundBlueP) || (normRed2 < highboundRedP && normRed2 > lowboundRedP && normGreen2 > lowboundGreenP && normGreen2 < highboundGreenP && normBlue2 < highboundBlueP && normBlue2 > lowboundBlueP)) {
+            telemetry.addData("Detected Color", "Purple");
+            return detectedColor.PURPLE;
         }
         else {
             telemetry.addData("Detected Color", "Empty");
