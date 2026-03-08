@@ -37,13 +37,13 @@ public class TestBenchColor {
         normBlue2 = colors2.blue / colors2.alpha * 10;
         normGreen2 = colors2.green / colors2.alpha * 10;
 
-//        telemetry.addData("red", normRed1);
-//        telemetry.addData("green", normGreen1);
-//        telemetry.addData("blue", normBlue1);
-//
-//        telemetry.addData("red", normRed2);
-//        telemetry.addData("green", normGreen2);
-//        telemetry.addData("blue", normBlue2);
+        telemetry.addData("red", normRed1);
+        telemetry.addData("green", normGreen1);
+        telemetry.addData("blue", normBlue1);
+
+        telemetry.addData("red", normRed2);
+        telemetry.addData("green", normGreen2);
+        telemetry.addData("blue", normBlue2);
 
         double lowboundRedP, lowboundGreenP, lowboundBlueP;
         lowboundRedP = 0.2761;

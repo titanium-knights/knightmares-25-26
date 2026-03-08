@@ -170,6 +170,7 @@ public class Teleop extends OpMode {
         else if (gamepad1.y) storer.toTwo();
         else if (gamepad1.b) storer.toThree();
         else if (gamepad1.right_stick_x > 0.1) storer.rotateRight();
+        else if (gamepad1.right_stick_x < -0.1) storer.rotateLeft();
         else dpadDownWasPressed = false;
 
         if (gamepad1.a) storer.overridePos(storer.getPosition());

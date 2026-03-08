@@ -171,33 +171,33 @@ public class shoot6_bn extends OpMode {
                 break;
 
             case 4: // Complex Sequence
-                if (pathTimer.getElapsedTimeSeconds() > 6.0) {
+                if (pathTimer.getElapsedTimeSeconds() > 6.6) {
                     storer.toOne();
                     outtake.stopOuttake();
                     intake.run();
                     follower.followPath(paths.Path3);
                     setPathState(5);
-                } else if (pathTimer.getElapsedTimeSeconds() > 5.6) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 6.2) {
                     intake.pullBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 4.4) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 5.0) {
                     intake.pushBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 4.0) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 4.4) {
                     if (detectedAprilTagId==21) storer.toOne();
                     else if (detectedAprilTagId==22) storer.toTwo();
                     else if (detectedAprilTagId==23) storer.toThree();
                     else storer.toOne();
-                } else if (pathTimer.getElapsedTimeSeconds() > 3.6) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 4.0) {
                     intake.pullBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 2.4) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 2.8) {
                     intake.pushBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 2.0) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 2.2) {
                     if (detectedAprilTagId==23) storer.toOne();
                     else if (detectedAprilTagId==21) storer.toTwo();
                     else if (detectedAprilTagId==22) storer.toThree();
                     else storer.toTwo();
-                } else if (pathTimer.getElapsedTimeSeconds() > 1.6) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 1.8) {
                     intake.pullBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 0.4) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 0.6) {
                     intake.pushBall();
                 } else {
                     if (detectedAprilTagId==22) storer.toOne();
@@ -261,33 +261,33 @@ public class shoot6_bn extends OpMode {
                 break;
 
             case 10: // Complex Sequence
-                if (pathTimer.getElapsedTimeSeconds() > 6.2) {
+                if (pathTimer.getElapsedTimeSeconds() > 6.8) {
                     storer.toOne();
                     outtake.stopOuttake();
                     intake.run();
                     follower.followPath(paths.Path8);
                     setPathState(11);
-                } else if (pathTimer.getElapsedTimeSeconds() > 5.8) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 6.4) {
                     intake.pullBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 4.6) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 5.2) {
                     intake.pushBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 4.2) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 4.6) {
                     if (detectedAprilTagId==21) storer.toOne();
                     else if (detectedAprilTagId==22) storer.toTwo();
                     else if (detectedAprilTagId==23) storer.toThree();
                     else storer.toOne();
-                } else if (pathTimer.getElapsedTimeSeconds() > 3.8) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 4.2) {
                     intake.pullBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 2.4) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 2.8) {
                     intake.pushBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 2.0) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 2.2) {
                     if (detectedAprilTagId==23) storer.toOne();
                     else if (detectedAprilTagId==21) storer.toTwo();
                     else if (detectedAprilTagId==22) storer.toThree();
                     else storer.toTwo();
-                } else if (pathTimer.getElapsedTimeSeconds() > 1.6) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 1.8) {
                     intake.pullBall();
-                } else if (pathTimer.getElapsedTimeSeconds() > 0.4) {
+                } else if (pathTimer.getElapsedTimeSeconds() > 0.6) {
                     intake.pushBall();
                 } else {
                     if (detectedAprilTagId==22) storer.toOne();
