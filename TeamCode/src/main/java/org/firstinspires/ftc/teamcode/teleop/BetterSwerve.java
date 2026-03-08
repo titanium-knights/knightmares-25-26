@@ -16,7 +16,7 @@ public class BetterSwerve extends LinearOpMode {
     BetterSwerveDrive drive;
     GoBildaPinpointDriver odo;
 
-    float stick_margin = 0.1f;
+    float stick_margin = 0.15f;
     final double normalPower = 0.9;
     double oldTime = 0;
     private TelemetryManager telemetryM;

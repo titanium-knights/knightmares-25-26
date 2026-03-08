@@ -50,7 +50,7 @@ public class Outtake {
     public void shootAtDistance(double distance) {
         double minDistance = 0.7;  // inches
         double maxDistance = 3.45;  // inches
-        double minPower = 0.52;
+        double minPower = 0.6;
         double maxPower = 0.85;
 
         double power = minPower + (maxPower - minPower) *

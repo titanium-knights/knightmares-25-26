@@ -166,16 +166,13 @@ public class Teleop extends OpMode {
         if (gamepad1.dpad_left) storer.goToColor(1);
         else if (gamepad1.dpad_up) storer.goToColor(0);
         else if (gamepad1.dpad_right) storer.goToColor(2);
-        else if (gamepad1.dpad_down) {
-            if (!dpadDownWasPressed) {
-                storer.nextSlot();
-                dpadDownWasPressed = true;
-            }
-        }
+        else if (gamepad1.x) storer.toOne();
+        else if (gamepad1.y) storer.toTwo();
+        else if (gamepad1.b) storer.toThree();
         else if (gamepad1.right_stick_x > 0.1) storer.rotateRight();
         else dpadDownWasPressed = false;
 
-        if (gamepad1.b) storer.overridePos(storer.getPosition());
+        if (gamepad1.a) storer.overridePos(storer.getPosition());
 
 
         if (limelightTimer.milliseconds() > VISION_POLL_MS) {
